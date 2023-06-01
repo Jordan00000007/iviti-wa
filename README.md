@@ -1,7 +1,7 @@
 ![COVER](./assets/images/iVIT-I-Logo-B.png)
 
 # iVIT-I-Web-Application
-The AI solution provdie by innodisk.
+The AI solution provided by innodisk.
 This project need to go with backend API as following:
 https://github.com/MaxChangInnodisk/ivit-i-web-api-fast
 
