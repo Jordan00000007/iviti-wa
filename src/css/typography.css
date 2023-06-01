@@ -1,0 +1,39 @@
+.roboto-h1 {
+    font-family: 'Roboto Medium';
+    font-size: 32px;
+}
+
+.roboto-h2 {
+    font-family: 'Roboto Medium';
+    font-size: 24px;
+}
+
+.roboto-h3 {
+    font-family: 'Roboto Medium';
+    font-size: 22px;
+}
+
+.roboto-h4 {
+    font-family: 'Roboto Medium';
+    font-size: 20px;
+}
+
+.roboto-h5 {
+    font-family: 'Roboto';
+    font-size: 18px;
+}
+
+.roboto-b1 {
+    font-family: 'Roboto'!important;
+    font-size: 16px!important;
+}
+
+.roboto-b2 {
+    font-family: 'Roboto';
+    font-size: 15px;
+}
+
+.roboto-c {
+    font-family: 'Roboto';
+    font-size: 13px;
+}
