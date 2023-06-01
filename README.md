@@ -15,8 +15,7 @@ https://github.com/MaxChangInnodisk/ivit-i-web-api-fast
 * [Docker 20.10 + ](https://docs.docker.com/engine/install/ubuntu/)
 * [Docker-Compose v2.15.1 ](https://docs.docker.com/compose/install/linux/#install-using-the-repository)
     * you can check via `docker compose version`
-* [NodeJS v18.14.2 ]
-* [NPM v8.5.0 ]
+* [NodeJS v18.14.2 ](https://nodejs.org/en/blog/release/v18.14.2)
 
 
 # Quick Start
