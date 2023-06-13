@@ -18,6 +18,9 @@ const AreaEdit = (props) => {
     const [lineA, setLineA] = useState([]);
     const [lineB, setLineB] = useState([]);
 
+    const [lineASelected, setLineASelected] = useState(false);
+    const [lineBSelected, setLineBSelected] = useState(false);
+
     const [cursorX, setCursorX] = useState(50);
     const [cursorY, setCursorY] = useState(50);
     const [cursorVisible, setCursorVisible] = useState(false);
@@ -40,6 +43,9 @@ const AreaEdit = (props) => {
     const drawHeight = useSelector((state) => state.sources.drawHeight);
 
     const dispatch = useDispatch();
+
+    const lineARef = useRef();
+    const lineBRef = useRef();
 
     const trans = (org) => {
         let ans = [];
@@ -110,7 +116,6 @@ const AreaEdit = (props) => {
         }
         return minItem;
     }
-
 
     const getLabelX = (polygons,myText) => {
 
@@ -330,13 +335,15 @@ const AreaEdit = (props) => {
 
                     {/* Line A for display */}
                     <Line
-                        strokeWidth={3}
+                        strokeWidth={lineASelected?5:3}
                         stroke="blue"
                         opacity={1}
                         lineJoin="round"
                         Draggable={props.lineMode}
                         points={(lineADrawing) ? transLineA.concat([nextPointA.x, nextPointA.y]) : transLineA}
                         onClick={event => {
+                            log('line A click')
+                            setLineASelected(true);
                         }}
                         onDragMove={event => {
                             setStopBubble(true);
@@ -345,6 +352,7 @@ const AreaEdit = (props) => {
 
                         }}
                         closed={false}
+                        ref={lineARef}
                     /> 
 
                     {/* Line B for display */}
@@ -358,6 +366,7 @@ const AreaEdit = (props) => {
                         onClick={event => {
                         }}
                         closed={false}
+                        ref={lineBRef}
                     />
 
                      {/* Editing Cursor Node */}
@@ -474,7 +483,6 @@ const AreaEdit = (props) => {
                     </Line>
 
                     {/* Edit Polygon Label */}
-                    {/* <Label x={getLabelX() + 15} y={getLabelY() - 40}> */}
                     <Label x={getLabelX(polygons,areaName)} y={getLabelY(polygons)-32}>
                         <Tag
                             fill={'white'}
@@ -632,6 +640,10 @@ const AreaEdit = (props) => {
                                 const y = event.evt.offsetY;
                                 tmp[order].x = x;
                                 tmp[order].y = y;
+                                if (tmp[order].x<0) tmp[order].x=0;
+                                if (tmp[order].x>drawWidth) tmp[order].x=drawWidth
+                                if (tmp[order].y<0) tmp[order].y=0;
+                                if (tmp[order].y>drawHeight) tmp[order].y=drawHeight
                                 setLineA(tmp);
                                 setTransLineA(trans(tmp));
                                 if (order === 1) {
@@ -641,7 +653,22 @@ const AreaEdit = (props) => {
                             }}
                             onDragEnd={event => {
                            
+                                //dispatch(lineAUpdate(transLineA));
+                                log('line a node drag end...')
+                                log(transLineA)
+                                if (transLineA[0]<0) transLineA[0]=0;
+                                if (transLineA[0]>drawWidth) transLineA[0]=drawWidth
+                                if (transLineA[1]<0) transLineA[1]=0;
+                                if (transLineA[1]>drawHeight) transLineA[1]=drawHeight
+                                if (transLineA[2]<0) transLineA[2]=0;
+                                if (transLineA[2]>drawWidth) transLineA[2]=drawWidth
+                                if (transLineA[3]<0) transLineA[3]=0;
+                                if (transLineA[3]>drawHeight) transLineA[3]=drawHeight
                                 dispatch(lineAUpdate(transLineA));
+
+                                lineARef.current.moveToTop();
+                                
+                        
                             }}
                         />
                     ))}
@@ -674,7 +701,7 @@ const AreaEdit = (props) => {
 
                     {/* Line B Node*/}
                     {
-                     (props.mode==='line') &&
+                    (props.mode==='line') &&
                     lineB.map((item, idx) => (
                         <Circle
                             key={idx}

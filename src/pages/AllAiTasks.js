@@ -29,7 +29,7 @@ function AllAiTasks() {
 
         setShowType(showType);
         setShowText(showText);
-        alertRef.current.setShowTrue();
+        alertRef.current.setShowTrue(1000);
 
     };
 

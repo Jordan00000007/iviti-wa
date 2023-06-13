@@ -1,7 +1,4 @@
 import {ReactComponent as Logo} from '../../assets/logo.svg';
-import { Link } from 'react-router-dom';
-
-
 
 function CustomHeader() {
 
@@ -18,9 +15,7 @@ function CustomHeader() {
 
             <div className="row p-0 g-0">
                 <div className="col-12 p-0" onClick={handleClick}>
-                    
                     <Logo />
-                    
                 </div>
             </div>
 

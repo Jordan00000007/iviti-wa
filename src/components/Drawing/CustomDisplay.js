@@ -167,9 +167,10 @@ const CustomDisplay = (props) => {
                         tmpAreaArr.push(Math.round(item2[0] * drawWidth))
                         tmpAreaArr.push(Math.round(item2[1] * drawHeight))
                     });
+                    myAreaPointArr.push(tmpAreaArr);
                 }
               
-                myAreaPointArr.push(tmpAreaArr);
+               
                 //-----------------------------------------
                 let tmpLineNameArr = [];
                 if (item.line_relation) {
@@ -199,6 +200,7 @@ const CustomDisplay = (props) => {
             setLineNameArr(myLineNameArr);
             setLinePointArr(myLinePointArr);
             log(myAreaNameArr)
+            log('------myAreaPointArr')
             log(myAreaPointArr)
             log(myLineNameArr)
             log(myLinePointArr)
@@ -262,8 +264,8 @@ const CustomDisplay = (props) => {
                                     closed={false}
                                 />
                                 
-                                     
-                                
+                                {
+                                    (areaPointArr.length > 0) &&
                                     <Label x={getLabelX(item, areaNameArr[idx])} y={getLabelY(item) - 32} key={`label_${idx}`} >
                                         <Tag
                                             key={`tag_${idx}`}
@@ -284,7 +286,7 @@ const CustomDisplay = (props) => {
 
                                         />
                                     </Label>
-                                
+                                }
                                 {
                                     (linePointArr.length > 0) &&
                                     <Line

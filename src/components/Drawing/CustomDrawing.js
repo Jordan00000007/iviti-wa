@@ -135,10 +135,10 @@ export default function App(props) {
    
 
     return (
-        <div style={{width:804,height:558,background:'var(--stream_empty)'}}  className="d-flex align-items-center justify-content-center">
+        <div style={{width:(props.basicType)?854:804,height:558,background:'var(--stream_empty)'}}  className="d-flex align-items-center justify-content-center">
             <Stage
                 height={props.height}
-                width={props.width}
+                width={(props.basicType)?854:props.width}
                 className={(props.mode!=='select')?"custom-cursor":"arrow"}
                
             >
@@ -146,9 +146,10 @@ export default function App(props) {
                     <Image image={image} />
                    
                     
-                        
-                    <AreaDisplay areaShapeArr={areaShapeArr} areaEditingIndex={areaEditingIndex} editMode={editMode} mode={props.mode} showAppSetting={props.showAppSetting}/>
-                    
+                    {
+                        (!props.basicType) &&
+                        <AreaDisplay areaShapeArr={areaShapeArr} areaEditingIndex={areaEditingIndex} editMode={editMode} mode={props.mode} showAppSetting={props.showAppSetting}/>
+                    }
 
                     {
                         (addMode) &&

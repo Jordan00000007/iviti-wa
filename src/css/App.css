@@ -30,7 +30,7 @@ div::-webkit-scrollbar-thumb {
 }
 
 .my-body::-webkit-scrollbar {
-    width: 6px;
+    width: 12px;
 }
 
 .my-body::-webkit-scrollbar-track {
@@ -114,6 +114,11 @@ div::-webkit-scrollbar-thumb {
     background-color: var(--highlight_1);
     color: var(--bs-white);
     padding: 0px 83px 0px 83px;
+
+}
+
+body{
+    overflow:hidden;
 }
 
 .my-body {

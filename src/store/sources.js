@@ -52,6 +52,9 @@ export const getSourceFrame = createAsyncThunk('sources/getSourceFrame', async (
         myData.height=fileSetHeight;
         myData.width=fileSetWidth;
 
+        log('url=')
+        log(`${TASK_URL}/sources/${fileUid}/frame`)
+
         const response = await fetch(`${TASK_URL}/sources/${fileUid}/frame`, {
             method: 'POST',
             headers: {
@@ -130,8 +133,7 @@ const sourcesSlice = createSlice({
             }
             state.drawWidth=drawWidth;
             state.drawHeight=drawHeight;
-          
-         
+             
         }
     },
     extraReducers: (builder) => {
@@ -144,6 +146,7 @@ const sourcesSlice = createSlice({
                 if (action.payload.status_code === 200) {
 
                     log('--- upload source data fulfilled  ---')
+                    log(action.payload.data)
                    
                     state.data = action.payload.data;
                     state.uid = action.payload.data.uid;

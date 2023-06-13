@@ -51,7 +51,7 @@ import { ReactComponent as Image_Default } from '../assets/Image_Default.svg';
 import SourcePanel from '../components/Panel/SourcePanel';
 import DependOnSelectPanel from '../components/Panel/DependOnSelectPanel';
 
-import { getSourceFrame, setSourceId, getSourceWidthHeight, sourcesActions, resetFrameStatus } from "../store/sources";
+import { getSourceFrame, setSourceId, getSourceWidthHeight, sourcesActions, resetFrameStatus,setDrawWidthHeight } from "../store/sources";
 import { areaSelected, areaRename, areaDelete, getAppSetting, setFileWidthHeight, areasActions, lineDataReset, setModelData, resetStatus, setSelectedApplication,setSelectedModel } from "../store/areas";
 import { fetchData, deleteTask, resetError } from "../store/tasks";
 
@@ -348,6 +348,8 @@ function EditAiTask() {
 
             if (value) {
 
+                setShowAppSetting(false)
+
                 if (value.toLowerCase() === 'movement_zone') {
                     setLinePanel(true);
                     const myLinePanel = {};
@@ -383,9 +385,12 @@ function EditAiTask() {
                             fileSetWidth = fileMaxWidth;
                         }
                     }
-                    //------------
+                   
 
                     dispatch(getSourceFrame({ "fileUid": fileUid, "basicType": false }));
+
+
+                  
                     dispatch(initData({ "w": fileSetWidth, "h": fileSetHeight }));
                 }
             }
@@ -999,17 +1004,40 @@ function EditAiTask() {
     useEffect(() => {
         // log('--------------- get source frame ------------------')
         // log('sizeStatus=' + sizeStatus)
-        // log('originWidth=' + originWidth)
-        // log('originHeight=' + originHeight)
+        log('originWidth=' + originWidth)
+        log('originHeight=' + originHeight)
+
+         //------------
+         const fileMaxWidth = 804;
+         const fileMaxHeight = 558;
+         const myWidth = parseInt(originWidth);
+         const myHeight = parseInt(originHeight);
+         let fileSetWidth = Math.trunc((myWidth / myHeight) * fileMaxHeight);
+         let fileSetHeight = Math.trunc((myHeight / myWidth) * fileMaxWidth);
+         if (fileSetWidth <= fileMaxWidth) {
+             fileSetHeight = fileMaxHeight;
+         } else {
+             if (fileSetHeight <= fileMaxHeight) {
+                 fileSetWidth = fileMaxWidth;
+             }
+         }
+        log('drawWidth=' + drawWidth)
+        log('drawHeight=' + drawHeight)
+        log('fileSetWidth=' + fileSetWidth)
+        log('fileSetHeight=' + fileSetHeight)
         // log('sourceId=' + sourceId)
         // log('basicType=' + basicType)
 
-        if ((sizeStatus === 'success') && (originWidth > 0) && (originHeight > 0) && (sourceId !== null)) {
+        if ((sizeStatus === 'success') && (originWidth > 0) && (originHeight > 0) && (fileUid !== '')) {
+            log('(a) fileUid------------')
+            log(fileUid)
            
-            dispatch(getSourceFrame({ "fileUid": sourceId, "basicType": basicType }));
+            dispatch(setDrawWidthHeight({ "maxWidth": 804, "maxHeight": 558 }));
+            dispatch(getSourceFrame({ "fileUid": fileUid, "basicType": basicType }));
+            dispatch(initData({ "w": fileSetWidth, "h": fileSetHeight }));
         }
 
-    }, [sizeStatus, originWidth, originHeight, sourceId]);
+    }, [sizeStatus, originWidth, originHeight, fileUid]);
 
     // [05] handle source frame and fetch app setting
     useEffect(() => {
@@ -1018,8 +1046,8 @@ function EditAiTask() {
         log('areaStatus=' + areaStatus)
         if ((frameStatus === 'success') && (taskUid !== '') && (areaStatus === 'idle')) {
             // log('taskUid=' + taskUid)
-            // log('drawWidth=' + drawWidth)
-            // log('drawHeight=' + drawHeight)
+            log('drawWidth=' + drawWidth)
+            log('drawHeight=' + drawHeight)
             // log('modelData')
             // log(modelData)
             // log('fire fetch app setting-----------------------------')
@@ -1032,6 +1060,13 @@ function EditAiTask() {
             dispatch(areasActions.setSelectedModel({"selectedModel":selectedModel}));
             dispatch(getAppSetting(taskUid));
             dispatch(resetFrameStatus());
+
+            setShowAppSetting(true)
+            
+        }
+
+        if ((frameStatus === 'success') && (areaStatus === 'complete')) {
+            setShowAppSetting(true)
         }
 
     }, [frameStatus]);
@@ -1213,8 +1248,8 @@ function EditAiTask() {
                                 </div>
                                 <div>
 
-                                    <CustomSelectSource name={sourceContent} width="240" height="52" fontSize="16" ref={sourceRef} onListboxOpenChange={handleSourceMenuToggle} placeHolder={true} disabled={(taskUid === '') ? false : true} />
-
+                                    {/* <CustomSelectSource name={sourceContent} width="240" height="52" fontSize="16" ref={sourceRef} onListboxOpenChange={handleSourceMenuToggle} placeHolder={true} disabled={(taskUid === '') ? false : true} /> */}
+                                    <CustomSelectSource name={sourceContent} width="240" height="52" fontSize="16" ref={sourceRef} onListboxOpenChange={handleSourceMenuToggle} placeHolder={true} />
                                 </div>
                                 <div className='position-relative'>
                                     {
@@ -1351,8 +1386,16 @@ function EditAiTask() {
                                                         <Image_Default style={{ width: (basicType) ? 856 : 806, height: 560, background: 'white', border: '0px solid white' }} />
                                                     }
 
+                                                    {/* {
+                                                        ((fileUrl !== '') && (basicType)) &&
+
+                                                        // 
+                                                        <img src={fileUrl}></img>
+                                                    } */}
+
                                                     {
-                                                        ((fileUrl !== '') && (!basicType)) &&
+                                                        // ((fileUrl !== '') && (!basicType)) &&
+                                                        (fileUrl !== '') &&
                                                         <CustomDrawing
                                                             src={fileUrl}
                                                             width={(basicType) ? (drawWidth + 50) : drawWidth}
@@ -1362,16 +1405,12 @@ function EditAiTask() {
                                                             areaArr={areaArr}
                                                             showAppSetting={showAppSetting}
                                                             onDrawLineComplete={handleDrawLineComplete}
+                                                            basicType={basicType}
                                                         >
                                                         </CustomDrawing>
                                                     }
 
-                                                    {
-                                                        ((fileUrl !== '') && (basicType)) &&
-
-                                                        // 
-                                                        <img src={fileUrl}></img>
-                                                    }
+                                                  
                                                 </div>
                                             </td>
                                             <td className='my-area-p3-c'>
@@ -1407,7 +1446,7 @@ function EditAiTask() {
                     }
 
                     {
-                        (!showAppSetting) &&
+                        ((!showAppSetting)&&(taskUid==='')) &&
                         <div className='roboto-b1' style={{ color: 'var(--on_color_2)', padding: '0px 8px' }}>
                             Please complete general section first.
                         </div>

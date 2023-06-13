@@ -102,8 +102,8 @@ const TaskCard = (props) => {
 
         if ("apiSuccess" in myItem)
         {
-            if((myItem.apiSuccess!==undefined)&&(myItem.apiSuccess!==''))
-                props.showMessage(0,myItem.apiSuccess);
+            // if((myItem.apiSuccess!==undefined)&&(myItem.apiSuccess!==''))
+            //     props.showMessage(0,myItem.apiSuccess);
         }
       
 
