@@ -52,7 +52,7 @@ import SourcePanel from '../components/Panel/SourcePanel';
 import DependOnSelectPanel from '../components/Panel/DependOnSelectPanel';
 
 import { getSourceFrame, setSourceId, getSourceWidthHeight, sourcesActions, resetFrameStatus,setDrawWidthHeight } from "../store/sources";
-import { areaSelected, areaRename, areaDelete, getAppSetting, setFileWidthHeight, areasActions, lineDataReset, setModelData, resetStatus, setSelectedApplication,setSelectedModel } from "../store/areas";
+import { areaSelected, areaRename, areaDelete, getAppSetting, setFileWidthHeight, areasActions, lineDataReset, setModelData, resetStatus, setSelectedApplication,setSelectedModel,lineADelete } from "../store/areas";
 import { fetchData, deleteTask, resetError } from "../store/tasks";
 
 
@@ -99,6 +99,7 @@ function EditAiTask() {
     const taskTitleRef = useRef(null);
     const confidenceTitleRef = useRef(null);
     const dependOnTitle = useRef(null);
+    const customDrawingRef= useRef(null);
 
     const KeySRef = useRef(null);
     const KeyERef = useRef(null);
@@ -111,6 +112,8 @@ function EditAiTask() {
     const params = useParams();
 
     const navigate = useNavigate();
+
+ 
 
     const linePanelRef = {
         line1Ref: lineRelation1Ref,
@@ -716,7 +719,14 @@ function EditAiTask() {
 
     const handleDeleteMode = (event) => {
 
-        dispatch(areaDelete());
+       
+        if (mode==='line'){
+            //dispatch(lineADelete());
+            customDrawingRef.current.setLineDelete();
+        }else{
+            dispatch(areaDelete());
+        }
+
     }
 
     const handleChangeMode = (myMode) => {
@@ -1406,6 +1416,7 @@ function EditAiTask() {
                                                             showAppSetting={showAppSetting}
                                                             onDrawLineComplete={handleDrawLineComplete}
                                                             basicType={basicType}
+                                                            ref={customDrawingRef}
                                                         >
                                                         </CustomDrawing>
                                                     }

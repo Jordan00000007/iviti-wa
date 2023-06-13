@@ -70,7 +70,7 @@ const TaskCard = (props) => {
 
     useEffect(() => {
         // Compare the old state with the new state
-        if ((myItem.status==='running')||(myItem.status==='stop')||(myItem.status==='error')) {
+        if ((myItem.status==='running')||(myItem.status==='stop')||(myItem.status.indexOf('error')>=0)) {
             
            setDisabled(false)
         } 

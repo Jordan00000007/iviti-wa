@@ -189,6 +189,14 @@ const areasSlice = createSlice({
             }
            
         },
+        lineADelete(state, action) {
+            log('line A delete')
+            state.linePointArr[state.areaEditingIndex][0]=null;
+        },
+        lineBDelete(state, action) {
+            log('line B delete')
+            state.linePointArr[state.areaEditingIndex][1]=null;
+        },
         lineAUpdate(state, action) {
             log('line A update')
             log(action.payload)
@@ -387,5 +395,5 @@ const areasSlice = createSlice({
     }
 });
 export const areasActions = areasSlice.actions;
-export const { initData, setDependOn, toggleSelectAll, toggleDependOnItem, areaInsert, areaSelected, areaRename, areaUpdate, areaDelete, lineAUpdate, lineBUpdate,lineARelationUpdate,lineBRelationUpdate,setFileWidthHeight,lineUpdate,setLinePanel,lineDataReset,setModelData,resetStatus,setSelectedApplication,setSelectedModel } = areasSlice.actions;
+export const { initData, setDependOn, toggleSelectAll, toggleDependOnItem, areaInsert, areaSelected, areaRename, areaUpdate, areaDelete, lineAUpdate, lineBUpdate,lineARelationUpdate,lineBRelationUpdate,setFileWidthHeight,lineUpdate,setLinePanel,lineDataReset,setModelData,resetStatus,setSelectedApplication,setSelectedModel,lineADelete,lineBDelete } = areasSlice.actions;
 export default areasSlice.reducer;

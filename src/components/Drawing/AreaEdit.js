@@ -4,10 +4,11 @@ import { useSelector, useDispatch } from "react-redux";
 import { Circle, Rect, Layer, Line, Stage, Image, Label, Text, Tag, Group, Draggable, useStrictMode } from "react-konva";
 import Konva from 'konva';
 import useImage from "use-image"
-import { areaSelected,areaUpdate,lineAUpdate,lineBUpdate,lineUpdate } from "../../store/areas";
+import { areaSelected, areaUpdate, lineAUpdate, lineBUpdate, lineUpdate, lineADelete,lineBDelete } from "../../store/areas";
 
 
-const AreaEdit = (props) => {
+
+const AreaEdit = forwardRef((props, ref) => {
 
 
     const [polygons, setPolygons] = useState([])
@@ -47,6 +48,27 @@ const AreaEdit = (props) => {
     const lineARef = useRef();
     const lineBRef = useRef();
 
+    useImperativeHandle(ref, () => ({
+      
+        setLineDelete: () => {
+            //setShow(true);
+            log('delete line on area editing ...')
+            if (lineASelected){
+                setLineA([]);
+                setTransLineA([]);
+                dispatch(lineADelete());
+                setLineASelected(false);
+            }
+            if (lineBSelected){
+                setLineB([]);
+                setTransLineB([]);
+                dispatch(lineBDelete());
+                setLineBSelected(false);
+            }
+        }
+    
+    }));
+
     const trans = (org) => {
         let ans = [];
         org.forEach(function (item) {
@@ -66,7 +88,7 @@ const AreaEdit = (props) => {
         polygons.forEach(function (item, idx) {
             const dist = Math.sqrt(Math.pow((item.x - point.x), 2) + Math.pow((item.y - point.y), 2));
             if ((dist <= 15) && (order !== idx)) {
-              
+
                 tmpPolys = tmpPolys.filter(function (ele) {
                     return ele !== item;
                 });
@@ -79,10 +101,10 @@ const AreaEdit = (props) => {
         // check out of range
         polygons.forEach(function (item, idx) {
             const dist = Math.sqrt(Math.pow((item.x - point.x), 2) + Math.pow((item.y - point.y), 2));
-           
-            if (item.x>drawWidth) polygons[idx].x=drawWidth;
-            if (item.y>drawHeight) polygons[idx].y=drawHeight;
-            
+
+            if (item.x > drawWidth) polygons[idx].x = drawWidth;
+            if (item.y > drawHeight) polygons[idx].y = drawHeight;
+
         });
 
 
@@ -117,7 +139,7 @@ const AreaEdit = (props) => {
         return minItem;
     }
 
-    const getLabelX = (polygons,myText) => {
+    const getLabelX = (polygons, myText) => {
 
         if (polygons.length > 0) {
             let maxX = getMax(polygons, "x").x;
@@ -131,8 +153,8 @@ const AreaEdit = (props) => {
                 //t[idx].dist = dist;
             });
             let obj = getMin(dist, "dist");
-            const myOffset=Math.round(6.66*myText.length)+33;
-            return polygons[obj.id].x-myOffset;
+            const myOffset = Math.round(6.66 * myText.length) + 33;
+            return polygons[obj.id].x - myOffset;
         }
 
         return 0;
@@ -226,7 +248,7 @@ const AreaEdit = (props) => {
         setLineB(tmpLineB);
         setTransLineB(trans(tmpLineB));
 
-        updateEditingLine([trans(tmpLineA),trans(tmpLineB)]);
+        updateEditingLine([trans(tmpLineA), trans(tmpLineB)]);
     }
 
     const areaShapeArr = useSelector((state) => state.areas.areaShapeArr);
@@ -235,27 +257,27 @@ const AreaEdit = (props) => {
     const linePointArr = useSelector((state) => state.areas.linePointArr);
     const areaEditingIndex = useSelector((state) => state.areas.areaEditingIndex);
 
-    const updateEditingData=(myData)=>{
+    const updateEditingData = (myData) => {
 
         dispatch(areaUpdate(myData))
 
     }
 
-    const updateEditingLine=(myData)=>{
+    const updateEditingLine = (myData) => {
 
         dispatch(lineUpdate(myData))
 
     }
 
-   
 
-    const cloneData=(myPoly)=>{
 
-        let myArr=[];
+    const cloneData = (myPoly) => {
+
+        let myArr = [];
         myPoly.forEach(function (item) {
-            let myItem={};
-            myItem.x=item.x;
-            myItem.y=item.y;
+            let myItem = {};
+            myItem.x = item.x;
+            myItem.y = item.y;
             myArr.push(myItem);
         });
 
@@ -265,27 +287,27 @@ const AreaEdit = (props) => {
 
     useEffect(() => {
 
-        const myData=cloneData(areaShapeArr[areaEditingIndex]);
+        const myData = cloneData(areaShapeArr[areaEditingIndex]);
         setAreaName(areaNameArr[areaEditingIndex][1])
         setPolygons(myData);
         setTransPoly(trans(myData));
 
-        const lineAData=linePointArr[areaEditingIndex][0];
-        if (lineAData){
-            if (lineAData.length>1){
+        const lineAData = linePointArr[areaEditingIndex][0];
+        if (lineAData) {
+            if (lineAData.length > 1) {
                 setTransLineA(lineAData);
-                setLineA([{"x":lineAData[0],"y":lineAData[1]},{"x":lineAData[2],"y":lineAData[3]}]);
+                setLineA([{ "x": lineAData[0], "y": lineAData[1] }, { "x": lineAData[2], "y": lineAData[3] }]);
             }
         }
-        
-        const lineBData=linePointArr[areaEditingIndex][1];
-        if (lineBData){
-            if (lineBData.length>1){
+
+        const lineBData = linePointArr[areaEditingIndex][1];
+        if (lineBData) {
+            if (lineBData.length > 1) {
                 setTransLineB(lineBData);
-                setLineB([{"x":lineBData[0],"y":lineBData[1]},{"x":lineBData[2],"y":lineBData[3]}]);
+                setLineB([{ "x": lineBData[0], "y": lineBData[1] }, { "x": lineBData[2], "y": lineBData[3] }]);
             }
         }
-        
+
 
 
     }, [props]);
@@ -302,8 +324,8 @@ const AreaEdit = (props) => {
             {/* Edit Polygon Whole Group */}
 
             {
-                (polygons!==[]) &&
-            
+                (polygons !== []) &&
+
                 <Group
                     draggable={!props.lineMode}
                     x={0}
@@ -328,36 +350,39 @@ const AreaEdit = (props) => {
                         }
                         setStopBubble(false);
                         updateEditingData(polygons);
-                        
+
                     }}
                 >
 
 
                     {/* Line A for display */}
-                    <Line
-                        strokeWidth={lineASelected?5:3}
-                        stroke="blue"
-                        opacity={1}
-                        lineJoin="round"
-                        Draggable={props.lineMode}
-                        points={(lineADrawing) ? transLineA.concat([nextPointA.x, nextPointA.y]) : transLineA}
-                        onClick={event => {
-                            log('line A click')
-                            setLineASelected(true);
-                        }}
-                        onDragMove={event => {
-                            setStopBubble(true);
-                            log('line A moving...')
-                            log(event)
+                    {
+                       
+                    
+                            <Line
+                                strokeWidth={lineASelected ? 5 : 3}
+                                stroke="blue"
+                                opacity={1}
+                                lineJoin="round"
+                                Draggable={props.lineMode}
+                                points={(lineADrawing) ? transLineA.concat([nextPointA.x, nextPointA.y]) : transLineA}
+                                onClick={event => {
+                                    log('line A click')
+                                    setLineASelected(true);
+                                }}
+                                onDragMove={event => {
+                                    setStopBubble(true);
+                                    log('line A moving...')
+                                    log(event)
 
-                        }}
-                        closed={false}
-                        ref={lineARef}
-                    /> 
-
+                                }}
+                                closed={false}
+                                ref={lineARef}
+                            />
+                    }
                     {/* Line B for display */}
                     <Line
-                        strokeWidth={3}
+                       strokeWidth={lineBSelected ? 5 : 3}
                         stroke="blue"
                         opacity={1}
                         lineJoin="round"
@@ -369,17 +394,17 @@ const AreaEdit = (props) => {
                         ref={lineBRef}
                     />
 
-                     {/* Editing Cursor Node */}
-                     <Circle
+                    {/* Editing Cursor Node */}
+                    <Circle
                         x={cursorX}
                         y={cursorY}
                         visible={cursorVisible}
                         radius={radius}
-                        fill={'red'}
-                        stroke={'red'}
+                        fill={(props.mode==='line')?'blue':'red'}
+                        stroke={(props.mode==='line')?'blue':'red'}
                         strokeWidth={2}>
                     </Circle>
-                    
+
 
                     {/* Edit Polygon for Display */}
                     <Line
@@ -396,7 +421,7 @@ const AreaEdit = (props) => {
                             log(props.lineMode)
                             log(lineADrawing)
 
-                            if (props.mode==='line') {
+                            if (props.mode === 'line') {
 
                                 if (lineA.length === 1) {
 
@@ -405,17 +430,17 @@ const AreaEdit = (props) => {
                                     const y = event.evt.offsetY;
                                     setLineA(lineA.concat([{ x: x, y: y }]))
                                     setTransLineA(trans(lineA.concat([{ x: x, y: y }])))
-                                    dispatch(lineAUpdate([lineA[0].x,lineA[0].y,x,y]))
+                                    dispatch(lineAUpdate([lineA[0].x, lineA[0].y, x, y]))
 
                                 }
-                                if  ((lineA.length === 2)&&(lineB.length === 1)) {
+                                if ((lineA.length === 2) && (lineB.length === 1)) {
 
                                     setLineBDrawing(false);
                                     const x = event.evt.offsetX;
                                     const y = event.evt.offsetY;
                                     setLineB(lineB.concat([{ x: x, y: y }]))
                                     setTransLineB(trans(lineB.concat([{ x: x, y: y }])))
-                                    dispatch(lineBUpdate([lineB[0].x,lineB[0].y,x,y]))
+                                    dispatch(lineBUpdate([lineB[0].x, lineB[0].y, x, y]))
                                     props.onComplete();
                                 }
                             }
@@ -423,7 +448,7 @@ const AreaEdit = (props) => {
                         }}
                         onMouseDown={event => {
 
-                            if (props.mode==='line') {
+                            if (props.mode === 'line') {
 
                                 if (lineA.length === 0) {
                                     log('start draw line a')
@@ -450,7 +475,7 @@ const AreaEdit = (props) => {
                         }}
                         onMouseMove={event => {
 
-                            if (props.mode==='line') {
+                            if (props.mode === 'line') {
 
                                 if (lineADrawing === true) {
                                     const x = event.evt.offsetX;
@@ -483,7 +508,7 @@ const AreaEdit = (props) => {
                     </Line>
 
                     {/* Edit Polygon Label */}
-                    <Label x={getLabelX(polygons,areaName)} y={getLabelY(polygons)-32}>
+                    <Label x={getLabelX(polygons, areaName)} y={getLabelY(polygons) - 32}>
                         <Tag
                             fill={'white'}
                             opacity={1}
@@ -491,7 +516,7 @@ const AreaEdit = (props) => {
                             stroke='red'
                             strokeWidth={2}
                         />
-                        <Text text={'  '+areaName+'  '}
+                        <Text text={'  ' + areaName + '  '}
                             fontSize={14}
                             fontFamily="roboto"
                             fill="red"
@@ -518,7 +543,7 @@ const AreaEdit = (props) => {
                             }
                             onClick={event => {
 
-                                if (props.mode==='edit'){
+                                if (props.mode === 'edit') {
 
                                     const order = parseInt(event.target.attrs.order);
                                     log('x')
@@ -535,13 +560,13 @@ const AreaEdit = (props) => {
 
                             }}
                             onMouseOver={event => {
-                                
-                                if (props.mode==='edit'){
+
+                                if (props.mode === 'edit') {
                                     setCursorX(event.evt.offsetX);
                                     setCursorY(event.evt.offsetY);
                                     setCursorVisible(true);
                                 }
-                              
+
                             }}
                             onMouseOut={event => {
                                 log('mouse over...')
@@ -555,129 +580,167 @@ const AreaEdit = (props) => {
 
                     ))}
 
-                   
+
 
                     {/* Edit Polygon Node */}
                     {
-                    (props.mode==='edit') &&
-                    polygons.map((item, idx) => (
-                        <Circle
-                            key={idx}
-                            x={item.x}
-                            y={item.y}
-                            order={idx}
-                            radius={radius}
-                            fill={'white'}
-                            stroke={'red'}
-                            strokeWidth={2}
-                            draggable={true}
-                            onMouseOver={event => {
-                                event.target.fill('red');
-                            }}
-                            onMouseLeave={event => {
-                                event.target.fill('white');
-                            }}
-                            onMouseOut={event => {
-                                event.target.fill('white');
-                            }}
-                            onDragMove={event => {
+                        (props.mode === 'edit') &&
+                        polygons.map((item, idx) => (
+                            <Circle
+                                key={idx}
+                                x={item.x}
+                                y={item.y}
+                                order={idx}
+                                radius={radius}
+                                fill={'white'}
+                                stroke={'red'}
+                                strokeWidth={2}
+                                draggable={true}
+                                onMouseOver={event => {
+                                    event.target.fill('red');
+                                }}
+                                onMouseLeave={event => {
+                                    event.target.fill('white');
+                                }}
+                                onMouseOut={event => {
+                                    event.target.fill('white');
+                                }}
+                                onDragMove={event => {
 
-                                log('circle drag move')
-                                let tmp = polygons;
-                                tmp[idx].x = event.target.attrs.x;
-                                tmp[idx].y = event.target.attrs.y;
-                                if (tmp[idx].x < 0) tmp[idx].x = 0;
-                                if (tmp[idx].y < 0) tmp[idx].y = 0;
-                                setPolygons(tmp);
-                                setTransPoly(trans(tmp));
-                                
-                            }}
-                            onDragEnd={event => {
+                                    log('circle drag move')
+                                    let tmp = polygons;
+                                    tmp[idx].x = event.target.attrs.x;
+                                    tmp[idx].y = event.target.attrs.y;
+                                    if (tmp[idx].x < 0) tmp[idx].x = 0;
+                                    if (tmp[idx].y < 0) tmp[idx].y = 0;
+                                    setPolygons(tmp);
+                                    setTransPoly(trans(tmp));
 
-                                log('circle drag end')
-                                const order = parseInt(event.target.attrs.order);
-                                log('order')
-                                log(order)
-                                checkDelete({ "x": event.target.attrs.x, "y": event.target.attrs.y }, order);
-                                setStopBubble(true);
-                                //updateEditingData();
-                            }}
-                        />
-                    ))}
+                                }}
+                                onDragEnd={event => {
 
-                   
+                                    log('circle drag end')
+                                    const order = parseInt(event.target.attrs.order);
+                                    log('order')
+                                    log(order)
+                                    checkDelete({ "x": event.target.attrs.x, "y": event.target.attrs.y }, order);
+                                    setStopBubble(true);
+                                    //updateEditingData();
+                                }}
+                            />
+                        ))}
 
+
+                 
                     {/* Line A Node*/}
                     {
-                    (props.mode==='line') &&
-                    lineA.map((item, idx) => (
-                        <Circle
-                            key={idx}
-                            x={item.x}
-                            y={item.y}
-                            order={idx}
-                            radius={radius}
-                           
-                            fill={'white'}
-                            stroke={'blue'}
-                            strokeWidth={2}
-                            draggable={props.lineMode}
-                            onMouseOver={event => {
-                                event.target.fill('blue')
-                            }}
-                            onMouseOut={event => {
-                                event.target.fill('white')
-                            }}
-                            onMouseLeave={event => {
-                                event.target.fill('white')
-                            }}
-                           
-                            onDragMove={event => {
-                               
-                                const order = parseInt(event.target.attrs.order);
-                                let tmp = lineA;
-                                const x = event.evt.offsetX;
-                                const y = event.evt.offsetY;
-                                tmp[order].x = x;
-                                tmp[order].y = y;
-                                if (tmp[order].x<0) tmp[order].x=0;
-                                if (tmp[order].x>drawWidth) tmp[order].x=drawWidth
-                                if (tmp[order].y<0) tmp[order].y=0;
-                                if (tmp[order].y>drawHeight) tmp[order].y=drawHeight
-                                setLineA(tmp);
-                                setTransLineA(trans(tmp));
-                                if (order === 1) {
-                                    setNextPointA({ x: x, y: y })
-                                }
+                        (props.mode === 'line') &&
+                        lineA.map((item, idx) => (
+                            <Circle
+                                key={idx}
+                                x={item.x}
+                                y={item.y}
+                                order={idx}
+                                radius={radius}
 
-                            }}
-                            onDragEnd={event => {
-                           
-                                //dispatch(lineAUpdate(transLineA));
-                                log('line a node drag end...')
-                                log(transLineA)
-                                if (transLineA[0]<0) transLineA[0]=0;
-                                if (transLineA[0]>drawWidth) transLineA[0]=drawWidth
-                                if (transLineA[1]<0) transLineA[1]=0;
-                                if (transLineA[1]>drawHeight) transLineA[1]=drawHeight
-                                if (transLineA[2]<0) transLineA[2]=0;
-                                if (transLineA[2]>drawWidth) transLineA[2]=drawWidth
-                                if (transLineA[3]<0) transLineA[3]=0;
-                                if (transLineA[3]>drawHeight) transLineA[3]=drawHeight
-                                dispatch(lineAUpdate(transLineA));
+                                fill={'white'}
+                                stroke={'blue'}
+                                strokeWidth={2}
+                                draggable={props.lineMode}
+                                onClick={event => {
+                                    log('mouse click line a node')
+                                }}
+                                onMouseOver={event => {
+                                    event.target.fill('blue')
+                                }}
+                                onMouseOut={event => {
+                                    event.target.fill('white')
+                                }}
+                                onMouseLeave={event => {
+                                    event.target.fill('white')
+                                }}
 
-                                lineARef.current.moveToTop();
-                                
-                        
-                            }}
-                        />
-                    ))}
+                                onDragMove={event => {
+
+                                    const order = parseInt(event.target.attrs.order);
+                                    let tmp = lineA;
+                                    const x = event.evt.offsetX;
+                                    const y = event.evt.offsetY;
+                                    tmp[order].x = x;
+                                    tmp[order].y = y;
+                                    if (tmp[order].x < 0) tmp[order].x = 0;
+                                    if (tmp[order].x > drawWidth) tmp[order].x = drawWidth
+                                    if (tmp[order].y < 0) tmp[order].y = 0;
+                                    if (tmp[order].y > drawHeight) tmp[order].y = drawHeight
+                                    setLineA(tmp);
+                                    setTransLineA(trans(tmp));
+                                    if (order === 1) {
+                                        setNextPointA({ x: x, y: y })
+                                    }
+
+                                }}
+                                onDragEnd={event => {
+
+                                    //dispatch(lineAUpdate(transLineA));
+                                    log('line a node drag end...')
+                                    log(transLineA)
+                                    if (transLineA[0] < 0) transLineA[0] = 0;
+                                    if (transLineA[0] > drawWidth) transLineA[0] = drawWidth
+                                    if (transLineA[1] < 0) transLineA[1] = 0;
+                                    if (transLineA[1] > drawHeight) transLineA[1] = drawHeight
+                                    if (transLineA[2] < 0) transLineA[2] = 0;
+                                    if (transLineA[2] > drawWidth) transLineA[2] = drawWidth
+                                    if (transLineA[3] < 0) transLineA[3] = 0;
+                                    if (transLineA[3] > drawHeight) transLineA[3] = drawHeight
+                                    dispatch(lineAUpdate(transLineA));
+
+                                   
+
+
+                                }}
+                            />
+                        ))}
+
+                    {/* Line A for detect */}
+                    {/* Line B for detect */}
+                    <Line
+                        strokeWidth={10}
+                        stroke="transparent"
+                        opacity={0}
+                        lineJoin="round"
+                        Draggable={true}
+                        points={linePointArr[areaEditingIndex][0]}
+                        onClick={event => {
+                            log('line A click')
+                            setLineASelected(true);
+                            setLineBSelected(false);
+                        }}
+                        onDragMove={event => {
+                            
+
+                        }}
+                        onMouseMove={event=>{
+                            if (props.mode === 'line') {
+                                setCursorX(event.evt.offsetX);
+                                setCursorY(event.evt.offsetY);
+                                setCursorVisible(true);
+                            }
+                        }}
+                        onMouseOut={event=>{
+                            if (props.mode === 'line') {
+                            
+                                setCursorVisible(false);
+                            }
+                        }}
+                        closed={false}
+
+                    />
 
                     {/* Line A Label */}
                     {
                         (lineA.length === 2) &&
 
-                        <Label x={lineA[1].x+5} y={lineA[1].y+5}>
+                        <Label x={lineA[1].x + 5} y={lineA[1].y + 5}>
                             <Tag
                                 fill={'white'}
                                 opacity={1}
@@ -696,59 +759,93 @@ const AreaEdit = (props) => {
                         </Label>
                     }
 
+                  
 
-                   
 
                     {/* Line B Node*/}
                     {
-                    (props.mode==='line') &&
-                    lineB.map((item, idx) => (
-                        <Circle
-                            key={idx}
-                            x={item.x}
-                            y={item.y}
-                            order={idx}
-                            radius={radius}
-                            fill={'white'}
-                            stroke={'blue'}
-                            strokeWidth={2}
-                            draggable={props.lineMode}
-                            onMouseOver={event => {
-                                event.target.fill('blue')
-                            }}
-                            onMouseOut={event => {
-                                event.target.fill('white')
-                            }}
-                            onMouseLeave={event => {
-                                event.target.fill('white')
-                            }}
-                            onDragMove={event => {
+                        (props.mode === 'line') &&
+                        lineB.map((item, idx) => (
+                            <Circle
+                                key={idx}
+                                x={item.x}
+                                y={item.y}
+                                order={idx}
+                                radius={radius}
+                                fill={'white'}
+                                stroke={'blue'}
+                                strokeWidth={2}
+                                draggable={props.lineMode}
+                                onMouseOver={event => {
+                                    event.target.fill('blue')
+                                }}
+                                onMouseOut={event => {
+                                    event.target.fill('white')
+                                }}
+                                onMouseLeave={event => {
+                                    event.target.fill('white')
+                                }}
+                                onDragMove={event => {
 
-                                const order = parseInt(event.target.attrs.order);
-                                let tmp = lineB;
-                                const x = event.evt.offsetX;
-                                const y = event.evt.offsetY;
-                                tmp[order].x = x;
-                                tmp[order].y = y;
-                                setLineB(tmp);
-                                setTransLineB(trans(tmp));
-                                if (order === 1) {
-                                    setNextPointB({ x: x, y: y })
-                                }
+                                    const order = parseInt(event.target.attrs.order);
+                                    let tmp = lineB;
+                                    const x = event.evt.offsetX;
+                                    const y = event.evt.offsetY;
+                                    tmp[order].x = x;
+                                    tmp[order].y = y;
+                                    setLineB(tmp);
+                                    setTransLineB(trans(tmp));
+                                    if (order === 1) {
+                                        setNextPointB({ x: x, y: y })
+                                    }
 
-                            }}
-                            onDragEnd={event => {
-                                dispatch(lineBUpdate(transLineB));
-                                
-                            }}
-                        />
-                    ))}
+                                }}
+                                onDragEnd={event => {
+                                    dispatch(lineBUpdate(transLineB));
+
+                                }}
+                            />
+                        ))}
+
+                    {/* Line B for detect */}
+                    <Line
+                        strokeWidth={10}
+                        stroke="transparent"
+                        opacity={0}
+                        lineJoin="round"
+                        Draggable={true}
+                        points={linePointArr[areaEditingIndex][1]}
+                        onClick={event => {
+                            log('line B click')
+                            setLineASelected(false);
+                            setLineBSelected(true);
+                        }}
+                        onDragMove={event => {
+                            
+
+                        }}
+                        onMouseMove={event=>{
+                            if (props.mode === 'line') {
+                                setCursorX(event.evt.offsetX);
+                                setCursorY(event.evt.offsetY);
+                                setCursorVisible(true);
+                            }
+                        }}
+                        onMouseOut={event=>{
+                            if (props.mode === 'line') {
+                            
+                                setCursorVisible(false);
+                            }
+                        }}
+                        closed={false}
+
+                    />
 
                     {/* Line B Label */}
                     {
                         (lineB.length === 2) &&
 
-                        <Label x={lineB[1].x+5} y={lineB[1].y+5}>
+                        <Label x={lineB[1].x + 5} y={lineB[1].y + 5}>
                             <Tag
                                 fill={'white'}
                                 opacity={1}
@@ -772,6 +869,6 @@ const AreaEdit = (props) => {
         </>
     )
 
-}
+});
 
 export default AreaEdit;

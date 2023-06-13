@@ -10,7 +10,8 @@ import AreaDisplay from '../../components/Drawing/AreaDisplay';
 import AreaCreate from '../../components/Drawing/AreaCreate';
 import AreaEdit from '../../components/Drawing/AreaEdit';
 
-export default function App(props) {
+
+const CustomDrawing = forwardRef((props, ref) => {
     const [points, setPoints] = useState([])
     //const [image] = useImage('https://konvajs.github.io/assets/yoda.jpg');
     const [image] = useImage(props.src);
@@ -32,6 +33,18 @@ export default function App(props) {
 
 
     const polygonConstructorRef = React.useRef(null);
+    const areaEditRef = React.useRef(null);
+
+
+    useImperativeHandle(ref, () => ({
+      
+        setLineDelete: () => {
+            //setShow(true);
+            log('delete line on custom drawing...')
+            areaEditRef.current.setLineDelete();
+        }
+    
+    }));
 
     const handleAddButton = () => {
        
@@ -174,7 +187,7 @@ export default function App(props) {
 
                     {
                         ((props.mode==='edit')||(props.mode==='line')) &&
-                        <AreaEdit polygon={editPolygon} mode={props.mode} lineMode={lineMode} polygonName={editPolygonName} width={props.width} height={props.height} onComplete={handleDrawLineComplete}/>
+                        <AreaEdit polygon={editPolygon} mode={props.mode} lineMode={lineMode} polygonName={editPolygonName} width={props.width} height={props.height} onComplete={handleDrawLineComplete} ref={areaEditRef}/>
                     }
 
                 </Layer>
@@ -183,4 +196,6 @@ export default function App(props) {
 
         </div>
     )
-}
+});
+
+export default CustomDrawing;
