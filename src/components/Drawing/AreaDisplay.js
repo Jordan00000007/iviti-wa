@@ -5,6 +5,7 @@ import { Circle, Rect, Layer, Line, Stage, Image, Label, Text, Tag, Group, Dragg
 import Konva from 'konva';
 import useImage from "use-image"
 import { areaSelected } from "../../store/areas";
+import LabelButton from '../../components/Buttons/LabelButton';
 
 
 const AreaDisplay=(props)=> {
@@ -62,7 +63,7 @@ const AreaDisplay=(props)=> {
         return minItem;
     }
 
-    const getLabelX = (polygons) => {
+    const getLabelX = (polygons,myText) => {
 
        if (polygons.length > 0) {
             let maxX = getMax(polygons, "x").x;
@@ -76,7 +77,10 @@ const AreaDisplay=(props)=> {
                 //t[idx].dist = dist;
             });
             let obj = getMin(dist, "dist");
-            return polygons[obj.id].x;
+            //log('myText.length='+myText.length)
+            //const myOffset=((myText.length)/2)*20;
+            const myOffset=Math.round(6.66*myText.length)+33;
+            return polygons[obj.id].x-myOffset;
         }
         
         return 0;
@@ -133,14 +137,8 @@ const AreaDisplay=(props)=> {
         setSelectedOrder(props.areaEditingIndex);
     }, [props.areaEditingIndex]);
 
-
-    
-   
-    return (
-
-      
+    return (      
         <>
-
             {areaShapeArr.map((item, idx) => (
                   
                 (!(((props.mode==='edit')||(props.mode==='line'))&&(areaEditingIndex===idx))) &&
@@ -158,7 +156,7 @@ const AreaDisplay=(props)=> {
                             .concat([item[0].x, item[0].y])}
                         onClick={event => {
                             //
-                            handleAreaSelected(idx)
+                            if (props.mode==='select') handleAreaSelected(idx)
                             //props.onClick(event, props.polygons[idx], props.polygonsName[idx], idx);
                         }}
                         //onClick={handleAreaSelected(idx)}
@@ -187,7 +185,8 @@ const AreaDisplay=(props)=> {
                             .concat([item[0].x, item[0].y])}
                         closed={false}
                     />
-                    <Label x={getLabelX(item)-60} y={getLabelY(item)-32 } key={`label_${idx}`}>
+                    <Label x={getLabelX(item,areaNameArr[idx][1])} y={getLabelY(item)-32 } key={`label_${idx}`} >
+                    {/* <Label x={0} y={0} key={`label_${idx}`} onClick={(e)=>{log(e.target.parent)}}> */}
                         <Tag
                             key={`tag_${idx}`}
                             fill={((mouseOverOrder===idx)||(selectedOrder===idx))?'white':'red'}
@@ -204,7 +203,9 @@ const AreaDisplay=(props)=> {
                             padding={6}
                             height={24}
                             lineHeight={1}
+                            
                         />
+                       
                     </Label>        
 
                     {/* Line A*/}

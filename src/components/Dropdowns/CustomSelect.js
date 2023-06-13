@@ -1,4 +1,4 @@
-import React, { useState, useEffect, forwardRef,useImperativeHandle } from 'react'
+import React, { useState, useEffect, forwardRef,useImperativeHandle,useRef } from 'react'
 import { extendTheme, CssVarsProvider } from '@mui/joy/styles';
 import ListItemDecorator from '@mui/joy/ListItemDecorator';
 import Chip from '@mui/joy/Chip';
@@ -8,34 +8,35 @@ import Option from '@mui/joy/Option';
 import KeyboardArrowDown from '@mui/icons-material/KeyboardArrowDown';
 import log from "../../utils/console";
 import { ReactComponent as Icon_Edit } from '../../assets/Icon_Edit.svg';
+import ListDivider from '@mui/joy/ListDivider';
 
 
 
 const CustomSelect = forwardRef((props, ref) => {
 
     const [placeHolder, setPlaceHolder] = useState(props.placeHolder);
-    const [selectedValue, setSelectedValue] = useState(props.defaultValue);
+    const [selectedValue, setSelectedValue] = useState('');
 
-    //defaultValue
-
+  
     const handleSelectChange = (event, value) => {
 
-        log('select change');
+        // log(`${props.name} select change`);
+        // log(value)
         setSelectedValue(value);
         props.onChange(event,value);
 
     };
 
-    useEffect(() => {
-
-        if (props.defaultValue !== '')
-           setSelectedValue(props.defaultValue)
-
-    }, [props]);
-
     useImperativeHandle(ref, () => ({
         getSelectedValue: () => {
+            // log(`${props.name} get selected value`)
             return selectedValue;
+        },
+        setSelectedValue: (myValue) => {
+            // log(`${props.name} set selected value`)
+            // log(myValue)
+            setSelectedValue(myValue);
+           
         }
     }));
 
@@ -69,7 +70,7 @@ const CustomSelect = forwardRef((props, ref) => {
 
             }}
             ref={ref}
-            // defaultValue={placeHolder?"":0}
+            defaultValue={placeHolder?"":props.defaultValue}
             value={selectedValue}
             onChange={handleSelectChange}
             slotProps={{
@@ -95,15 +96,17 @@ const CustomSelect = forwardRef((props, ref) => {
                     sx={{
                         fontSize: parseInt(props.fontSize),
                         fontWeight: 400,
-                        color: '#16272E',
+                        color: '#979CB599',
                         backgroundColor: '#FAFAFD!important',
                         minHeight: parseInt(props.height),
                     }}
-                >--- please select ---</Option>
+                    disabled
+                >{(props.name==='application')?"please select model first":"--- please select ---"}</Option>
             }
 
 
             {props.areaArr.map((item, index) => (
+                
                 <Option value={item[0]} key={index} label={item[1]}
                     sx={{
                         fontSize: parseInt(props.fontSize),
@@ -116,6 +119,7 @@ const CustomSelect = forwardRef((props, ref) => {
                 >  
                 {item[1]}     
                 </Option>
+               
             ))}
         </Select>
 

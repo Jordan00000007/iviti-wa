@@ -9,6 +9,8 @@ import DependOnPanel from '../components/Panel/DependOnPanel';
 import TemperaturePanel from '../components/Panel/TemperaturePanel';
 import CustomAlert from '../components/Alerts/CustomAlert';
 
+import CustomDisplay from '../components/Drawing/CustomDisplay'
+
 import RemoteVideo from '../components/Video/RemoteVideo';
 
 import CustomTooltip from '../components/Tooltips/CustomTooltip';
@@ -16,7 +18,10 @@ import CustomTooltip from '../components/Tooltips/CustomTooltip';
 import { Link, useParams } from 'react-router-dom';
 import { useSelector, useDispatch } from "react-redux";
 import { fetchData, fetchTask, runTask, stopTask, addStream, deleteStream, deviceTemperature } from "../store/tasks";
+
+
 import { WebSocket } from '../components/Panel/WebSocket';
+
 
 
 
@@ -29,14 +34,15 @@ function AiInference() {
 
     const [showType, setShowType] = useState(0);
     const [showText, setShowText] = useState('test');
+    const [playing, setplaying] = useState(false);
 
     const [temp, setTemp] = useState('N/A');
  
 
     const alertRef = useRef();
 
-
-
+ 
+  
     //const [uuid, setUuid] = useState('0');
     const params = useParams();
     const STREAM_SERVER = process.env.REACT_APP_STREAM_SERVER;
@@ -46,7 +52,7 @@ function AiInference() {
     const myStatus = useSelector((state) => state.tasks.status);
     const myIndex = myData.findIndex(item => item.task_uid === params.uuid);
     let myItem = myData[myIndex];
-
+   
     if (myItem===undefined){
         myItem={};
         myItem.status=null;
@@ -59,8 +65,53 @@ function AiInference() {
        
     };
 
+    const handleClickBack = () => {
+        log('Add Button clicked!');
+    };
+
+
+    const handleToggleChange = (event) => {
+
+        if (event.target.checked) {
+            dispatch(runTask(params.uuid));
+        } else {
+            dispatch(stopTask(params.uuid));
+        }
+    };
+
+    const handleLabelExpandClick = () => {
+        log('Label Expand Click!');
+    };
+
+
+    const handleLogTabClick = () => {
+
+        // ws://192.168.8.134:819/ws/results
+
+        log('handle Log Tab Click')
+        //  connectWebSocket();
+    }
+
+    const handleUpdateTemp = (temp) => {
+
+        setTemp(temp);
+    }
+
+    const handleEditClick=()=>{
+
+        window.location.href=`/editTask/${params.uuid}`;
+
+    }
+
+    const handlePlaying=(myValue)=>{
+
+        setplaying(myValue);
+
+    }
+
     useEffect(() => {
         dispatch(fetchData());
+        //dispatch(getAllModels());
     }, []);
 
 
@@ -96,41 +147,7 @@ function AiInference() {
 
     }, [myItem.status]);
 
-    const handleClickBack = () => {
-        log('Add Button clicked!');
-    };
-
-    const handleToggleChange = (event) => {
-
-        if (event.target.checked) {
-            dispatch(runTask(params.uuid));
-        } else {
-            dispatch(stopTask(params.uuid));
-        }
-    };
-
-    const handleLabelExpandClick = () => {
-        log('Label Expand Click!');
-    };
-
-
-    const handleLogTabClick = () => {
-
-        // ws://192.168.8.134:819/ws/results
-
-        log('handle Log Tab Click')
-        //  connectWebSocket();
-    }
-
-    const handleUpdateTemp = (temp) => {
-
-        setTemp(temp);
-    }
-
-
-
-
-
+   
     if (myStatus === 'success')
         return (
             <SimpleLayout>
@@ -154,16 +171,13 @@ function AiInference() {
                                         <ToggleButton onChange={handleToggleChange} status={myItem.status} />
                                     </div>
                                 </div>
-                                
-
-
-                                <Link to={`/editTask/${params.uuid}`}>
-                                    {
-                                        (myItem.status === 'stop')&&
-                                        <CustomButton name="edit" />
-                                    }
+                               
+                                {
+                                    (myItem.status === 'stop')&&
+                                    <CustomButton name="edit" onClick={handleEditClick} />
+                                }
                                     
-                                </Link>
+                            
                             </div>
                         </div>
                         <div className="row p-0 g-0 mb-3 mt-3">
@@ -180,8 +194,9 @@ function AiInference() {
                                                             <span className="my-time-badge roboto-b2">{myItem.liveTime}</span>
                                                         }
                                                     </div>
-                                                    <div className='my-area-a2'>
-                                                        <RemoteVideo uuid={params.uuid} status={myItem.status} />
+                                                    <div className='my-area-a2 position-relative'>
+                                                        <RemoteVideo uuid={params.uuid} status={myItem.status} onPlaying={handlePlaying}/>
+                                                        <CustomDisplay uuid={myItem.source_uid} playing={playing}></CustomDisplay> 
                                                     </div>
                                                     <div className='my-area-a3'>
 

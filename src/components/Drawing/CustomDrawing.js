@@ -94,7 +94,6 @@ export default function App(props) {
 
 
     const handleDrawLineComplete=()=>{
-        log('handle draw line complete');
         props.onDrawLineComplete();
     }
 

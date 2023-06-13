@@ -36,6 +36,12 @@ const CustomAlert = forwardRef((props, ref) => {
                 setShow(false);
                
             }, myInterval); 
+        },
+        setShowKeep: () => {
+            setShow(true);
+        },
+        setShowClose: () => {
+            setShow(false);
         }
     }));
 
@@ -45,7 +51,8 @@ const CustomAlert = forwardRef((props, ref) => {
                 <Alert
                     sx={{ alignItems: 'flex-start',  width: '1200px', height: '44px', backgroundColor: 'var(--on_color_1)', color: '#F8F8F8' }}
                     startDecorator={React.cloneElement(iconArr[props.type], {
-                        style: { position: 'relative', top: '-5px'}
+                        style: { position: 'relative', top: '-5px'},
+                        className:(props.type===2)?'rotating-svg':''
                     })}
                     variant="soft"
                     

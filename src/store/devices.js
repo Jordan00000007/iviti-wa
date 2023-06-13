@@ -26,13 +26,12 @@ const devicesSlice = createSlice({
         builder.addCase(
             getAllDevices.fulfilled,
             (state, action) => {
-
+                log('--- get all devices fulfilled ---');
                 if (action.payload.status_code===200){
                     let myData=[];
                     Object.keys(action.payload.data).map((e, i) => {
                         myData.push([action.payload.data[e].uid,action.payload.data[e].uid])
                     })
-                    log(myData)
                     state.options = myData;
                     state.data = action.payload.data;
                     state.status = 'success';

@@ -1,4 +1,4 @@
-import React,{ useState,useEffect } from 'react';
+import React,{ useState,useEffect ,useRef} from 'react';
 
 import log from "../../utils/console";
 import CustomSelect from '../../components/Dropdowns/CustomSelect';
@@ -12,6 +12,8 @@ const DependOnPanel = (props) => {
     const [areaIndex, setAreaIndex] = useState(0);
     const [areaNameArr, setAreaNameArr] = useState([]);
     const [dependOnArr, setDependOnArr] = useState([]);
+
+    const areaRef = useRef(null);
 
     const handleSelectChange = (event,value) => {
         log(`--- select change to index ${value} ---`);
@@ -47,6 +49,15 @@ const DependOnPanel = (props) => {
         log('expand label')
     }
 
+    useEffect(() => {
+
+        if (areaNameArr.length >0) {
+            
+            areaRef.current.setSelectedValue(areaNameArr[0][0]);
+        }
+
+    }, [areaNameArr]);
+
 
     return (
         <div className='my-area-b2'>
@@ -55,7 +66,7 @@ const DependOnPanel = (props) => {
                     Depend on
                 </div>
                 <div className='my-area-b2-1-2 d-flex justify-content-end'>
-                    <CustomSelect areaArr={areaNameArr} width="140" height="32" fontSize="15" onChange={handleSelectChange} defaultValue={0} />
+                    <CustomSelect areaArr={areaNameArr} width="140" height="32" fontSize="15" onChange={handleSelectChange} ref={areaRef} />
                 </div>
             </div>
             <div className='my-area-b2-2'>

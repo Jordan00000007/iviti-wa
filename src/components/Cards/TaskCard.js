@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useNavigate } from "react-router-dom";
 import log from "../../utils/console";
 import AppIcon from '../Icons/AppIcon'
 import CustomButton from '../Buttons/CustomButton';
@@ -14,31 +15,46 @@ const TaskCard = (props) => {
 
     // const [name, setName] = useState("");
     const [status, setStatus] = useState(props.nameStatus);
+    const [disabled, setDisabled] = useState(false);
+
     const dispatch = useDispatch();
     const myData = useSelector((state) => state.tasks.data);
     const myIndex = myData.findIndex(item => item.task_uid === props.task_uid);
     const myItem = myData[myIndex];
+    const navigate = useNavigate();
+
 
     const init = [];
     const [state, setState] = useState(init);
     const dummyState = useRef(init);
+    const toggleRef = useRef(null);
 
     const handleClickEdit = () => {
 
-        log('Edit Button clicked!');
+        window.location.href=`/editTask/${props.task_uid}`;
 
     };
 
     const handleClickView = () => {
 
-        log('View Button clicked!');
+        window.location.href=`/inference/${props.task_uid}`;
 
     };
+
+    const getToggleDisabled=()=>{
+
+        log('get toggle disabled')
+        log(toggleRef.current.getDisabled())
+        //return toggleRef.current.getToggleDisabled();
+    }
 
     const handleToggleChange = (event) => {
 
         log('toogle change')
         log(props.task_uid)
+
+      
+        setDisabled(true);
 
         if (event.target.checked) {
             dispatch(runTask(props.task_uid));
@@ -48,26 +64,17 @@ const TaskCard = (props) => {
 
     }
 
-    // useEffect(() => {
-    //     // Compare the old state with the new state
-    //     if (dummyState.current == state) {
-    //         // This means that the component is mounting
-    //         log(`--- This means that the component is mounting`)
-           
-    //     } else {
-    //         // This means that the component updated.
-    //         log(`--- This means that the component updated`)
-    //         dummyState.current = state;
-    //         if (myItem.status === 'run'){
-    //             props.showMessage(0, 'Set streaming run success')
-    //         }
-    //         if (myItem.status === 'stop') {
 
-    //             props.showMessage(0, 'Set streaming stop success')
-    //         }
-          
-    //     }
-    // }, [state,myItem.status]);
+
+
+
+    useEffect(() => {
+        // Compare the old state with the new state
+        if ((myItem.status==='running')||(myItem.status==='stop')||(myItem.status==='error')) {
+            
+           setDisabled(false)
+        } 
+    }, [myItem.status]);
 
     useEffect(() => {
 
@@ -162,10 +169,11 @@ const TaskCard = (props) => {
                                         </div>
                                         <div>
                                             <StatusButton name={myItem.status} className="mb-2" />
+                                            
                                         </div>
                                     </div>
                                     <div style={{ paddingTop: '4px', paddingRight: '5px' }}>
-                                        <ToggleButton onChange={handleToggleChange} status={status} />
+                                        <ToggleButton onChange={handleToggleChange} status={myItem.status} ref={toggleRef} />
                                     </div>
                                 </div>
                             </div>
@@ -173,13 +181,13 @@ const TaskCard = (props) => {
                     </div>
                     <div className="col-12 mt-1 d-flex justify-content-between">
                         {(myItem.status !== 'running') &&
-                            <Link to={`/editTask/${props.task_uid}`}>
-                                <CustomButton onClick={handleClickEdit} disabled={myItem.status === 'running' ? true : false} name="edit" />
-                            </Link>
+                            
+                            <CustomButton onClick={handleClickEdit} disabled={myItem.status === 'running' ? true : false} name="edit" />
+                            
                         }
-                        <Link to={`/inference/${props.task_uid}`}>
-                            <CustomButton onClick={handleClickView} status={myItem.status} name="view" />
-                        </Link>
+                       
+                        <CustomButton onClick={handleClickView} status={myItem.status} name="view" disabled={disabled} />
+                       
                     </div>
                 </div>
             </div>

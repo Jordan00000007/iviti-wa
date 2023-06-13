@@ -18,6 +18,11 @@ const AreaEdit = (props) => {
     const [lineA, setLineA] = useState([]);
     const [lineB, setLineB] = useState([]);
 
+    const [cursorX, setCursorX] = useState(50);
+    const [cursorY, setCursorY] = useState(50);
+    const [cursorVisible, setCursorVisible] = useState(false);
+
+
     const [lineADrawing, setLineADrawing] = useState(false);
     const [lineBDrawing, setLineBDrawing] = useState(false);
 
@@ -30,6 +35,9 @@ const AreaEdit = (props) => {
     //const [polygons, setPolygons] = useState(props.polygons)
 
     const [stopBubble, setStopBubble] = useState(false);
+
+    const drawWidth = useSelector((state) => state.sources.drawWidth);
+    const drawHeight = useSelector((state) => state.sources.drawHeight);
 
     const dispatch = useDispatch();
 
@@ -47,11 +55,10 @@ const AreaEdit = (props) => {
         log('check delete')
 
         let tmpPolys = polygons;
+
+        // check delete
         polygons.forEach(function (item, idx) {
-
-
             const dist = Math.sqrt(Math.pow((item.x - point.x), 2) + Math.pow((item.y - point.y), 2));
-
             if ((dist <= 15) && (order !== idx)) {
               
                 tmpPolys = tmpPolys.filter(function (ele) {
@@ -61,8 +68,17 @@ const AreaEdit = (props) => {
                 setTransPoly(trans(tmpPolys));
                 //updateEditingData(tmpPolys);
             }
-
         });
+
+        // check out of range
+        polygons.forEach(function (item, idx) {
+            const dist = Math.sqrt(Math.pow((item.x - point.x), 2) + Math.pow((item.y - point.y), 2));
+           
+            if (item.x>drawWidth) polygons[idx].x=drawWidth;
+            if (item.y>drawHeight) polygons[idx].y=drawHeight;
+            
+        });
+
 
         updateEditingData(tmpPolys);
 
@@ -96,7 +112,7 @@ const AreaEdit = (props) => {
     }
 
 
-    const getLabelX = (polygons) => {
+    const getLabelX = (polygons,myText) => {
 
         if (polygons.length > 0) {
             let maxX = getMax(polygons, "x").x;
@@ -110,7 +126,8 @@ const AreaEdit = (props) => {
                 //t[idx].dist = dist;
             });
             let obj = getMin(dist, "dist");
-            return polygons[obj.id].x;
+            const myOffset=Math.round(6.66*myText.length)+33;
+            return polygons[obj.id].x-myOffset;
         }
 
         return 0;
@@ -310,6 +327,51 @@ const AreaEdit = (props) => {
                     }}
                 >
 
+
+                    {/* Line A for display */}
+                    <Line
+                        strokeWidth={3}
+                        stroke="blue"
+                        opacity={1}
+                        lineJoin="round"
+                        Draggable={props.lineMode}
+                        points={(lineADrawing) ? transLineA.concat([nextPointA.x, nextPointA.y]) : transLineA}
+                        onClick={event => {
+                        }}
+                        onDragMove={event => {
+                            setStopBubble(true);
+                            log('line A moving...')
+                            log(event)
+
+                        }}
+                        closed={false}
+                    /> 
+
+                    {/* Line B for display */}
+                    <Line
+                        strokeWidth={3}
+                        stroke="blue"
+                        opacity={1}
+                        lineJoin="round"
+                        //points={transLineB.concat([nextPointB.x,nextPointB.y])}
+                        points={(lineBDrawing) ? transLineB.concat([nextPointB.x, nextPointB.y]) : transLineB}
+                        onClick={event => {
+                        }}
+                        closed={false}
+                    />
+
+                     {/* Editing Cursor Node */}
+                     <Circle
+                        x={cursorX}
+                        y={cursorY}
+                        visible={cursorVisible}
+                        radius={radius}
+                        fill={'red'}
+                        stroke={'red'}
+                        strokeWidth={2}>
+                    </Circle>
+                    
+
                     {/* Edit Polygon for Display */}
                     <Line
                         // for display
@@ -321,13 +383,13 @@ const AreaEdit = (props) => {
                         points={transPoly}
                         onMouseUp={event => {
 
-                            log('mouse up')
+                            log('detect area mouse up')
                             log(props.lineMode)
                             log(lineADrawing)
 
                             if (props.mode==='line') {
 
-                                if (lineADrawing) {
+                                if (lineA.length === 1) {
 
                                     setLineADrawing(false);
                                     const x = event.evt.offsetX;
@@ -337,7 +399,7 @@ const AreaEdit = (props) => {
                                     dispatch(lineAUpdate([lineA[0].x,lineA[0].y,x,y]))
 
                                 }
-                                if (lineBDrawing) {
+                                if  ((lineA.length === 2)&&(lineB.length === 1)) {
 
                                     setLineBDrawing(false);
                                     const x = event.evt.offsetX;
@@ -413,7 +475,7 @@ const AreaEdit = (props) => {
 
                     {/* Edit Polygon Label */}
                     {/* <Label x={getLabelX() + 15} y={getLabelY() - 40}> */}
-                    <Label x={getLabelX(polygons)-60} y={getLabelY(polygons)-32}>
+                    <Label x={getLabelX(polygons,areaName)} y={getLabelY(polygons)-32}>
                         <Tag
                             fill={'white'}
                             opacity={1}
@@ -448,18 +510,36 @@ const AreaEdit = (props) => {
                             }
                             onClick={event => {
 
-                                const order = parseInt(event.target.attrs.order);
-                                log('x')
-                                log(event.target.getStage().getPointerPosition().x)
-                                log('y')
-                                log(event.target.getStage().getPointerPosition().y)
-                                let newPolys = polygons;
-                                newPolys.splice(order + 1, 0, { "x": event.target.getStage().getPointerPosition().x, "y": event.target.getStage().getPointerPosition().y });
-                                log(newPolys)
-                                setPolygons(newPolys);
-                                setTransPoly(trans(polygons));
-                                updateEditingData(polygons);
+                                if (props.mode==='edit'){
 
+                                    const order = parseInt(event.target.attrs.order);
+                                    log('x')
+                                    log(event.target.getStage().getPointerPosition().x)
+                                    log('y')
+                                    log(event.target.getStage().getPointerPosition().y)
+                                    let newPolys = polygons;
+                                    newPolys.splice(order + 1, 0, { "x": event.target.getStage().getPointerPosition().x, "y": event.target.getStage().getPointerPosition().y });
+                                    log(newPolys)
+                                    setPolygons(newPolys);
+                                    setTransPoly(trans(polygons));
+                                    updateEditingData(polygons);
+                                }
+
+                            }}
+                            onMouseOver={event => {
+                                
+                                if (props.mode==='edit'){
+                                    setCursorX(event.evt.offsetX);
+                                    setCursorY(event.evt.offsetY);
+                                    setCursorVisible(true);
+                                }
+                              
+                            }}
+                            onMouseOut={event => {
+                                log('mouse over...')
+                                setCursorVisible(false);
+                                setCursorX(-10);
+                                setCursorY(-10);
                             }}
                             closed={false}
 
@@ -467,8 +547,12 @@ const AreaEdit = (props) => {
 
                     ))}
 
+                   
+
                     {/* Edit Polygon Node */}
-                    {polygons.map((item, idx) => (
+                    {
+                    (props.mode==='edit') &&
+                    polygons.map((item, idx) => (
                         <Circle
                             key={idx}
                             x={item.x}
@@ -480,16 +564,13 @@ const AreaEdit = (props) => {
                             strokeWidth={2}
                             draggable={true}
                             onMouseOver={event => {
-                                //setRadius(15)
-                                log('mouse over')
-                                //event.target.attrs.fill = 'red';
-                                //log(event.target.attrs)
+                                event.target.fill('red');
                             }}
                             onMouseLeave={event => {
-                                //setRadius(10)
-                                log('mouse leave')
-                                //event.target.attrs.fill = 'white';
-                                //event.target.attrs.radius = 10;
+                                event.target.fill('white');
+                            }}
+                            onMouseOut={event => {
+                                event.target.fill('white');
                             }}
                             onDragMove={event => {
 
@@ -516,47 +597,35 @@ const AreaEdit = (props) => {
                         />
                     ))}
 
-                    {/* Line A*/}
-                    <Line
-                        strokeWidth={3}
-                        stroke="blue"
-                        opacity={1}
-                        lineJoin="round"
-                        Draggable={props.lineMode}
-                        points={(lineADrawing) ? transLineA.concat([nextPointA.x, nextPointA.y]) : transLineA}
-                        onClick={event => {
-                        }}
-                        onDragMove={event => {
-                            setStopBubble(true);
-                            log('line A moving...')
-                            log(event)
-
-                        }}
-                        closed={false}
-                    />
-
-
+                   
 
                     {/* Line A Node*/}
-                    {lineA.map((item, idx) => (
+                    {
+                    (props.mode==='line') &&
+                    lineA.map((item, idx) => (
                         <Circle
                             key={idx}
                             x={item.x}
                             y={item.y}
                             order={idx}
                             radius={radius}
+                           
                             fill={'white'}
                             stroke={'blue'}
                             strokeWidth={2}
                             draggable={props.lineMode}
                             onMouseOver={event => {
-
+                                event.target.fill('blue')
+                            }}
+                            onMouseOut={event => {
+                                event.target.fill('white')
                             }}
                             onMouseLeave={event => {
-
+                                event.target.fill('white')
                             }}
+                           
                             onDragMove={event => {
-
+                               
                                 const order = parseInt(event.target.attrs.order);
                                 let tmp = lineA;
                                 const x = event.evt.offsetX;
@@ -571,7 +640,7 @@ const AreaEdit = (props) => {
 
                             }}
                             onDragEnd={event => {
-                                log('line A drag end');
+                           
                                 dispatch(lineAUpdate(transLineA));
                             }}
                         />
@@ -601,21 +670,12 @@ const AreaEdit = (props) => {
                     }
 
 
-                    {/* Line B*/}
-                    <Line
-                        strokeWidth={3}
-                        stroke="blue"
-                        opacity={1}
-                        lineJoin="round"
-                        //points={transLineB.concat([nextPointB.x,nextPointB.y])}
-                        points={(lineBDrawing) ? transLineB.concat([nextPointB.x, nextPointB.y]) : transLineB}
-                        onClick={event => {
-                        }}
-                        closed={false}
-                    />
+                   
 
                     {/* Line B Node*/}
-                    {lineB.map((item, idx) => (
+                    {
+                     (props.mode==='line') &&
+                    lineB.map((item, idx) => (
                         <Circle
                             key={idx}
                             x={item.x}
@@ -627,10 +687,13 @@ const AreaEdit = (props) => {
                             strokeWidth={2}
                             draggable={props.lineMode}
                             onMouseOver={event => {
-
+                                event.target.fill('blue')
+                            }}
+                            onMouseOut={event => {
+                                event.target.fill('white')
                             }}
                             onMouseLeave={event => {
-
+                                event.target.fill('white')
                             }}
                             onDragMove={event => {
 

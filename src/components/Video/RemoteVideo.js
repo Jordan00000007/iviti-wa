@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import log from "../../utils/console";
+import { PropaneSharp } from '@mui/icons-material';
 
-const RemoteVideo = ({ uuid, status }) => {
+const RemoteVideo = ({ uuid, status,onPlaying }) => {
     const STREAM_SERVER = process.env.REACT_APP_STREAM_SERVER;
     const [remoteStream, setRemoteStream] = useState(null);
     const remoteVideoRef = useRef(null);
@@ -127,15 +128,18 @@ const RemoteVideo = ({ uuid, status }) => {
 
         if (status === 'set_task_run_loading') {
             setVideoMessage('Loading...');
+            onPlaying(false);
         }
         if (status === 'running') {
             //setVideoMessage('');
         }
         if (status === 'stop') {
             setVideoMessage('Switch on the AI task to view inference');
+            onPlaying(false);
         }
         if (status === 'set_task_stop_loading') {
             setVideoMessage('Stoping...');
+            onPlaying(false);
         }
 
     }, [status]);
@@ -148,9 +152,11 @@ const RemoteVideo = ({ uuid, status }) => {
     const myPlaying = () => {
         log('playing');
         //setVideoMessage('loading...');
+        
         setVideoMessage('');
         clearInterval(intervalId);
         setIntervalId(null);
+        onPlaying(true);
     }
 
     return (

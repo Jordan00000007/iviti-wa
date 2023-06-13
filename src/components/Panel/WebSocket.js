@@ -32,9 +32,6 @@ export const WebSocket = (props) => {
 
                 const myData = JSON.parse(lastMessage.data);
 
-                log('--- myData ---')
-                log(myData)
-
                 if (myData.type!==undefined){
                     if (myData.type==="TEMP"){
                         const myTemp=myData.data[props.device].temperature;
@@ -46,15 +43,9 @@ export const WebSocket = (props) => {
                         if (myTask){
                             let myNewArr = myTask.concat(messageHistory).slice(0, 9);
                             setMessageHistory(myNewArr);
-                            // log('myTask')
-                            // log(myTask)
-                            log('messageHistory')
-                            log(messageHistory)
-                            
+                          
                         }
-                      
-
-                        
+                          
                         const duration=moment.duration(myData.data.live_time,'seconds');
                         const minutes=duration.minutes();
                         const hours=duration.hours();

@@ -227,7 +227,7 @@ const updateTemperatureInfo=(state,uuid,message)=>{
 
 const tasksSlice = createSlice({
     name: "tasks",
-    initialState: { status: 'idle', data: [], error: null ,temperature:'N/A'},
+    initialState: { status: 'idle', data: [], error: null ,temperature:'N/A', deleteStatus:'idle',deleteMessage:''},
     reducers: {
         toggleOn(state, action) {
            
@@ -264,10 +264,31 @@ const tasksSlice = createSlice({
         // ---- fetch data conditions ---
         builder.addCase(
             fetchData.fulfilled,
-            (state, { payload }) => {
-                log('--- fetch tasks success ---');
-                state.data = payload.data;
-                state.status = 'success';
+            (state, action) => {
+               
+                if (action.payload.status_code === 200) {
+
+                    log('--- fetch data fulfilled  ---')
+                    log(action.payload)
+                    if (action.payload.message==="No task setup"){
+                        //log('empty')
+                        state.data = [];
+                    }else{
+                        //log('have data')
+                        state.data = action.payload.data;
+                    }
+                    
+                    state.status = 'success';
+                }else if(action.payload.status_code === 500){
+                    log('--- fetch data error ---')
+                    log(action.payload.message)
+                    state.error=action.payload.message;
+                    state.status = 'error';
+                } else {
+                    //return updateTaskStatus(state,action.meta.arg,'set_stream_delete_error');
+                    log('--- fetch data unknow error ---')
+                    state.status = 'error';
+                }
                
             }
         )
@@ -420,7 +441,7 @@ const tasksSlice = createSlice({
                     state.error='';
                 }else if (action.payload.status_code===500){
                     state.status='add_new_task_error'
-                    state.error=action.payload.message;
+                    state.error=JSON.stringify(action.payload.data.data);
                 }else{
                     state.status='add_new_task_error'
                     state.error='unknow error';
@@ -482,7 +503,18 @@ const tasksSlice = createSlice({
             deleteTask.fulfilled,
             (state, action) => {
                 log(`--- delete task fulfilled ---`);
-                log(action.payload);
+                if (action.payload.status_code === 200) {
+                    state.deleteMessage = 'Delete task success';
+                    state.deleteStatus = 'success';
+                }else if(action.payload.status_code === 500){
+                    state.deleteMessage=action.payload.message;
+                    state.deleteStatus = 'error';
+                } else {
+                    //return updateTaskStatus(state,action.meta.arg,'set_stream_delete_error');
+                    log('--- fetch data unknow error ---')
+                    state.deleteMessage="Unknow error";
+                    state.deleteStatus = 'error';
+                }
               
                 
             }
@@ -491,6 +523,7 @@ const tasksSlice = createSlice({
             deleteTask.pending,
             (state, action) => {
                 log(`--- delete task pending ---`);
+                state.deleteStatus='pending';
                 
             }
         )
@@ -498,6 +531,8 @@ const tasksSlice = createSlice({
             deleteTask.rejected,
             (state, action ) => {
                 log(`--- delete task rejected ---`);
+                state.deleteMessage='Delete task rejected';
+                state.deleteStatus='error';
             }
         )
 

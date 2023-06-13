@@ -31,13 +31,12 @@ export const getSourceFrame = createAsyncThunk('sources/getSourceFrame', async (
     log('--- get source frame start ---')
  
     let {fileUid,basicType}=myData;
-
-    //--- calculate widht and height ---
+ 
     const state = getState();
     const fileMaxWidth = (basicType)?864:804;
     const fileMaxHeight = 558;
-    const myWidth = parseInt(state.sources.width);
-    const myHeight = parseInt(state.sources.height);
+    const myWidth = parseInt(state.sources.originWidth);
+    const myHeight = parseInt(state.sources.originHeight);
     let fileSetWidth = Math.trunc((myWidth / myHeight) * fileMaxHeight);
     let fileSetHeight = Math.trunc((myHeight / myWidth) * fileMaxWidth);
     if (fileSetWidth <= fileMaxWidth) {
@@ -52,7 +51,7 @@ export const getSourceFrame = createAsyncThunk('sources/getSourceFrame', async (
         const myData={}
         myData.height=fileSetHeight;
         myData.width=fileSetWidth;
-        //log(`${TASK_URL}/sources/${uid}/frame`)
+
         const response = await fetch(`${TASK_URL}/sources/${fileUid}/frame`, {
             method: 'POST',
             headers: {
@@ -94,7 +93,7 @@ export const getSourceWidthHeight = createAsyncThunk('sources/getSourceWitdhHeig
 
 const sourcesSlice = createSlice({
     name: "sources",
-    initialState: { status: 'idle', data: [], uid: '', width: 0, height: 0, drawWidth: 0, drawHeight: 0, fileName: '', fileUrl: '', v4l2Data: [], v4l2Options: [], type:'', error: null },
+    initialState: { uploadStatus: 'idle', frameStatus:'idle' ,sizeStatus:'idle', data: [], uid: '', originWidth: 0, originHeight: 0, drawWidth: 0, drawHeight: 0, fileName: '', fileUrl: '', v4l2Data: [], v4l2Options: [], type:'', error: null },
     reducers: {
 
         resetErrorMessage(state) {
@@ -108,10 +107,32 @@ const sourcesSlice = createSlice({
             state.uid = '';
         },
         setSourceId(state,action) {
-            log('set source id')
-            state.uid = action.payload.uid;
+           
+            state.uid = action.payload;
             state.status='idle';
         },
+        resetFrameStatus(state,action) {
+            state.frameStatus='idle';
+        },
+        setDrawWidthHeight(state,action){
+            const {maxWidth,maxHeight}=action.payload;
+          
+            const myWidth = parseInt(state.originWidth);
+            const myHeight = parseInt(state.originHeight);
+            let drawWidth = Math.trunc((myWidth / myHeight) * maxHeight);
+            let drawHeight = Math.trunc((myHeight / myWidth) * maxWidth);
+            if (drawWidth <= maxWidth) {
+                drawHeight = maxHeight;
+            } else {
+                if (drawHeight <= maxHeight) {
+                    drawWidth = maxWidth;
+                }
+            }
+            state.drawWidth=drawWidth;
+            state.drawHeight=drawHeight;
+          
+         
+        }
     },
     extraReducers: (builder) => {
 
@@ -123,17 +144,17 @@ const sourcesSlice = createSlice({
                 if (action.payload.status_code === 200) {
 
                     log('--- upload source data fulfilled  ---')
-                    //log(action.payload)
+                   
                     state.data = action.payload.data;
                     state.uid = action.payload.data.uid;
-                    state.width = action.payload.data.width;
-                    state.height = action.payload.data.height;
+                    state.originWidth = action.payload.data.width;
+                    state.originHeight = action.payload.data.height;
                     state.fileName = action.payload.data.name;
                     state.type = action.payload.data.type.toUpperCase();
-                    state.status = 'success';
+                    state.uploadStatus = 'success';
                 }else if(action.payload.status_code === 500){
                     state.error=action.payload.message;
-                    state.status = 'success';
+                    state.uploadStatus = 'success';
                 } else {
                     //return updateTaskStatus(state,action.meta.arg,'set_stream_delete_error');
                     log('--- upload source data other ---')
@@ -145,7 +166,7 @@ const sourcesSlice = createSlice({
             uploadSourceData.pending,
             (state, { meta }) => {
                 log('--- upload source data pending ---');
-                state.status = 'loading';
+                state.uploadStatus = 'loading';
                 //return updateTaskStatus(state,meta.arg,'set_stream_delete_loading');
             }
         )
@@ -153,7 +174,7 @@ const sourcesSlice = createSlice({
             uploadSourceData.rejected,
             (state, action) => {
                 log(`--- upload source data rejected ---`);
-                state.status = 'rejected';
+                state.uploadStatus = 'rejected';
                 // return updateTaskStatus(state,action.meta.arg,'set_stream_delete_error');
             }
         )
@@ -207,12 +228,14 @@ const sourcesSlice = createSlice({
             getSourceFrame.fulfilled,
             (state, action) => {
              
+                log('--- get source frame fulfilled  ---')
                 const {width,height,blob} = action.payload;
                 const myImage= URL.createObjectURL(blob);
 
                 state.fileUrl = myImage;
                 state.drawHeight=height;
                 state.drawWidth=width;
+                state.frameStatus='success';
 
             }
         )
@@ -221,7 +244,7 @@ const sourcesSlice = createSlice({
             (state, { meta }) => {
 
                 log('--- get source frame pending  ---')
-                state.status = 'loading';
+                state.frameStatus = 'loading';
                 //return updateTaskStatus(state,meta.arg,'set_stream_delete_loading');
             }
         )
@@ -229,7 +252,7 @@ const sourcesSlice = createSlice({
             getSourceFrame.rejected,
             (state, action) => {
                 log('--- get source frame rejected  ---')
-                state.status = 'rejected';
+                state.frameStatus = 'rejected';
                 // return updateTaskStatus(state,action.meta.arg,'set_stream_delete_error');
             }
         )
@@ -239,17 +262,16 @@ const sourcesSlice = createSlice({
             getSourceWidthHeight.fulfilled,
             (state, action) => {
 
-                log('--- get source width height fulfilled ---')
                 const myData=action.payload.data;
                 myData.forEach(function (item, idx) {
                 
-                    if (item.uid.trim()===state.uid.trim()){
-                        state.width=parseInt(item.width);
-                        state.height=parseInt(item.height);
+                    if (item.uid===state.uid){
+                        state.originWidth=parseInt(item.width);
+                        state.originHeight=parseInt(item.height);
                         
                     }
                 })
-              
+                state.sizeStatus = 'success';
             }
         )
         builder.addCase(
@@ -257,7 +279,7 @@ const sourcesSlice = createSlice({
             (state, { meta }) => {
 
                 log('--- get source width height pending  ---')
-                state.status = 'loading';
+                state.sizeStatus = 'loading';
                 
             }
         )
@@ -265,7 +287,7 @@ const sourcesSlice = createSlice({
             getSourceWidthHeight.rejected,
             (state, action) => {
                 log('--- get source width height rejected  ---')
-                state.status = 'rejected';
+                state.sizeStatus = 'rejected';
                 
             }
         )
@@ -276,5 +298,5 @@ const sourcesSlice = createSlice({
 
 });
 export const sourcesActions = sourcesSlice.actions;
-export const { resetErrorMessage,resetFileName,setSourceId } = sourcesSlice.actions;
+export const { resetErrorMessage,resetFileName,setSourceId,resetFrameStatus,setDrawWidthHeight } = sourcesSlice.actions;
 export default sourcesSlice.reducer;

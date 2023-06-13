@@ -18,9 +18,9 @@ function CustomHeader() {
 
             <div className="row p-0 g-0">
                 <div className="col-12 p-0" onClick={handleClick}>
-                    <Link to="/Admin">
-                        <Logo />
-                    </Link>
+                    
+                    <Logo />
+                    
                 </div>
             </div>
 

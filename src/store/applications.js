@@ -44,10 +44,9 @@ const applicationsSlice = createSlice({
                     state.data = action.payload.data;
                     state.status = 'success';
                     
-                    log(myData)
-                    //return updateTemperatureInfo(state,action.meta.arg,action.payload.data);
+                  
                 }else{
-                    //return updateTaskStatus(state,action.meta.arg,'set_stream_delete_error');
+                  
                     log('--- other ---')
                 }
                 
@@ -81,8 +80,8 @@ const applicationsSlice = createSlice({
 
                     const areas=action.payload.data[0].app_setting.application.areas;
                     state.areas=action.payload.data[0].app_setting.application.areas;
-                    log('areas')
-                    log(areas)
+                 
+                    state.status = 'success';
                     
                 }else{
                     

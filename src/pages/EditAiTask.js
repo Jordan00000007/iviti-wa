@@ -1,8 +1,9 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import SimpleLayout from '../components/Layouts/SimpleLayout';
 import CustomButton from '../components/Buttons/CustomButton';
 import CustomAlert from '../components/Alerts/CustomAlert';
+import DrawingTooltip from '../components/Tooltips/DrawingTooltip';
 
 import CustomInput from '../components/Inputs/CustomInput';
 import LinePanel from '../components/Panel/LinePanel';
@@ -11,19 +12,22 @@ import CustomDrawing from '../components/Drawing/CustomDrawing';
 import { useSelector, useDispatch } from "react-redux";
 
 import { getAllDevices } from "../store/devices";
-import { getAllModels } from "../store/models";
+import { getAllModels, importModel, deleteModel } from "../store/models";
 import { getAllApplications } from "../store/applications";
 import { addTask, updateTask } from "../store/tasks";
 import areas, { initData, setDependOn, setLinePanel } from "../store/areas";
+
 
 import Modal from '@mui/joy/Modal';
 import ModalClose from '@mui/joy/ModalClose';
 import ModalDialog from '@mui/joy/ModalDialog';
 import Typography from '@mui/joy/Typography';
 import Sheet from '@mui/joy/Sheet';
+import Tooltip from '@mui/joy/Tooltip';
 
 import { Image } from "react-konva";
-import useImage from "use-image"
+import useImage from "use-image";
+import Hotkeys from "react-hot-keys";
 
 
 import log from "../utils/console";
@@ -31,6 +35,7 @@ import search from "../utils/search";
 
 import CustomSelect from '../components/Dropdowns/CustomSelect';
 import CustomSelectArea from '../components/Dropdowns/CustomSelectArea';
+import CustomSelectModel from '../components/Dropdowns/CustomSelectModel';
 import CustomSelectSource from '../components/Dropdowns/CustomSelectSource';
 import CustomLoading from '../components/Loading/CustomLoading';
 
@@ -46,8 +51,8 @@ import { ReactComponent as Image_Default } from '../assets/Image_Default.svg';
 import SourcePanel from '../components/Panel/SourcePanel';
 import DependOnSelectPanel from '../components/Panel/DependOnSelectPanel';
 
-import { getSourceFrame, setSourceId, getSourceWidthHeight, sourcesActions } from "../store/sources";
-import { areaSelected, areaRename, areaDelete, getAppSetting, setFileWidthHeight, areasActions, lineDataReset } from "../store/areas";
+import { getSourceFrame, setSourceId, getSourceWidthHeight, sourcesActions, resetFrameStatus } from "../store/sources";
+import { areaSelected, areaRename, areaDelete, getAppSetting, setFileWidthHeight, areasActions, lineDataReset, setModelData, resetStatus, setSelectedApplication,setSelectedModel } from "../store/areas";
 import { fetchData, deleteTask, resetError } from "../store/tasks";
 
 
@@ -93,7 +98,15 @@ function EditAiTask() {
     const lineRelationTitleRef = useRef(null);
     const taskTitleRef = useRef(null);
     const confidenceTitleRef = useRef(null);
-    const dependOnTitle=useRef(null);
+    const dependOnTitle = useRef(null);
+
+    const KeySRef = useRef(null);
+    const KeyERef = useRef(null);
+    const KeyARef = useRef(null);
+    const KeyLRef = useRef(null);
+    const KeyDRef = useRef(null);
+    const fileRef = useRef(null);
+
 
     const params = useParams();
 
@@ -112,6 +125,19 @@ function EditAiTask() {
 
     };
 
+    const setMessageKeep = (showType, showText) => {
+        setShowType(showType);
+        setShowText(showText);
+        alertRef.current.setShowKeep();
+
+    };
+
+    const setMessageClose = () => {
+
+        alertRef.current.setShowClose();
+
+    };
+
 
     const [colorList, setColorList] = useState([]);
     const [areaArr, setAreaArr] = useState([[0, 'Area 1']]);
@@ -124,18 +150,25 @@ function EditAiTask() {
     const areaShapeArr = useSelector((state) => state.areas.areaShapeArr);
     const areaDependOn = useSelector((state) => state.areas.areaDependOn);
     const areaEditingIndex = useSelector((state) => state.areas.areaEditingIndex);
+    const selectedApplicationSlice = useSelector((state) => state.areas.selectedApplication);
     const lineRelationArr = useSelector((state) => state.areas.lineRelationArr);
     const areaStatus = useSelector((state) => state.areas.status);
-
-
-
+    const modelStatus = useSelector((state) => state.models.status);
+    const deviceStatus = useSelector((state) => state.devices.status);
+    const applicationStatus = useSelector((state) => state.applications.status);
 
     const [selectedModel, setSelectedModel] = useState('');
     const [selectedDevice, setSelectedDevice] = useState('');
     const [selectedApplication, setSelectedApplication] = useState('');
     const [showAreaRenameModal, setShowAreaRenameModal] = useState(false);
+    const [showModelDeleteModal, setShowModelDeleteModal] = useState(false);
+    
     const [showTaskDeleteModal, setShowTaskDeleteModal] = useState(false);
     const [showLoadingModal, setShowLoadingModal] = useState(false);
+
+    const [deleteModelUid, setDeleteModelUid] = useState(null);
+    const [deleteModelName, setDeleteModelName] = useState('');
+
 
     const deviceArr = useSelector((state) => state.devices.options);
     const fileName = useSelector((state) => state.sources.fileName);
@@ -144,15 +177,27 @@ function EditAiTask() {
     const sourceUid = useSelector((state) => state.sources.uid);
     const drawWidth = useSelector((state) => state.sources.drawWidth);
     const drawHeight = useSelector((state) => state.sources.drawHeight);
-    const fileWidth = useSelector((state) => state.sources.width);
-    const fileHeight = useSelector((state) => state.sources.height);
+    const originWidth = useSelector((state) => state.sources.originWidth);
+    const originHeight = useSelector((state) => state.sources.originHeight);
     const modelUid = useSelector((state) => state.models.uid);
+
+    const modelImportStatus = useSelector((state) => state.models.importStatus);
+    const modelImportMessage = useSelector((state) => state.models.importMessage);
+
+    const modelDeleteStatus = useSelector((state) => state.models.deleteStatus);
+    const modelDeleteMessage = useSelector((state) => state.models.deleteMessage);
 
     const taskData = useSelector((state) => state.tasks.data);
     const taskStatus = useSelector((state) => state.tasks.status);
     const taskError = useSelector((state) => state.tasks.error);
 
-    const sourcesStatus = useSelector((state) => state.sources.status);
+    const taskDeleteMessage = useSelector((state) => state.tasks.deleteMessage);
+    const taskDeleteStatus = useSelector((state) => state.tasks.deleteStatus);
+
+
+    const uploadStatus = useSelector((state) => state.sources.uploadStatus);
+    const frameStatus = useSelector((state) => state.sources.frameStatus);
+    const sizeStatus = useSelector((state) => state.sources.sizeStatus);
 
     const taskNameRef = useRef(null);
 
@@ -161,30 +206,27 @@ function EditAiTask() {
 
     const dispatch = useDispatch();
 
-    useEffect(() => {
-        dispatch(getAllDevices());
-        dispatch(getAllModels());
-        dispatch(getAllApplications());
 
-    }, []);
-
-    useEffect(() => {
-
-        log('deviceArr--------------------')
-        log(deviceArr)
-
-        if (deviceArr.length > 0) {
-            //setSelectedDevice(deviceArr[0][0])
-
-            log(deviceArr[0][0])
-            log('selectedDevice--------------------')
-            log(selectedDevice)
-        }
-
-    }, [deviceArr]);
 
     const fileMaxWidth = 860;
     const fileMaxHeight = 558;
+
+    const handleImportModel = (event, value) => {
+        fileRef.current.click();
+    };
+
+    const handleModelDelete= (value) => {
+    
+        setDeleteModelUid(value.uid);
+        setDeleteModelName(value.name);
+        setShowModelDeleteModal(true);
+    };
+
+    const handleModelDeleteExecute= () => {
+        
+        setShowModelDeleteModal(false);
+        dispatch(deleteModel(deleteModelUid));
+    };
 
     useEffect(() => {
         setSourceContent(fileName);
@@ -200,10 +242,50 @@ function EditAiTask() {
 
     useEffect(() => {
 
-        if ((fileUid !== '') && (fileWidth !== 0) && (fileWidth !== 0) && (selectedApplication != '')) {
-            dispatch(getSourceFrame({ "fileUid": fileUid, "basicType": basicType }));
+        if (modelImportStatus === 'success') {
+            setMessageClose();
+            setMessageOpen(0, modelImportMessage);
+            fileRef.current.value = "";
+
+            setTimeout(() => {
+                dispatch(getAllModels());
+
+            }, 3000);
         }
-    }, [fileUid, fileWidth, fileHeight, basicType, selectedApplication]);
+        if (modelImportStatus === 'error') {
+            setMessageClose();
+            setMessageOpen(1, modelImportMessage);
+            fileRef.current.value = "";
+        }
+        if (modelImportStatus === 'loading') {
+            setMessageKeep(2, 'Import model loading...');
+        }
+
+
+    }, [modelImportStatus]);
+
+    useEffect(() => {
+
+        if (modelDeleteStatus === 'success') {
+            setMessageClose();
+            setMessageOpen(0, modelDeleteMessage);
+
+            setTimeout(() => {
+                dispatch(getAllModels());
+                setApplicationOptions([]);
+            }, 1000);
+        }
+        if (modelDeleteStatus === 'error') {
+            setMessageClose();
+            setMessageOpen(1, modelDeleteMessage);
+            
+        }
+        if (modelDeleteStatus === 'loading') {
+            setMessageKeep(2, 'Delete model loading...');
+        }
+
+
+    }, [modelDeleteStatus]);
 
 
     useEffect(() => {
@@ -223,6 +305,9 @@ function EditAiTask() {
 
     const handleModelChange = (event, value) => {
 
+        log('--- handle model change ---')
+        log(value)
+
         if (value) {
 
             setSelectedModel(value);
@@ -238,6 +323,7 @@ function EditAiTask() {
             });
             setApplicationOptions(myAppOptions);
             setShowAppSetting(false);
+            log('---(2) handle model change')
             dispatch(setDependOn(JSON.parse(myDependOn.replace(/'/g, '"'))))
 
 
@@ -248,34 +334,60 @@ function EditAiTask() {
 
     const handleApplicationChange = (event, value) => {
 
+        log('--- handle application change ---')
+        if ((value !== -1)&&(value!=="")) {
 
-        setSelectedApplication(value === null ? '' : value);
-        log('application change');
 
-        if (value) {
 
-            if (value.toLowerCase() === 'movement_zone') {
-                setLinePanel(true);
-                const myLinePanel = {};
-                myLinePanel.linePanel = true;
-                dispatch(areasActions.setLinePanel(myLinePanel))
-
-            } else {
-                setLinePanel(false);
-                const myLinePanel = {};
-                myLinePanel.linePanel = false;
-                dispatch(areasActions.setLinePanel(myLinePanel))
-                dispatch(areasActions.lineDataReset());
-
+            log(value)
+            if (value !== null) {
+                setSelectedApplication(value)
             }
 
-            if (value.toLowerCase().indexOf("basic") >= 0) {
 
-                setBasicType(true);
-                dispatch(getSourceFrame({ "fileUid": fileUid, "basicType": true }));
-            } else {
-                setBasicType(false);
-                dispatch(getSourceFrame({ "fileUid": fileUid, "basicType": false }));
+
+            if (value) {
+
+                if (value.toLowerCase() === 'movement_zone') {
+                    setLinePanel(true);
+                    const myLinePanel = {};
+                    myLinePanel.linePanel = true;
+                    dispatch(areasActions.setLinePanel(myLinePanel))
+
+                } else {
+                    setLinePanel(false);
+                    const myLinePanel = {};
+                    myLinePanel.linePanel = false;
+                    dispatch(areasActions.setLinePanel(myLinePanel))
+                    dispatch(areasActions.lineDataReset());
+
+                }
+
+                if (value.toLowerCase().indexOf("basic") >= 0) {
+                    setBasicType(true);
+                    dispatch(getSourceFrame({ "fileUid": fileUid, "basicType": true }));
+                } else {
+                    setBasicType(false);
+
+                    //------------
+                    const fileMaxWidth = 804;
+                    const fileMaxHeight = 558;
+                    const myWidth = parseInt(originWidth);
+                    const myHeight = parseInt(originHeight);
+                    let fileSetWidth = Math.trunc((myWidth / myHeight) * fileMaxHeight);
+                    let fileSetHeight = Math.trunc((myHeight / myWidth) * fileMaxWidth);
+                    if (fileSetWidth <= fileMaxWidth) {
+                        fileSetHeight = fileMaxHeight;
+                    } else {
+                        if (fileSetHeight <= fileMaxHeight) {
+                            fileSetWidth = fileMaxWidth;
+                        }
+                    }
+                    //------------
+
+                    dispatch(getSourceFrame({ "fileUid": fileUid, "basicType": false }));
+                    dispatch(initData({ "w": fileSetWidth, "h": fileSetHeight }));
+                }
             }
         }
 
@@ -283,11 +395,8 @@ function EditAiTask() {
 
     const handleAcceleratorsChange = (event, value) => {
 
-        log('device change')
-        log(value)
-
         if (value !== null) {
-            setSelectedDevice(value)
+            //setSelectedDevice(value)
         }
     };
 
@@ -329,6 +438,7 @@ function EditAiTask() {
     const submitCheck = () => {
         let myPass = true;
         // (1) check task name
+        log('(1) check task name')
         const myTaskName = taskNameRef.current.value.trim();
         if (myTaskName === '') {
             myPass = false;
@@ -338,7 +448,10 @@ function EditAiTask() {
             taskNameRef.current.className = "form-control roboto-b1 my-text-input";
             taskTitleRef.current.className = "my-input-title roboto-b2 py-1";
         }
+        log(myPass)
+
         // (2) check confidence
+        log('(2) check confidence')
         const myConfidence = confidenceRef.current.value;
         if (!between(myConfidence, 0.01, 0.99)) {
             myPass = false;
@@ -348,7 +461,12 @@ function EditAiTask() {
             confidenceRef.current.className = "form-control roboto-b1 my-text-input";
             confidenceTitleRef.current.className = "my-input-title roboto-b2 py-1"
         }
+        log(myPass)
+
         // (3) check depend on
+        log('(3) check depend on')
+        log('---- areaDependOn ----')
+        log(areaDependOn)
         let dependOnCountArr = [];
         areaDependOn.forEach(function (item, idx) {
             let myCount = 0;
@@ -358,31 +476,36 @@ function EditAiTask() {
             dependOnCountArr.push(myCount);
         });
         const foundIndex1 = dependOnCountArr.findIndex(element => element <= 0);
-        dependOnTitle.current.className="roboto-h5";
+        log('foundIndex1=' + foundIndex1)
+        log('dependOnCountArr.length=' + dependOnCountArr.length)
+        dependOnTitle.current.className = "roboto-h5";
         if (foundIndex1 >= 0) {
             myPass = false;
             dispatch(areaSelected(foundIndex1));
-            //return myPass;
-            log('---------------depend on have zero')
-            log(dependOnTitle.current.className)
-            dependOnTitle.current.className="roboto-h5 my-warnning";
+            dependOnTitle.current.className = "roboto-h5 my-warnning";
         }
+        log(myPass)
+
         // (4) check line drawing
+        log('(4) check line drawing')
         if (linePanel) {
             let foundIndex3 = -1;
             linePointArr.forEach(function (item, idx) {
-                if (item[0].length===0) foundIndex3=idx;
-                if (item[1].length===0) foundIndex3=idx;
+                if (item[0].length === 0) foundIndex3 = idx;
+                if (item[1].length === 0) foundIndex3 = idx;
             });
-            if (foundIndex3>=0){
-                myPass=false;
+            if (foundIndex3 >= 0) {
+                myPass = false;
                 dispatch(areaSelected(foundIndex3));
                 //return myPass;
 
             }
+
         }
+        log(myPass)
 
         // (5) check line relation
+        log('(5) check line relation')
         if (linePanel) {
 
             lineRelation1Ref.current.className = "form-control roboto-b1 my-text-input";
@@ -391,6 +514,9 @@ function EditAiTask() {
 
             let foundIndex2 = -1;
             lineRelationArr.forEach(function (item, idx) {
+                log('---------item')
+                log(item)
+
                 if (item[0].trim() === '') {
                     foundIndex2 = idx;
                 }
@@ -411,19 +537,19 @@ function EditAiTask() {
                 if (lineRelation1Ref.current.value.trim() === '') {
                     lineRelation1Ref.current.className = "form-control roboto-b1 my-text-input-warnning";
                     myFlag = true;
-                } 
+                }
 
                 if (lineRelation2Ref.current.value.trim() === '') {
                     lineRelation2Ref.current.className = "form-control roboto-b1 my-text-input-warnning";
                     myFlag = true;
-                } 
+                }
                 if (myFlag) {
                     lineRelationTitleRef.current.className = "my-area-p3-c3-1 d-flex flex-row roboto-h5 my-warnning";
-                } 
+                }
             }
-          
-        }
 
+        }
+        log(myPass)
 
         if (!myPass) {
             setMessageOpen(1, "Please fix the errors marked with red");
@@ -434,9 +560,12 @@ function EditAiTask() {
 
     }
 
+    const handleCancelClick = () => {
+        window.location.href = "/";
+    }
+
     const handleSubmit = () => {
         log('Submit Click');
-        log(submitCheck())
 
         if (submitCheck() === true) {
 
@@ -470,11 +599,16 @@ function EditAiTask() {
                 });
 
                 let myShape = [];
-                areaShapeArr[idx].forEach(function (item, idx) {
-                    let shape = [];
-                    shape.push(convertToScale(item.x, drawWidth), convertToScale(item.y, drawHeight));
-                    myShape.push(shape);
-                });
+                if (!basicType) {
+                    areaShapeArr[idx].forEach(function (item, idx) {
+                        let shape = [];
+                        shape.push(convertToScale(item.x, drawWidth), convertToScale(item.y, drawHeight));
+                        myShape.push(shape);
+                    });
+                }
+
+                log('----------------------selectedApplication')
+                log(selectedApplication)
 
                 let myLine = {};
                 if (selectedApplication.toLowerCase() === 'movement_zone') {
@@ -576,14 +710,12 @@ function EditAiTask() {
     }
 
     const handleDeleteMode = (event) => {
-        log('handle delete area');
-        //setMode('delete');
+
         dispatch(areaDelete());
     }
 
     const handleChangeMode = (myMode) => {
-        log('handle change mode');
-        log(myMode);
+
         setMode(myMode);
     }
 
@@ -600,8 +732,7 @@ function EditAiTask() {
     const handleDelete = () => {
 
         dispatch(deleteTask(taskUid));
-        navigate('/');
-
+        //window.location.href = "/";
     };
 
     const handleShowDeleteModal = () => {
@@ -610,31 +741,172 @@ function EditAiTask() {
 
     };
 
-    const handleDrawLineComplete= () => {
+    const handleDrawLineComplete = () => {
 
         setMode('select');
 
     };
 
+    const handleKeyDown = (keyName, e, handle) => {
+
+        e.preventDefault();
+
+        if (e.code === 'KeyS') {
+
+            setMode('select');
+        }
+        if (e.code === 'KeyE') {
+
+            setMode('edit');
+        }
+        if (e.code === 'KeyA') {
+
+            setMode('add');
+        }
+        if (e.code === 'KeyL') {
+
+            setMode('line');
+        }
+        if (e.code === 'KeyD') {
+
+            dispatch(areaDelete());
+        }
+
+    };
+
+    const handleFileChange = (event, value) => {
+
+        log('handle file change')
+
+        if (event.target.files) {
+
+            // dispatch(resetFileName());
+
+            const file = event.target.files[0];
+            const formData = new FormData();
+            formData.append('file', event.target.files[0]);
+            dispatch(importModel(formData))
+
+            // setShowType(2);
+            // setShowText('Loading...');
+            // setShowInterval(10000);
+            // alertRef.current.setShowTrue();
+
+        }
+
+    };
+
+  
+
     useEffect(() => {
 
-        if ((sourceUid !== '') && (selectedModel !== '') && (selectedApplication !== '') && (taskUid === '')) {
-            // log('---(1) --- set show app setting true')
+        if (taskDeleteStatus === 'success') {
+            setShowTaskDeleteModal(false);
+            setMessageClose();
+            setMessageOpen(0, taskDeleteMessage);
 
-            setShowAppSetting(true);
+            window.location.href="/"
+        }
+        if (taskDeleteStatus === 'error') {
+            setShowTaskDeleteModal(false);
+            setMessageClose();
+            setMessageOpen(1, taskDeleteMessage);
+            
+        }
+        if (taskDeleteStatus === 'loading') {
+            setMessageKeep(2, 'Delete task loading...');
         }
 
 
-    }, [sourceUid, selectedModel, selectedApplication]);
+    }, [taskDeleteStatus]);
+
+
+
+
 
     useEffect(() => {
+
+        if ((taskUid !== '') && (modelType !== '') && (applicationData !== [])) {
+            const myAppArr = search(applicationData, modelType);
+            const myIndex = taskData.findIndex(item => item.task_uid === taskUid);
+            const myItem = taskData[myIndex];
+            const { app_name } = myItem;
+            //setSelectedApplication('');
+            //setSelectedApplication(app_name[0]);
+
+            let myAppOptions = [];
+            myAppArr.forEach(item => {
+                myAppOptions.push([item, item.replace(/_/g, " ")])
+            });
+            setApplicationOptions(myAppOptions);
+            log('---(3) set application selected data')
+            log(app_name[0])
+            setSelectedApplication(app_name[0]);
+
+            (app_name[0].toLowerCase() === 'movement_zone') ? setLinePanel(true) : setLinePanel(false);
+        }
+
+
+    }, [taskUid, modelType, applicationData]);
+
+
+
+
+
+
+    useEffect(() => {
+
+        if (modelType !== '') {
+
+            const myIndex_1 = modelData.findIndex(item => item.type === modelType);
+            const myDependOn = modelData[myIndex_1].classes;
+
+            if (taskUid === '') {
+                dispatch(setDependOn(JSON.parse(myDependOn.replace(/'/g, '"'))))
+            }
+
+        }
+
+    }, [modelType]);
+
+    useEffect(() => {
+
+        if ((deviceStatus === 'success') && (selectedDevice === '')) {
+            setSelectedDevice(deviceArr[0][0]);
+            deviceRef.current.setSelectedValue(deviceArr[0][0]);
+        }
+
+    }, [deviceStatus]);
+
+
+
+    // [01] get all options data
+    useEffect(() => {
+
+        setShowLoadingModal(true);
         if (params.uuid) {
             setTaskUid(params.uuid);
-            setShowLoadingModal(true);
-            dispatch(fetchData());
         }
-    }, [params.uuid]);
+        dispatch(getAllDevices());
+        dispatch(getAllModels());
+        dispatch(getAllApplications());
+    }, []);
 
+    // [02] handle all options data and fetch task data
+    useEffect(() => {
+
+        if ((modelStatus === 'success') && (applicationStatus === 'success') && (deviceStatus === 'success')) {
+
+            if (params.uuid !== undefined) {
+                dispatch(fetchData());
+            } else {
+                setShowLoadingModal(false);
+            }
+        }
+
+    }, [modelStatus, applicationStatus, deviceStatus]);
+
+    // [03] handle tasks data and fetch source width height
     useEffect(() => {
 
         if ((taskStatus === 'success') && (taskUid !== '')) {
@@ -643,20 +915,43 @@ function EditAiTask() {
             const myItem = taskData[myIndex];
 
             const { model_uid, model_type, task_name, model_setting, device, source_name, source_uid, app_name } = myItem;
-            setSelectedModel(model_uid);
-            setModelType(model_type);
+
+            log('--- (1) set task name ---')
+            log(task_name)
             setTaskName(task_name);
+
+            log('--- (2) set confidence ---')
+            log(model_setting.confidence_threshold)
             setConfidence(model_setting.confidence_threshold);
 
-            log('---set device---')
-            log(device)
-            setSelectedDevice(device);
+            log('--- (3) set source name ---')
+            log(source_name[0])
             setSourceContent(source_name[0]);
+
+            log('--- (4) set source id ---')
+            log(source_uid)
             setSourceId(source_uid);
 
-            const myPayload = {};
-            myPayload.uid = source_uid;
-            dispatch(sourcesActions.setSourceId(myPayload));
+            log('--- (5) set device ---')
+            log(device)
+            setSelectedDevice(device);
+            deviceRef.current.setSelectedValue(device);
+
+            log('--- (6) set model ---')
+            log(model_uid)
+            setSelectedModel(model_uid);
+            modelRef.current.setSelectedValue(model_uid);
+
+            log('--- (7) set application ---')
+            log(app_name[0])
+            setSelectedApplication(app_name[0]);
+            applicationRef.current.setSelectedValue(app_name[0]);
+
+            log('--- (8) set model type ---')
+            log(model_type)
+            setModelType(model_type);
+
+            dispatch(sourcesActions.setSourceId(source_uid));
             dispatch(getSourceWidthHeight());
 
             (app_name[0].toLowerCase().indexOf("basic") >= 0) ? setBasicType(true) : setBasicType(false);
@@ -673,8 +968,6 @@ function EditAiTask() {
 
         }
 
-
-
         if (taskStatus === 'update_edit_task_success') {
             dispatch(resetError());
             navigate('/');
@@ -689,7 +982,7 @@ function EditAiTask() {
 
         if (taskStatus === 'add_new_task_success') {
             dispatch(resetError());
-            navigate('/');
+            window.location.href = '/';
         }
 
         if (taskStatus === 'add_new_task_error') {
@@ -702,105 +995,153 @@ function EditAiTask() {
 
     }, [taskStatus]);
 
+    // [04] handle source width height and fetch picture
+    useEffect(() => {
+        // log('--------------- get source frame ------------------')
+        // log('sizeStatus=' + sizeStatus)
+        // log('originWidth=' + originWidth)
+        // log('originHeight=' + originHeight)
+        // log('sourceId=' + sourceId)
+        // log('basicType=' + basicType)
+
+        if ((sizeStatus === 'success') && (originWidth > 0) && (originHeight > 0) && (sourceId !== null)) {
+           
+            dispatch(getSourceFrame({ "fileUid": sourceId, "basicType": basicType }));
+        }
+
+    }, [sizeStatus, originWidth, originHeight, sourceId]);
+
+    // [05] handle source frame and fetch app setting
     useEffect(() => {
 
-        log('---------- fetch app setting ---')
-
-        if ((taskUid !== '') && (drawHeight > 0) && (drawWidth > 0)) {
+        log('frameStatus=' + frameStatus)
+        log('areaStatus=' + areaStatus)
+        if ((frameStatus === 'success') && (taskUid !== '') && (areaStatus === 'idle')) {
+            // log('taskUid=' + taskUid)
+            // log('drawWidth=' + drawWidth)
+            // log('drawHeight=' + drawHeight)
+            // log('modelData')
+            // log(modelData)
+            // log('fire fetch app setting-----------------------------')
 
             dispatch(setFileWidthHeight({ "drawWidth": drawWidth, "drawHeight": drawHeight }))
+            dispatch(setModelData(modelData));
+           
+            log('--selected model---')
+            log(selectedModel)
+            dispatch(areasActions.setSelectedModel({"selectedModel":selectedModel}));
             dispatch(getAppSetting(taskUid));
+            dispatch(resetFrameStatus());
         }
 
-        if ((taskUid === '') && (drawHeight > 0) && (drawWidth > 0)) {
+    }, [frameStatus]);
 
-            dispatch(initData({ "w": drawWidth, "h": drawHeight }));
-        }
-
-    }, [taskUid, drawHeight, drawWidth])
-
+    // [06] handle appsetting complete
     useEffect(() => {
 
-        if ((taskUid !== '') && (modelType !== '') && (applicationData !== [])) {
-            const myAppArr = search(applicationData, modelType);
-            const myIndex = taskData.findIndex(item => item.task_uid === taskUid);
-            const myItem = taskData[myIndex];
-            const { app_name } = myItem;
-            setSelectedApplication('');
-            setSelectedApplication(app_name[0]);
-
-            let myAppOptions = [];
-            myAppArr.forEach(item => {
-                myAppOptions.push([item, item.replace(/_/g, " ")])
-            });
-            setApplicationOptions(myAppOptions);
-            setSelectedApplication(app_name[0]);
-
-            (app_name[0].toLowerCase() === 'movement_zone') ? setLinePanel(true) : setLinePanel(false);
-        }
-
-
-    }, [taskUid, modelType, applicationData]);
-
-
-    useEffect(() => {
-
-        if ((sourcesStatus === 'success') && (taskUid !== '')) {
-            const myIndex = taskData.findIndex(item => item.task_uid === taskUid);
-            const myItem = taskData[myIndex];
-            const { source_uid } = myItem;
-            if (selectedApplication.toLowerCase().indexOf("basic") >= 0) {
-                setBasicType(true);
-                dispatch(getSourceFrame({ "fileUid": source_uid, "basicType": true }));
-            } else {
-                setBasicType(false);
-                dispatch(getSourceFrame({ "fileUid": source_uid, "basicType": false }));
-            }
-
-        }
-        if ((sourcesStatus === 'success') && (taskUid === '')) {
-            dispatch(initData({ "w": drawWidth, "h": drawHeight }));
-        }
-
-    }, [sourcesStatus]);
-
-    useEffect(() => {
-
-        log('----- area status -----')
-        log(areaStatus)
         if (areaStatus === 'complete') {
             if (taskUid !== '') {
-                setShowAppSetting(true);
-               
-            }
 
+                log('areaStatus=' + areaStatus);
+                setShowAppSetting(true);
+                setShowLoadingModal(false);
+                // dispatch(resetStatus());
+            }
         }
 
     }, [areaStatus]);
 
+
+
+    // useEffect(() => {
+
+    //     if ((sourceStatus === 'success') && (taskUid !== '')) {
+    //         const myIndex = taskData.findIndex(item => item.task_uid === taskUid);
+    //         const myItem = taskData[myIndex];
+    //         const { source_uid } = myItem;
+    //         if (selectedApplication.toLowerCase().indexOf("basic") >= 0) {
+    //             setBasicType(true);
+    //             dispatch(getSourceFrame({ "fileUid": source_uid, "basicType": true }));
+    //         } else {
+    //             setBasicType(false);
+    //             dispatch(getSourceFrame({ "fileUid": source_uid, "basicType": false }));
+    //         }
+
+    //     }
+    //     if ((sourceStatus === 'success') && (taskUid === '')) {
+    //         dispatch(initData({ "w": drawWidth, "h": drawHeight }));
+    //     }
+
+    // }, [sourceStatus]);
+
+
+
+
+    // useEffect(() => {
+
+    //     if (selectedApplicationSlice.toLowerCase() === 'movement_zone') {
+    //         setLinePanel(true);
+    //         const myLinePanel = {};
+    //         myLinePanel.linePanel = true;
+    //         dispatch(areasActions.setLinePanel(myLinePanel))
+
+    //     } else {
+    //         setLinePanel(false);
+    //         const myLinePanel = {};
+    //         myLinePanel.linePanel = false;
+    //         dispatch(areasActions.setLinePanel(myLinePanel))
+    //         dispatch(areasActions.lineDataReset());
+
+    //     }
+
+    //     if (selectedApplicationSlice.toLowerCase().indexOf("basic") >= 0) {
+    //         setBasicType(true);
+    //     } else {
+    //         setBasicType(false);
+    //     }
+
+
+    // }, [selectedApplicationSlice]);
+
+    
+
     useEffect(() => {
 
-        if (modelType !== '') {
+        if ((sourceUid !== '') && (selectedModel !== '') && (selectedApplication !== '') && (taskUid === '')) {
+            log('---(1) add task --- set show app setting true')
 
-            const myIndex_1 = modelData.findIndex(item => item.type === modelType);
-            const myDependOn = modelData[myIndex_1].classes;
-            dispatch(setDependOn(JSON.parse(myDependOn.replace(/'/g, '"'))))
+            //------------
+            const fileMaxWidth = 804;
+            const fileMaxHeight = 558;
+            const myWidth = parseInt(originWidth);
+            const myHeight = parseInt(originHeight);
+            let fileSetWidth = Math.trunc((myWidth / myHeight) * fileMaxHeight);
+            let fileSetHeight = Math.trunc((myHeight / myWidth) * fileMaxWidth);
+            if (fileSetWidth <= fileMaxWidth) {
+                fileSetHeight = fileMaxHeight;
+            } else {
+                if (fileSetHeight <= fileMaxHeight) {
+                    fileSetWidth = fileMaxWidth;
+                }
+            }
+            //------------
+
+            dispatch(initData({ "w": fileSetWidth, "h": fileSetHeight }));
+            dispatch(getSourceFrame({ "fileUid": fileUid, "basicType": basicType }));
+            setShowAppSetting(true);
         }
 
-    }, [modelType]);
 
-    useEffect(() => {
+    }, [sourceUid, selectedModel, selectedApplication]);
 
-        if ((areaStatus==='complete')&&(fileUrl!=='')){
-            setShowLoadingModal(false);
-        }
-
-    }, [areaStatus,fileUrl]);
 
 
     return (
         <SimpleLayout>
-
+            <Hotkeys
+                keyName="s,e,a,l,d"
+                onKeyDown={handleKeyDown.bind(this)}
+            />
             <CustomAlert message={showText} type={showType} ref={alertRef} />
             <div className="container p-0">
                 <div className="my-body">
@@ -814,7 +1155,7 @@ function EditAiTask() {
                                 </div>
                             }
 
-                           
+
                             {
                                 (taskUid !== '') &&
                                 <div className="my-body-title roboto-h2">
@@ -892,11 +1233,11 @@ function EditAiTask() {
 
                                     {
                                         (taskUid !== '') &&
-                                        <CustomSelect areaArr={modelArr} width="240" height="52" fontSize="16" className="my-dropdown-select" onChange={handleModelChange} placeHolder={true} ref={modelRef} defaultValue={selectedModel} disabled={(taskUid === '') ? false : true}></CustomSelect>
+                                        <CustomSelect areaArr={modelArr} width="240" height="52" fontSize="16" className="my-dropdown-select" onChange={handleModelChange} placeHolder={false} ref={modelRef} defaultValue={selectedModel} disabled={true} name="model"></CustomSelect>
                                     }
                                     {
                                         (taskUid === '') &&
-                                        <CustomSelect areaArr={modelArr} width="240" height="52" fontSize="16" className="my-dropdown-select" onChange={handleModelChange} placeHolder={true} ref={modelRef} disabled={(taskUid === '') ? false : true}></CustomSelect>
+                                        <CustomSelectModel areaArr={modelArr} width="240" height="52" fontSize="16" className="my-dropdown-select" onChange={handleModelChange} placeHolder={true} ref={modelRef} disabled={false} name="model" importModel={handleImportModel} modelDelete={handleModelDelete}></CustomSelectModel>
                                     }
                                 </div>
                             </div>
@@ -907,11 +1248,11 @@ function EditAiTask() {
                                 <div>
                                     {
                                         (taskUid !== '') &&
-                                        <CustomSelect areaArr={applicationOptions} width="240" height="52" fontSize="16" className="my-dropdown-select" onChange={handleApplicationChange} placeHolder={true} ref={applicationRef} defaultValue={selectedApplication}></CustomSelect>
+                                        <CustomSelect areaArr={applicationOptions} width="240" height="52" fontSize="16" className="my-dropdown-select" onChange={handleApplicationChange} placeHolder={false} ref={applicationRef} name="application"></CustomSelect>
                                     }
                                     {
                                         (taskUid === '') &&
-                                        <CustomSelect areaArr={applicationOptions} width="240" height="52" fontSize="16" className="my-dropdown-select" onChange={handleApplicationChange} placeHolder={true} ref={applicationRef}></CustomSelect>
+                                        <CustomSelect areaArr={applicationOptions} width="240" height="52" fontSize="16" className="my-dropdown-select" onChange={handleApplicationChange} placeHolder={true} ref={applicationRef} name="application"></CustomSelect>
                                     }
 
                                 </div>
@@ -934,11 +1275,11 @@ function EditAiTask() {
                                 <div>
                                     {
                                         (taskUid !== '') &&
-                                        <CustomSelect areaArr={deviceArr} width="240" height="52" fontSize="16" className="my-dropdown-select" onChange={handleAcceleratorsChange} placeHolder={true} ref={deviceRef} defaultValue={selectedDevice} disabled={(taskUid === '') ? false : true}></CustomSelect>
+                                        <CustomSelect areaArr={deviceArr} width="240" height="52" fontSize="16" className="my-dropdown-select" onChange={handleAcceleratorsChange} placeHolder={false} ref={deviceRef} defaultValue={selectedDevice} disabled={true} name="device"></CustomSelect>
                                     }
                                     {
                                         (taskUid === '') &&
-                                        <CustomSelect areaArr={deviceArr} width="240" height="52" fontSize="16" className="my-dropdown-select" onChange={handleAcceleratorsChange} placeHolder={true} ref={deviceRef}  defaultValue={"CPU"} disabled={(taskUid === '') ? false : true}></CustomSelect>
+                                        <CustomSelect areaArr={deviceArr} width="240" height="52" fontSize="16" className="my-dropdown-select" onChange={handleAcceleratorsChange} placeHolder={true} ref={deviceRef} defaultValue={selectedDevice} disabled={false} name="device"></CustomSelect>
                                     }
 
                                 </div>
@@ -978,20 +1319,28 @@ function EditAiTask() {
 
                                                 <td className='my-area-p3-a'>
                                                     <div className='w-100 h-100 d-flex flex-column p-0 align-items-center'>
-                                                        <div className="position-relative">
-                                                            <ToolIcon_Point className={mode === 'select' ? "my-tool-icon-selected p-0 mt-3 mb-1" : "my-tool-icon p-0 mt-3 mb-1"} onClick={handleSelectMode} />
-                                                        </div>
+                                                        <DrawingTooltip title="Select area">
+                                                            <ToolIcon_Point className={mode === 'select' ? "my-tool-icon-selected p-0 mt-3 mb-1" : "my-tool-icon p-0 mt-3 mb-1"} onClick={handleSelectMode} ref={KeySRef} />
+                                                        </DrawingTooltip>
 
-                                                        <ToolIcon_Pen className={mode === 'edit' ? "my-tool-icon-selected p-0 mt-3 mb-1" : "my-tool-icon p-0 mt-3 mb-1"} onClick={handleEditMode} />
+                                                        <DrawingTooltip title="Edit area">
+                                                            <ToolIcon_Pen className={mode === 'edit' ? "my-tool-icon-selected p-0 mt-3 mb-1" : "my-tool-icon p-0 mt-3 mb-1"} onClick={handleEditMode} ref={KeyERef} />
+                                                        </DrawingTooltip>
 
-                                                        <ToolIcon_Pen_Add className={mode === 'add' ? "my-tool-icon-selected p-0 mt-3 mb-1" : "my-tool-icon p-0 mt-3 mb-1"} onClick={handleAddMode} />
+                                                        <DrawingTooltip title="Add new area">
+                                                            <ToolIcon_Pen_Add className={mode === 'add' ? "my-tool-icon-selected p-0 mt-3 mb-1" : "my-tool-icon p-0 mt-3 mb-1"} onClick={handleAddMode} ref={KeyARef} />
+                                                        </DrawingTooltip>
 
                                                         {
                                                             linePanel &&
-                                                            <ToolIcon_Line className={mode === 'line' ? "my-tool-icon-selected p-0 mt-3 mb-1" : "my-tool-icon p-0 mt-3 mb-1"} onClick={handleLineMode} />
+                                                            <DrawingTooltip title="Set line">
+                                                                <ToolIcon_Line className={mode === 'line' ? "my-tool-icon-selected p-0 mt-3 mb-1" : "my-tool-icon p-0 mt-3 mb-1"} onClick={handleLineMode} ref={KeyLRef} />
+                                                            </DrawingTooltip>
                                                         }
 
-                                                        <ToolIcon_Delete className={mode === 'delete' ? "my-tool-icon-selected p-0 mt-3 mb-1" : "my-tool-icon p-0 mt-3 mb-1"} onClick={handleDeleteMode} />
+                                                        <DrawingTooltip title="Delete">
+                                                            <ToolIcon_Delete className={mode === 'delete' ? "my-tool-icon-selected p-0 mt-3 mb-1" : "my-tool-icon p-0 mt-3 mb-1"} onClick={handleDeleteMode} ref={KeyDRef} />
+                                                        </DrawingTooltip>
                                                     </div>
                                                 </td>
                                             }
@@ -1038,7 +1387,7 @@ function EditAiTask() {
                                                         }
                                                     </div>
                                                     <div className='my-area-p3-c2'>
-                                                        <DependOnSelectPanel linePanel={linePanel} basicType={basicType} ref={dependOnTitle}/>
+                                                        <DependOnSelectPanel linePanel={linePanel} basicType={basicType} ref={dependOnTitle} areaDependOn={areaDependOn} />
                                                         {/* <DependOnSelectPanel dependOn={[]} linePanel={linePanel}/> */}
                                                     </div>
 
@@ -1074,9 +1423,8 @@ function EditAiTask() {
 
                     <div className="row p-0 g-0 mb-3">
                         <div className="col-12 d-flex justify-content-end align-items-center my-flex-gap gap-3">
-                            <Link to="/">
-                                <CustomButton name='cancel'></CustomButton>
-                            </Link>
+
+                            <CustomButton name='cancel' onClick={handleCancelClick}></CustomButton>
 
                             <CustomButton name={(taskUid === '') ? 'submit' : 'save'} onClick={handleSubmit} disabled={!showAppSetting}></CustomButton>
                         </div>
@@ -1170,6 +1518,45 @@ function EditAiTask() {
                 </ModalDialog>
             </Modal>
 
+            <Modal
+                open={showModelDeleteModal}
+            >
+                <ModalDialog
+                    sx={{ minWidth: 500, maxWidth: 500, minHeight: 400 }}
+                >
+                    <div className='container-fluid'>
+                        <div className='row'>
+                            <div className='col-12 roboto-h2 p-0' style={{ paddingTop: 20, paddingLeft: 20 }}>
+                                <div style={{ paddingTop: 20, paddingLeft: 20 }}>
+                                    Delete {deleteModelName}
+                                </div>
+
+                            </div>
+                        </div>
+                        <div className='row'>
+                            <div className='col-12 roboto-b1 p-0' style={{ color: 'var(--on_color_1)' }}>
+                                <div style={{ paddingTop: 25, paddingLeft: 20 }}>
+                                    {deleteModelName} will be deleted.
+                                </div>
+
+                            </div>
+                        </div>
+
+                        <div className='row'>
+                            <div className='col-12 d-flex justify-content-end '>
+                                <div style={{ paddingTop: 205, paddingRight: 8 }} className='d-flex gap-3'>
+                                    <CustomButton name="cancel" onClick={() => {
+                                        setShowModelDeleteModal(false);
+                                    }} />
+                                    <CustomButton name="delete" onClick={handleModelDeleteExecute} />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </ModalDialog>
+            </Modal>
+
+
 
             <Modal
                 open={showLoadingModal}
@@ -1177,12 +1564,14 @@ function EditAiTask() {
                 <ModalDialog
                     sx={{ minWidth: 200, maxWidth: 200, minHeight: 200 }}
                 >
-                    <div style={{width:160,height:160,background:'white',paddingTop:33,paddingLeft:33}}>
-                        <CustomLoading/>
+                    <div style={{ width: 160, height: 160, background: 'white', paddingTop: 33, paddingLeft: 33 }}>
+                        <CustomLoading />
                     </div>
                 </ModalDialog>
             </Modal>
 
+
+            <input type="file" name="files" onChange={handleFileChange} ref={fileRef} style={{ visibility: 'hidden', width: '0px', height: '0px' }} />
         </SimpleLayout>
     );
 }

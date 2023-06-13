@@ -29,6 +29,23 @@ div::-webkit-scrollbar-thumb {
     border-radius: 10px;
 }
 
+.my-body::-webkit-scrollbar {
+    width: 6px;
+}
+
+.my-body::-webkit-scrollbar-track {
+
+    margin: 2px;
+    border-radius: 10px;
+    background: rgba(224, 225, 230, 0.376);
+
+}
+
+.my-body::-webkit-scrollbar-thumb {
+    background: rgb(224, 225, 230);
+    border-radius: 10px;
+}
+
 .App {
     text-align: center;
 }
@@ -142,7 +159,7 @@ div::-webkit-scrollbar-thumb {
 
 .custom-cursor {
     cursor: url('../assets/Cursor_Pen.svg') 6 6, auto;
-  }
+}
 
 
 .my-button-add {
@@ -202,6 +219,11 @@ div::-webkit-scrollbar-thumb {
     background-color: var(--highlight_2);
 }
 
+.my-button-view:disabled {
+    background-color: #E0E1E65C;
+    color:#16272E29;
+}
+
 .my-button-cancel {
     background-color: var(--base_3);
     color: var(--on_color_1);
@@ -253,7 +275,7 @@ div::-webkit-scrollbar-thumb {
 
 .my-button-stop {
     font-size: 15px;
-    background-color: #21D59B14;
+    background-color: #979CB514;
     color: var(--on_color_2);
     padding: 0px 0px 0px 0px;
     border: solid 1px var(--on_color_2);
@@ -264,7 +286,7 @@ div::-webkit-scrollbar-thumb {
 
 .my-button-loading {
     font-size: 15px;
-    background-color: #21D59B14;
+    background-color: #FEAC5414;
     color: var(--vivid_2);
     padding: 0px 0px 0px 0px;
     border: solid 1px var(--vivid_2);
@@ -275,7 +297,7 @@ div::-webkit-scrollbar-thumb {
 
 .my-button-error {
     font-size: 15px;
-    background-color: #21D59B14;
+    background-color: #E61F2314; 
     color: var(--highlight_1);
     padding: 0px 0px 0px 0px;
     border: solid 1px var(--highlight_1);
@@ -505,13 +527,13 @@ div::-webkit-scrollbar-thumb {
 }
 
 .my-area-p3-c1 {
-    width: 320px;
+    width: 318px;
     border-bottom: 1px solid #E0E1E6;
     padding: 16px 20px;
 } 
 
 .my-area-p3-c2 {
-    width: 320px;
+    width: 318px;
     /* height: 330px;
     border-bottom: 1px solid #E0E1E6; */
     padding-top: 13px;
@@ -522,7 +544,7 @@ div::-webkit-scrollbar-thumb {
 }
 
 .my-area-p3-c3 {
-    width: 320px;
+    width: 318px;
     /* margin-top: 12px;
     margin-left: 20px; */
     border-top: 1px solid #E0E1E6;
@@ -661,6 +683,7 @@ div::-webkit-scrollbar-thumb {
     background-color: var(--bg_gray);
     border-radius: 100px;
     border: 0px;
+    padding-top: 2px;
 }
 
 .my-label-button-select:hover {
@@ -850,11 +873,23 @@ div::-webkit-scrollbar-thumb {
 
 .css-63sa2y-JoySelect-button {
     opacity: 0.31 !important; 
+    border-radius: 12px!important;   
    
 }
 
-.css-114iouz-JoyModal-backdrop{
-    backdrop-filter: blur(0px)!important;
+
+.MuiModal-backdrop{
+    backdrop-filter: blur(0px)!important;   
+}
+
+.MuiModal-root{
+    background-color:#0000001f!important;
+}
+
+.MuiModalDialog-root{
+    border: 1px solid #E0E1E6!important;
+    border-radius: 12px!important; 
+    box-shadow: 0px 0px 4px #CACBD733!important;
 }
 
 
@@ -949,6 +984,16 @@ div::-webkit-scrollbar-thumb {
 
 input:checked+.my-toggle-slider {
     background-color: #34C756;
+    /* Toggle Checked Color */
+}
+
+input:checked:disabled+.my-toggle-slider {
+    opacity: 0.4;
+    /* Toggle Checked Color */
+}
+
+input:disabled+.my-toggle-slider {
+    opacity: 0.4;
     /* Toggle Checked Color */
 }
 
@@ -1229,9 +1274,6 @@ input:checked+.my-toggle-slider:before {
 /* .MuiSelect-button{
     opacity: 0.5!important;
 } */
-
-
-
 
 
 

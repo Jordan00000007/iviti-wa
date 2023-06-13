@@ -27,9 +27,11 @@ const setPaletteArr = () => {
     return (myColorList);
 }
 
-export const getAppSetting = createAsyncThunk('areas/getAppSetting', async (task_uid) => {
-    log(`--- fetch app setting start ---`);
-    const response = await fetch(`${APP_URL}/${task_uid}`);
+export const getAppSetting = createAsyncThunk('areas/getAppSetting', async (taskUid, { getState, requestId }) => {
+   
+
+
+    const response = await fetch(`${APP_URL}/${taskUid}`);
     return response.json();
 });
 
@@ -51,7 +53,10 @@ const areasSlice = createSlice({
         areaDependOn: [[{ "name": "name", "checked": true, "key": 0, "color": "white" }]], 
         areaEditingIndex: 0, 
         areaMaxNumber: 1, 
-        paletteArr: setPaletteArr() 
+        paletteArr: setPaletteArr(),
+        modelData:'N/A',
+        selectedApplication:'',
+        selectedModel:'',
     },
     reducers: {
 
@@ -70,11 +75,12 @@ const areasSlice = createSlice({
             state.areaEditingIndex = 0;
             state.areaMaxNumber= 1;
             state.paletteArr = setPaletteArr();
+            //state.areaDependOn = [[{ "name": "name", "checked": true, "key": 0, "color": "white" }]];
         },
         setDependOn(state, action) {
-            log('set depend on')
+          
             const myData = action.payload;
-            const myDependOnData = [];
+            let myDependOnData = [];
             myData.forEach((item, idx) => {
                 const myItem = {};
                 myItem.name = item;
@@ -88,8 +94,8 @@ const areasSlice = createSlice({
             for (let i = 0; i < currentLength; i++) {
                 myArr.push(myDependOnData)
             }
-
             state.areaDependOn = myArr;
+            log('myArr.length='+myArr.length)
            
         },
         toggleSelectAll(state, action) {
@@ -149,7 +155,6 @@ const areasSlice = createSlice({
             state.areaEditingIndex = currentLength;
         },
         areaSelected(state, action) {
-            log('area selected index');
             state.areaEditingIndex = action.payload===null?0:action.payload;
         },
         areaRename(state, action) {
@@ -218,8 +223,6 @@ const areasSlice = createSlice({
         },
         lineDataReset(state,action){
 
-            log('reset line data')
-           
             state.linePointArr.forEach((item, idx) => {
                 state.linePointArr[idx]=[[],[]];
             });
@@ -228,27 +231,49 @@ const areasSlice = createSlice({
                 state.lineRelationArr[idx]=['',''];
             });
 
-            
+        },
+        setModelData(state,action){
+            state.modelData=action.payload;
+        },
+        resetStatus(state,action){
+            state.status='idle';
+        },
+        setSelectedModel(state,action){
 
-        }
+            log('set selected model')
+            log(action.payload)
+            state.selectedModel=action.payload.selectedModel;
+        },
+        setSelectedApplication(state,action){
+            state.selectedApplication=action.payload.applicationName;
+        },
     },
     extraReducers: (builder) => {
 
     // ---- fetch data conditions ---
     builder.addCase(
         getAppSetting.fulfilled,
-        (state, { payload }) => {
+        (state, action) => {
           
-            const myData=payload.data[0].app_setting.application.areas;
-            state.areaEditingIndex=0;
+            log('--- get app setting fulfilled ---')
+           
+            state.selectedApplication=action.payload.data[0].name;
 
+            const modelType=action.payload.data[0].type
+
+            const myIndex_1 = state.modelData.findIndex(item => item.uid === state.selectedModel);
+            const myDependOn = JSON.parse(state.modelData[myIndex_1].classes.replace(/'/g, '"'));
+
+            const myData=action.payload.data[0].app_setting.application.areas;
+           
             let myAreaNameArr=[];
             let myAreaDependOn=[];
             let myAreaShapeArr=[];
             let myLineNameArr=[];
             let myLinePointArr=[];
             let myLineRelationArr=[];
-            const sampleAreaDependOn=state.areaDependOn[0];
+           // const sampleAreaDependOn=state.areaDependOn[0];
+
             myData.forEach((item1, idx) => {
                 
                 // (1) Area Name Array
@@ -256,18 +281,19 @@ const areasSlice = createSlice({
 
                 // (2) Depend On Array
                 let newDependOn=[];
-                sampleAreaDependOn.forEach((item2, idx) => {
+                myDependOn.forEach(function(item2, idx2){
                     const myItem = {};
-                    myItem.name = item2.name;
+                    myItem.name = item2;
                     myItem.checked = false;
-                    myItem.key = item2.key;
-                    myItem.color = item2.color;
-                    item1.depend_on.forEach((item3, idx) => {
-                        if (item2.name===item3){
+                    myItem.key = idx2;
+                    myItem.color = state.paletteArr[idx2];
+                    item1.depend_on.forEach((item3, idx3) => {
+                        if (item2===item3){
                             myItem.checked = true;
                         }
                     });
                     newDependOn.push(myItem);
+                  
                 });
                 myAreaDependOn.push(newDependOn);
 
@@ -303,17 +329,18 @@ const areasSlice = createSlice({
                         linePointArr.push([x1,y1,x2,y2]);
                         lineNameArr.push(k);
                     });
+                    myLinePointArr.push(linePointArr);
                 }else{
                     lineNameArr.push(`Line ${idx+1}A`);
                     lineNameArr.push(`Line ${idx+1}B`);
+                    myLinePointArr.push([[],[]]);
                 }
                 
-                myLinePointArr.push(linePointArr);
                 myLineNameArr.push(lineNameArr);
 
                 // (5) Line Relation Array 
                 const lineRelation=item1.line_relation;
-                let lineRelationArr=[]
+                let lineRelationArr=['','']
                 if (lineRelation){
                     if (lineRelation.length===2){
                         lineRelationArr=[lineRelation[0].name,lineRelation[1].name];
@@ -333,7 +360,9 @@ const areasSlice = createSlice({
             state.lineNameArr=myLineNameArr;
             state.lineRelationArr=myLineRelationArr;
             state.areaDependOn=myAreaDependOn;
+
             state.areaNameArr=myAreaNameArr;
+            state.areaEditingIndex=0;
 
             state.status = 'complete';
         
@@ -342,14 +371,14 @@ const areasSlice = createSlice({
     builder.addCase(
         getAppSetting.pending,
         (state, { payload }) => {
-            log('--- get AppSetting pending ---');
+            log('--- get app setting pending ---');
             state.status = 'loading';
         }
     )
     builder.addCase(
         getAppSetting.rejected,
         (state, { payload }) => {
-            log('--- get AppSetting reject ---');
+            log('--- get app setting reject ---');
             state.status = 'error';
         }
     )
@@ -358,5 +387,5 @@ const areasSlice = createSlice({
     }
 });
 export const areasActions = areasSlice.actions;
-export const { initData, setDependOn, toggleSelectAll, toggleDependOnItem, areaInsert, areaSelected, areaRename, areaUpdate, areaDelete, lineAUpdate, lineBUpdate,lineARelationUpdate,lineBRelationUpdate,setFileWidthHeight,lineUpdate,setLinePanel,lineDataReset } = areasSlice.actions;
+export const { initData, setDependOn, toggleSelectAll, toggleDependOnItem, areaInsert, areaSelected, areaRename, areaUpdate, areaDelete, lineAUpdate, lineBUpdate,lineARelationUpdate,lineBRelationUpdate,setFileWidthHeight,lineUpdate,setLinePanel,lineDataReset,setModelData,resetStatus,setSelectedApplication,setSelectedModel } = areasSlice.actions;
 export default areasSlice.reducer;

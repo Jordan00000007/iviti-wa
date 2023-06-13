@@ -12,7 +12,7 @@ const CustomButton = (props) => {
 
         if (props.name==="edit"){
             return (
-                <button onClick={props.onClick} className="my-button-edit">
+                <button onClick={props.onClick} className="my-button-edit" >
                     Edit
                 </button>
             )
@@ -20,7 +20,7 @@ const CustomButton = (props) => {
 
         if (props.name==="view"){
             return (
-                <button onClick={props.onClick} className="my-button-view roboto-b1" style={(props.status!=='running')?{width:'115px'}:{width:'240px'}}>
+                <button onClick={props.onClick} className="my-button-view roboto-b1" style={(props.status!=='running')?{width:'115px'}:{width:'240px'}} disabled={props.disabled}>
                     View
                 </button>
             )
