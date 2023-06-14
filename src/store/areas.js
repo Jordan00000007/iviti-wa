@@ -5,6 +5,9 @@ import moment from 'moment';
 import palette from '../utils/palette.json';
 
 
+
+
+
 const TASK_SERVER = process.env.REACT_APP_TASK_SERVER;
 const APP_URL = `${TASK_SERVER}/apps`;
 
@@ -57,6 +60,15 @@ const areasSlice = createSlice({
         modelData:'N/A',
         selectedApplication:'',
         selectedModel:'',
+        
+        deleteStatus:'idle',
+        deleteMessage:'',
+
+        addStatus:'idle',
+        addMessage:'',
+
+        updateStatus:'idle',
+        updateMessage:'',
     },
     reducers: {
 
@@ -171,6 +183,7 @@ const areasSlice = createSlice({
             log('area delete')
             if (state.areaNameArr.length>1){
                 const idx=state.areaEditingIndex;
+                const areaName=state.areaNameArr[idx][1];
                 state.areaNameArr.splice(idx, 1);
                 state.areaShapeArr.splice(idx, 1);
                 state.areaDependOn.splice(idx, 1);
@@ -184,8 +197,12 @@ const areasSlice = createSlice({
                 });
                
                 state.areaEditingIndex=0;
+                state.deleteStatus='success';
+                state.deleteMessage=`${areaName} has been deleted`;
             }else{
                 log('left 1 area, could not delete it')
+                state.deleteStatus='error';
+                state.deleteMessage='Requires at least one area';
             }
            
         },
@@ -245,6 +262,18 @@ const areasSlice = createSlice({
         },
         resetStatus(state,action){
             state.status='idle';
+        },
+        resetDeleteStatus(state,action){
+            state.deleteStatus='idle';
+            state.deleteMessage='';
+        },
+        resetAddStatus(state,action){
+            state.addStatus='idle';
+            state.addMessage='';
+        },
+        resetUpdateStatus(state,action){
+            state.updateStatus='idle';
+            state.updateMessage='';
         },
         setSelectedModel(state,action){
 
@@ -395,5 +424,5 @@ const areasSlice = createSlice({
     }
 });
 export const areasActions = areasSlice.actions;
-export const { initData, setDependOn, toggleSelectAll, toggleDependOnItem, areaInsert, areaSelected, areaRename, areaUpdate, areaDelete, lineAUpdate, lineBUpdate,lineARelationUpdate,lineBRelationUpdate,setFileWidthHeight,lineUpdate,setLinePanel,lineDataReset,setModelData,resetStatus,setSelectedApplication,setSelectedModel,lineADelete,lineBDelete } = areasSlice.actions;
+export const { initData, setDependOn, toggleSelectAll, toggleDependOnItem, areaInsert, areaSelected, areaRename, areaUpdate, areaDelete, lineAUpdate, lineBUpdate,lineARelationUpdate,lineBRelationUpdate,setFileWidthHeight,lineUpdate,setLinePanel,lineDataReset,setModelData,resetStatus,resetDeleteStatus,resetAddStatus,resetUpdateStatus,setSelectedApplication,setSelectedModel,lineADelete,lineBDelete } = areasSlice.actions;
 export default areasSlice.reducer;

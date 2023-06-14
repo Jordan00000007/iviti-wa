@@ -227,7 +227,7 @@ const updateTemperatureInfo=(state,uuid,message)=>{
 
 const tasksSlice = createSlice({
     name: "tasks",
-    initialState: { status: 'idle', data: [], error: null ,temperature:'N/A', deleteStatus:'idle',deleteMessage:''},
+    initialState: { status: 'idle', data: [], error: null ,temperature:'N/A', deleteStatus:'idle',deleteMessage:'',addStatus:'idle',addMessage:'', updateStatus:'idle',updateMessage:''},
     reducers: {
         toggleOn(state, action) {
            
@@ -257,6 +257,11 @@ const tasksSlice = createSlice({
 
             state.status='idle';
             state.error='';
+        },
+        setTaskDeleteMessage(state, action){
+
+            state.deleteMessage=action.payload;
+            
         },
     },
     extraReducers: (builder) => {
@@ -437,14 +442,14 @@ const tasksSlice = createSlice({
                 log(action.payload);
 
                 if (action.payload.status_code===200){
-                    state.status='add_new_task_success'
-                    state.error='';
+                    state.addStatus='success'
+                    state.addMessage='Success';
                 }else if (action.payload.status_code===500){
-                    state.status='add_new_task_error'
-                    state.error=JSON.stringify(action.payload.data.data);
+                    state.addStatus='error'
+                    state.addMessage=JSON.stringify(action.payload.data.data);
                 }else{
-                    state.status='add_new_task_error'
-                    state.error='unknow error';
+                    state.addStatus='error'
+                    state.addMessage='unknow error';
                 }
               
                 
@@ -454,6 +459,8 @@ const tasksSlice = createSlice({
             addTask.pending,
             (state, action) => {
                 log(`--- add task pending ---`);
+                state.addStatus='pending'
+                state.addMessage='';
                 
             }
         )
@@ -461,25 +468,27 @@ const tasksSlice = createSlice({
             addTask.rejected,
             (state, action ) => {
                 log(`--- add task rejected ---`);
+                state.addStatus='rejected'
+                state.addMessage='';
             }
         )
 
-         // ---- update task conditions ---
-         builder.addCase(
+        // ---- update task conditions ---
+        builder.addCase(
             updateTask.fulfilled,
             (state, action) => {
                 log(`--- update task fulfilled ---`);
                 log(action.payload);
 
                 if (action.payload.status_code===200){
-                    state.status='update_edit_task_success'
-                    state.error='';
+                    state.updateStatus='success'
+                    state.updateMessage='Success';
                 }else if (action.payload.status_code===500){
-                    state.status='update_edit_task_error'
-                    state.error=action.payload.message;
+                    state.updateStatus='error'
+                    state.updateMessage=action.payload.message;
                 }else{
-                    state.status='update_edit_task_error'
-                    state.error='unknow error';
+                    state.updateStatus='error'
+                    state.updateMessage='unknow error';
                 }
                    
             }
@@ -488,13 +497,16 @@ const tasksSlice = createSlice({
             updateTask.pending,
             (state, action) => {
                 log(`--- update task pending ---`);
-                
+                state.updateStatus='pending'
+                state.updateMessage='';
             }
         )
         builder.addCase(
             updateTask.rejected,
             (state, action ) => {
                 log(`--- update task rejected ---`);
+                state.updateStatus='rejected'
+                state.updateMessage='';
             }
         )
 
@@ -503,8 +515,8 @@ const tasksSlice = createSlice({
             deleteTask.fulfilled,
             (state, action) => {
                 log(`--- delete task fulfilled ---`);
+                log(action.payload)
                 if (action.payload.status_code === 200) {
-                    state.deleteMessage = 'Delete task success';
                     state.deleteStatus = 'success';
                 }else if(action.payload.status_code === 500){
                     state.deleteMessage=action.payload.message;
@@ -542,5 +554,5 @@ const tasksSlice = createSlice({
 
 });
 export const tasksActions = tasksSlice.actions;
-export const { resetError } = tasksSlice.actions;
+export const { resetError,setTaskDeleteMessage } = tasksSlice.actions;
 export default tasksSlice.reducer;

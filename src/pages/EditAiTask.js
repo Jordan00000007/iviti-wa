@@ -52,8 +52,8 @@ import SourcePanel from '../components/Panel/SourcePanel';
 import DependOnSelectPanel from '../components/Panel/DependOnSelectPanel';
 
 import { getSourceFrame, setSourceId, getSourceWidthHeight, sourcesActions, resetFrameStatus,setDrawWidthHeight } from "../store/sources";
-import { areaSelected, areaRename, areaDelete, getAppSetting, setFileWidthHeight, areasActions, lineDataReset, setModelData, resetStatus, setSelectedApplication,setSelectedModel,lineADelete } from "../store/areas";
-import { fetchData, deleteTask, resetError } from "../store/tasks";
+import { areaSelected, areaRename, areaDelete, getAppSetting, setFileWidthHeight, areasActions, lineDataReset, setModelData, resetStatus, setSelectedApplication,setSelectedModel,lineADelete,resetDeleteStatus } from "../store/areas";
+import { fetchData, deleteTask, resetError,setTaskDeleteMessage } from "../store/tasks";
 
 
 import { Link, useParams } from 'react-router-dom';
@@ -156,6 +156,13 @@ function EditAiTask() {
     const selectedApplicationSlice = useSelector((state) => state.areas.selectedApplication);
     const lineRelationArr = useSelector((state) => state.areas.lineRelationArr);
     const areaStatus = useSelector((state) => state.areas.status);
+
+    const areaDeleteStatus = useSelector((state) => state.areas.deleteStatus);
+    const areaDeleteMessage = useSelector((state) => state.areas.deleteMessage);
+
+
+
+
     const modelStatus = useSelector((state) => state.models.status);
     const deviceStatus = useSelector((state) => state.devices.status);
     const applicationStatus = useSelector((state) => state.applications.status);
@@ -196,6 +203,12 @@ function EditAiTask() {
 
     const taskDeleteMessage = useSelector((state) => state.tasks.deleteMessage);
     const taskDeleteStatus = useSelector((state) => state.tasks.deleteStatus);
+
+    const taskAddMessage = useSelector((state) => state.tasks.addMessage);
+    const taskAddStatus = useSelector((state) => state.tasks.addStatus);
+
+    const taskUpdateMessage = useSelector((state) => state.tasks.updateMessage);
+    const taskUpdateStatus = useSelector((state) => state.tasks.updateStatus);
 
 
     const uploadStatus = useSelector((state) => state.sources.uploadStatus);
@@ -818,9 +831,10 @@ function EditAiTask() {
         if (taskDeleteStatus === 'success') {
             setShowTaskDeleteModal(false);
             setMessageClose();
-            setMessageOpen(0, taskDeleteMessage);
-
-            window.location.href="/"
+            dispatch(setTaskDeleteMessage(`${taskName} had been deleted.`));
+            dispatch(resetError());
+            navigate('/');
+            
         }
         if (taskDeleteStatus === 'error') {
             setShowTaskDeleteModal(false);
@@ -828,13 +842,54 @@ function EditAiTask() {
             setMessageOpen(1, taskDeleteMessage);
             
         }
-        if (taskDeleteStatus === 'loading') {
+        if (taskDeleteStatus === 'pending') {
             setMessageKeep(2, 'Delete task loading...');
         }
 
 
     }, [taskDeleteStatus]);
 
+
+    useEffect(() => {
+
+        if (taskAddStatus === 'success') {
+            setShowTaskDeleteModal(false);
+            setMessageClose();
+            navigate('/');
+            
+        }
+        if (taskAddStatus === 'error') {
+            setShowTaskDeleteModal(false);
+            setMessageClose();
+            setMessageOpen(1, taskAddMessage);
+            
+        }
+        if (taskAddStatus === 'pending') {
+            setMessageKeep(2, 'Add task loading...');
+        }
+
+
+    }, [taskAddStatus]);
+
+    useEffect(() => {
+
+        if (taskUpdateStatus === 'success') {
+            setMessageClose();
+            navigate('/');
+            
+        }
+        if (taskUpdateStatus === 'error') {
+            setShowTaskDeleteModal(false);
+            setMessageClose();
+            setMessageOpen(1, taskUpdateMessage);
+            
+        }
+        if (taskUpdateStatus === 'pending') {
+            setMessageKeep(2, 'Update task loading...');
+        }
+
+
+    }, [taskUpdateStatus]);
 
 
 
@@ -893,6 +948,19 @@ function EditAiTask() {
 
     }, [deviceStatus]);
 
+
+    useEffect(() => {
+
+        log('delete ----')
+        log(areaDeleteStatus)
+        log(areaDeleteMessage)
+
+        if (areaDeleteMessage!==''){
+            setMessageOpen((areaDeleteStatus==='success')?0:1, areaDeleteMessage);
+            dispatch(resetDeleteStatus());
+        }
+
+    }, [areaDeleteStatus]);
 
 
     // [01] get all options data
@@ -995,10 +1063,7 @@ function EditAiTask() {
             dispatch(resetError());
         }
 
-        if (taskStatus === 'add_new_task_success') {
-            dispatch(resetError());
-            window.location.href = '/';
-        }
+      
 
         if (taskStatus === 'add_new_task_error') {
             log('add new task error');

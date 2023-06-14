@@ -36,13 +36,12 @@ function AiInference() {
     const [showText, setShowText] = useState('test');
     const [playing, setplaying] = useState(false);
 
+    const [disabled, setDisabled] = useState(false);
+
     const [temp, setTemp] = useState('N/A');
  
-
     const alertRef = useRef();
-
  
-  
     //const [uuid, setUuid] = useState('0');
     const params = useParams();
     const STREAM_SERVER = process.env.REACT_APP_STREAM_SERVER;

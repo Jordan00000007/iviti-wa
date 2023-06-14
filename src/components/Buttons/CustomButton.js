@@ -20,7 +20,7 @@ const CustomButton = (props) => {
 
         if (props.name==="view"){
             return (
-                <button onClick={props.onClick} className="my-button-view roboto-b1" style={(props.status!=='running')?{width:'115px'}:{width:'240px'}} disabled={props.disabled}>
+                <button onClick={props.onClick} className="my-button-view roboto-b1" style={((props.status==='running')||(props.status.indexOf('loading')>=0))?{width:'240px'}:{width:'115px'}} disabled={props.disabled}>
                     View
                 </button>
             )

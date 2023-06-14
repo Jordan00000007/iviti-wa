@@ -79,25 +79,22 @@ const TaskCard = (props) => {
     useEffect(() => {
 
 
-
         if (myItem.status === 'set_task_run_success') {
             dispatch(addStream(props.task_uid));
             //dispatch(runStream(props.task_uid));
         }
-        // if (myItem.status === 'set_stream_add_success') {
-        //     dispatch(runStream(props.task_uid));
-        // }
+       
         if (myItem.status === 'set_task_stop_success') {
             dispatch(deleteStream(props.task_uid));
         }
-        // if (myItem.status === 'set_stream_stop_success') {
-        //     dispatch(deleteStream(props.task_uid));
-        // }
-
+       
         if ("apiError" in myItem)
         {
-            if((myItem.apiError!==undefined)&&(myItem.apiError!==''))
+            if((myItem.apiError!==undefined)&&(myItem.apiError!=='')){
                 props.showMessage(1,myItem.apiError);
+              
+            }
+               
         }
 
         if ("apiSuccess" in myItem)
@@ -109,21 +106,7 @@ const TaskCard = (props) => {
 
     }, [myItem.status]);
 
-    //   useEffect(() => {
-    //     if(isFirst){
-    //       isFirst = false
-    //       return
-    //     }
-    //     if (myItem.status==='run'){
-    //         props.showMessage(0,'Set streaming run success')
-    //     }
-    //     if (myItem.status==='stop'){
-    //         props.showMessage(0,'Set streaming stop success')
-    //     }
-
-    //   //your code that don't want to execute at first time
-    // },[myItem.status])
-
+   
     return (
         <div className="card border-0">
             <div className="card-body my-card-l p-3">
@@ -180,7 +163,7 @@ const TaskCard = (props) => {
                         </div>
                     </div>
                     <div className="col-12 mt-1 d-flex justify-content-between">
-                        {(myItem.status !== 'running') &&
+                        { ((myItem.status === 'stop')||(myItem.status.indexOf("error")>=0)) &&
                             
                             <CustomButton onClick={handleClickEdit} disabled={myItem.status === 'running' ? true : false} name="edit" />
                             

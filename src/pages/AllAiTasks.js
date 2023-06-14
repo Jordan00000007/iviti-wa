@@ -9,8 +9,7 @@ import { Link } from 'react-router-dom';
 import { useSelector, useDispatch } from "react-redux";
 import { fetchData } from "../store/tasks";
 import { resetFileName } from "../store/sources";
-
-
+import { resetDeleteStatus,resetAddStatus,resetUpdateStatus } from "../store/areas";
 
 
 function AllAiTasks() {
@@ -25,11 +24,20 @@ function AllAiTasks() {
     const myData = useSelector((state) => state.tasks.data);
     const myStatus = useSelector((state) => state.tasks.status);
 
+    const taskDeleteMessage = useSelector((state) => state.tasks.deleteMessage);
+    const taskDeleteStatus = useSelector((state) => state.tasks.deleteStatus);
+
+    const taskAddMessage = useSelector((state) => state.tasks.addMessage);
+    const taskAddStatus = useSelector((state) => state.tasks.addStatus);
+
+    const taskUpdateMessage = useSelector((state) => state.tasks.updateMessage);
+    const taskUpdateStatus = useSelector((state) => state.tasks.updateStatus);
+
     const setMessageOpen = (showType, showText) => {
 
         setShowType(showType);
         setShowText(showText);
-        alertRef.current.setShowTrue(1000);
+        alertRef.current.setShowTrue(3000);
 
     };
 
@@ -38,6 +46,37 @@ function AllAiTasks() {
         window.location.href = "/addTask";
 
     };
+
+    useEffect(() => {
+   
+        if ((taskDeleteMessage!=='')&&(taskDeleteStatus==='success')&&(myStatus==='success')){
+          
+            setMessageOpen((taskDeleteStatus==='success')?0:1, taskDeleteMessage);
+            dispatch(resetDeleteStatus());
+        }
+
+    }, [taskDeleteStatus,myStatus]);
+
+    useEffect(() => {
+
+        if ((taskAddMessage!=='')&&(taskAddStatus==='success')&&(myStatus==='success')){
+          
+            setMessageOpen((taskAddStatus==='success')?0:1, taskAddMessage);
+            dispatch(resetAddStatus());
+        }
+
+    }, [taskAddStatus,myStatus]);
+
+    useEffect(() => {
+
+        if ((taskUpdateMessage!=='')&&(taskUpdateStatus==='success')&&(myStatus==='success')){
+          
+            setMessageOpen((taskUpdateStatus==='success')?0:1, taskUpdateMessage);
+            dispatch(resetUpdateStatus());
+        }
+
+    }, [taskUpdateStatus,myStatus]);
+
 
     useEffect(() => {
         dispatch(fetchData());
