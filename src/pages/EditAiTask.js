@@ -741,13 +741,11 @@ function EditAiTask() {
     const handleDeleteMode = (event) => {
 
 
-        if (mode === 'line') {
-            //dispatch(lineADelete());
-            customDrawingRef.current.setLineDelete();
-        } else {
-            dispatch(areaDelete());
-        }
+        if (mode === 'select') {
+            
+            customDrawingRef.current.handleDeleteObject();
 
+        } 
     }
 
     const handleChangeMode = (myMode) => {

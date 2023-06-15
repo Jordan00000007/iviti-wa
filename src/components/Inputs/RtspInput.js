@@ -55,7 +55,7 @@ const RtspInput = (props) => {
             </style>
             <div>
                 
-                <div class="input-box">
+                <div className="input-box">
                     <input className="form-control my-rtsp-input" type="text" onChange={handleInputChange} value={inputValue} />
                     <span className="my-prefix">rtsp://</span>
                 </div>

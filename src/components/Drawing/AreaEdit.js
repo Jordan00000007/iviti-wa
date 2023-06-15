@@ -4,7 +4,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { Circle, Rect, Layer, Line, Stage, Image, Label, Text, Tag, Group, Draggable, useStrictMode } from "react-konva";
 import Konva from 'konva';
 import useImage from "use-image"
-import { areaSelected, areaUpdate, lineAUpdate, lineBUpdate, lineUpdate, lineADelete,lineBDelete } from "../../store/areas";
+import { areaSelected, areaUpdate, lineAUpdate, lineBUpdate, lineUpdate, lineADelete, lineBDelete } from "../../store/areas";
 
 
 
@@ -49,24 +49,24 @@ const AreaEdit = forwardRef((props, ref) => {
     const lineBRef = useRef();
 
     useImperativeHandle(ref, () => ({
-      
+
         setLineDelete: () => {
             //setShow(true);
             log('delete line on area editing ...')
-            if (lineASelected){
+            if (lineASelected) {
                 setLineA([]);
                 setTransLineA([]);
                 dispatch(lineADelete());
                 setLineASelected(false);
             }
-            if (lineBSelected){
+            if (lineBSelected) {
                 setLineB([]);
                 setTransLineB([]);
                 dispatch(lineBDelete());
                 setLineBSelected(false);
             }
         }
-    
+
     }));
 
     const trans = (org) => {
@@ -356,33 +356,29 @@ const AreaEdit = forwardRef((props, ref) => {
 
 
                     {/* Line A for display */}
-                    {
-                       
-                    
-                            <Line
-                                strokeWidth={lineASelected ? 5 : 3}
-                                stroke="blue"
-                                opacity={1}
-                                lineJoin="round"
-                                Draggable={props.lineMode}
-                                points={(lineADrawing) ? transLineA.concat([nextPointA.x, nextPointA.y]) : transLineA}
-                                onClick={event => {
-                                    log('line A click')
-                                    setLineASelected(true);
-                                }}
-                                onDragMove={event => {
-                                    setStopBubble(true);
-                                    log('line A moving...')
-                                    log(event)
+                    {/* <Line
+                        strokeWidth={lineASelected ? 5 : 3}
+                        stroke="blue"
+                        opacity={1}
+                        lineJoin="round"
+                        Draggable={props.lineMode}
+                        points={(lineADrawing) ? transLineA.concat([nextPointA.x, nextPointA.y]) : transLineA}
+                        onClick={event => {
+                            log('line A click')
+                            setLineASelected(true);
+                        }}
+                        onDragMove={event => {
+                            setStopBubble(true);
+                            log('line A moving...')
+                            log(event)
 
-                                }}
-                                closed={false}
-                                ref={lineARef}
-                            />
-                    }
+                        }}
+                        closed={false}
+                        ref={lineARef}
+                    />  */}
                     {/* Line B for display */}
-                    <Line
-                       strokeWidth={lineBSelected ? 5 : 3}
+                    {/* <Line
+                        strokeWidth={lineBSelected ? 5 : 3}
                         stroke="blue"
                         opacity={1}
                         lineJoin="round"
@@ -392,7 +388,7 @@ const AreaEdit = forwardRef((props, ref) => {
                         }}
                         closed={false}
                         ref={lineBRef}
-                    />
+                    /> */}
 
                     {/* Editing Cursor Node */}
                     <Circle
@@ -400,8 +396,8 @@ const AreaEdit = forwardRef((props, ref) => {
                         y={cursorY}
                         visible={cursorVisible}
                         radius={radius}
-                        fill={(props.mode==='line')?'blue':'red'}
-                        stroke={(props.mode==='line')?'blue':'red'}
+                        fill={(props.mode === 'line') ? 'blue' : 'red'}
+                        stroke={(props.mode === 'line') ? 'blue' : 'red'}
                         strokeWidth={2}>
                     </Circle>
 
@@ -411,7 +407,7 @@ const AreaEdit = forwardRef((props, ref) => {
                         // for display
                         strokeWidth={5}
                         stroke="#FBB03B"
-                        opacity={0.2}
+                        opacity={0.15}
                         lineJoin="round"
                         fill="red"
                         points={transPoly}
@@ -431,6 +427,9 @@ const AreaEdit = forwardRef((props, ref) => {
                                     setLineA(lineA.concat([{ x: x, y: y }]))
                                     setTransLineA(trans(lineA.concat([{ x: x, y: y }])))
                                     dispatch(lineAUpdate([lineA[0].x, lineA[0].y, x, y]))
+                                    if (lineB.length === 2){
+                                        props.onComplete();
+                                    }
 
                                 }
                                 if ((lineA.length === 2) && (lineB.length === 1)) {
@@ -443,6 +442,7 @@ const AreaEdit = forwardRef((props, ref) => {
                                     dispatch(lineBUpdate([lineB[0].x, lineB[0].y, x, y]))
                                     props.onComplete();
                                 }
+                              
                             }
 
                         }}
@@ -631,107 +631,17 @@ const AreaEdit = forwardRef((props, ref) => {
                         ))}
 
 
-                 
-                    {/* Line A Node*/}
-                    {
-                        (props.mode === 'line') &&
-                        lineA.map((item, idx) => (
-                            <Circle
-                                key={idx}
-                                x={item.x}
-                                y={item.y}
-                                order={idx}
-                                radius={radius}
-
-                                fill={'white'}
-                                stroke={'blue'}
-                                strokeWidth={2}
-                                draggable={props.lineMode}
-                                onClick={event => {
-                                    log('mouse click line a node')
-                                }}
-                                onMouseOver={event => {
-                                    event.target.fill('blue')
-                                }}
-                                onMouseOut={event => {
-                                    event.target.fill('white')
-                                }}
-                                onMouseLeave={event => {
-                                    event.target.fill('white')
-                                }}
-
-                                onDragMove={event => {
-
-                                    const order = parseInt(event.target.attrs.order);
-                                    let tmp = lineA;
-                                    const x = event.evt.offsetX;
-                                    const y = event.evt.offsetY;
-                                    tmp[order].x = x;
-                                    tmp[order].y = y;
-                                    if (tmp[order].x < 0) tmp[order].x = 0;
-                                    if (tmp[order].x > drawWidth) tmp[order].x = drawWidth
-                                    if (tmp[order].y < 0) tmp[order].y = 0;
-                                    if (tmp[order].y > drawHeight) tmp[order].y = drawHeight
-                                    setLineA(tmp);
-                                    setTransLineA(trans(tmp));
-                                    if (order === 1) {
-                                        setNextPointA({ x: x, y: y })
-                                    }
-
-                                }}
-                                onDragEnd={event => {
-
-                                    //dispatch(lineAUpdate(transLineA));
-                                    log('line a node drag end...')
-                                    log(transLineA)
-                                    if (transLineA[0] < 0) transLineA[0] = 0;
-                                    if (transLineA[0] > drawWidth) transLineA[0] = drawWidth
-                                    if (transLineA[1] < 0) transLineA[1] = 0;
-                                    if (transLineA[1] > drawHeight) transLineA[1] = drawHeight
-                                    if (transLineA[2] < 0) transLineA[2] = 0;
-                                    if (transLineA[2] > drawWidth) transLineA[2] = drawWidth
-                                    if (transLineA[3] < 0) transLineA[3] = 0;
-                                    if (transLineA[3] > drawHeight) transLineA[3] = drawHeight
-                                    dispatch(lineAUpdate(transLineA));
-
-                                   
 
 
-                                }}
-                            />
-                        ))}
 
-                    {/* Line A for detect */}
-                    {/* Line B for detect */}
+                    {/* Line A display */}
                     <Line
-                        strokeWidth={10}
-                        stroke="transparent"
-                        opacity={0}
+                        strokeWidth={lineBSelected ? 5 : 3}
+                        stroke="blue"
+                        opacity={1}
                         lineJoin="round"
                         Draggable={true}
-                        points={linePointArr[areaEditingIndex][0]}
-                        onClick={event => {
-                            log('line A click')
-                            setLineASelected(true);
-                            setLineBSelected(false);
-                        }}
-                        onDragMove={event => {
-                            
-
-                        }}
-                        onMouseMove={event=>{
-                            if (props.mode === 'line') {
-                                setCursorX(event.evt.offsetX);
-                                setCursorY(event.evt.offsetY);
-                                setCursorVisible(true);
-                            }
-                        }}
-                        onMouseOut={event=>{
-                            if (props.mode === 'line') {
-                            
-                                setCursorVisible(false);
-                            }
-                        }}
+                        points={(lineADrawing) ? transLineA.concat([nextPointA.x, nextPointA.y]) : transLineA}
                         closed={false}
 
                     />
@@ -739,7 +649,6 @@ const AreaEdit = forwardRef((props, ref) => {
                     {/* Line A Label */}
                     {
                         (lineA.length === 2) &&
-
                         <Label x={lineA[1].x + 5} y={lineA[1].y + 5}>
                             <Tag
                                 fill={'white'}
@@ -759,84 +668,16 @@ const AreaEdit = forwardRef((props, ref) => {
                         </Label>
                     }
 
-                  
 
 
-                    {/* Line B Node*/}
-                    {
-                        (props.mode === 'line') &&
-                        lineB.map((item, idx) => (
-                            <Circle
-                                key={idx}
-                                x={item.x}
-                                y={item.y}
-                                order={idx}
-                                radius={radius}
-                                fill={'white'}
-                                stroke={'blue'}
-                                strokeWidth={2}
-                                draggable={props.lineMode}
-                                onMouseOver={event => {
-                                    event.target.fill('blue')
-                                }}
-                                onMouseOut={event => {
-                                    event.target.fill('white')
-                                }}
-                                onMouseLeave={event => {
-                                    event.target.fill('white')
-                                }}
-                                onDragMove={event => {
-
-                                    const order = parseInt(event.target.attrs.order);
-                                    let tmp = lineB;
-                                    const x = event.evt.offsetX;
-                                    const y = event.evt.offsetY;
-                                    tmp[order].x = x;
-                                    tmp[order].y = y;
-                                    setLineB(tmp);
-                                    setTransLineB(trans(tmp));
-                                    if (order === 1) {
-                                        setNextPointB({ x: x, y: y })
-                                    }
-
-                                }}
-                                onDragEnd={event => {
-                                    dispatch(lineBUpdate(transLineB));
-
-                                }}
-                            />
-                        ))}
-
-                    {/* Line B for detect */}
+                    {/* Line B display */}
                     <Line
-                        strokeWidth={10}
-                        stroke="transparent"
-                        opacity={0}
+                        strokeWidth={lineBSelected ? 5 : 3}
+                        stroke="blue"
+                        opacity={1}
                         lineJoin="round"
                         Draggable={true}
-                        points={linePointArr[areaEditingIndex][1]}
-                        onClick={event => {
-                            log('line B click')
-                            setLineASelected(false);
-                            setLineBSelected(true);
-                        }}
-                        onDragMove={event => {
-                            
-
-                        }}
-                        onMouseMove={event=>{
-                            if (props.mode === 'line') {
-                                setCursorX(event.evt.offsetX);
-                                setCursorY(event.evt.offsetY);
-                                setCursorVisible(true);
-                            }
-                        }}
-                        onMouseOut={event=>{
-                            if (props.mode === 'line') {
-                            
-                                setCursorVisible(false);
-                            }
-                        }}
+                        points={(lineBDrawing) ? transLineB.concat([nextPointB.x, nextPointB.y]) : transLineB}
                         closed={false}
 
                     />
@@ -844,7 +685,6 @@ const AreaEdit = forwardRef((props, ref) => {
                     {/* Line B Label */}
                     {
                         (lineB.length === 2) &&
-
                         <Label x={lineB[1].x + 5} y={lineB[1].y + 5}>
                             <Tag
                                 fill={'white'}

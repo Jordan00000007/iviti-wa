@@ -39,14 +39,17 @@ const CustomDrawing = forwardRef((props, ref) => {
 
     const polygonConstructorRef = React.useRef(null);
     const areaEditRef = React.useRef(null);
+    const areaDisplayRef = React.useRef(null);
+    const layerRef = React.useRef(null);
 
 
     useImperativeHandle(ref, () => ({
       
-        setLineDelete: () => {
+        handleDeleteObject: () => {
             //setShow(true);
             log('delete line on custom drawing...')
-            areaEditRef.current.setLineDelete();
+            //areaEditRef.current.setLineDelete();
+            areaDisplayRef.current.handleDeleteObject();
         }
     
     }));
@@ -174,13 +177,13 @@ const CustomDrawing = forwardRef((props, ref) => {
                 className={(props.mode!=='select')?"custom-cursor":"arrow"}
                
             >
-                <Layer>
+                <Layer ref={layerRef}>
                     <Image image={image} />
                    
                     
                     {
                         (!props.basicType) &&
-                        <AreaDisplay areaShapeArr={areaShapeArr} areaEditingIndex={areaEditingIndex} editMode={editMode} mode={props.mode} showAppSetting={props.showAppSetting}/>
+                        <AreaDisplay areaEditingIndex={areaEditingIndex} mode={props.mode} showAppSetting={props.showAppSetting} ref={areaDisplayRef}/>
                     }
 
                     {

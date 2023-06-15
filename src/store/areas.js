@@ -208,11 +208,11 @@ const areasSlice = createSlice({
         },
         lineADelete(state, action) {
             log('line A delete')
-            state.linePointArr[state.areaEditingIndex][0]=null;
+            state.linePointArr[state.areaEditingIndex][0]=[];
         },
         lineBDelete(state, action) {
             log('line B delete')
-            state.linePointArr[state.areaEditingIndex][1]=null;
+            state.linePointArr[state.areaEditingIndex][1]=[];
         },
         lineAUpdate(state, action) {
             log('line A update')
