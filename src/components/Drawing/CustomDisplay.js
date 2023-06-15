@@ -232,7 +232,7 @@ const CustomDisplay = (props) => {
                                     key={`area_${idx}`}
                                     strokeWidth={0}
                                     stroke="red"
-                                    opacity={0.2}
+                                    opacity={0.15}
                                     lineJoin="round"
                                     fill="red"
                                     points={item}

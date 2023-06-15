@@ -8,6 +8,7 @@ import ToggleButton from '../components/Buttons/ToggleButton';
 import DependOnPanel from '../components/Panel/DependOnPanel';
 import TemperaturePanel from '../components/Panel/TemperaturePanel';
 import CustomAlert from '../components/Alerts/CustomAlert';
+import GeneralTooltip from '../components/Tooltips/GeneralTooltip';
 
 import CustomDisplay from '../components/Drawing/CustomDisplay'
 
@@ -190,7 +191,12 @@ function AiInference() {
                                                     <div className='my-area-a1 d-flex justify-content-center align-items-center'>
                                                         {
                                                             ((myItem.status==='running')&&(myItem.liveTime)) &&
-                                                            <span className="my-time-badge roboto-b2">{myItem.liveTime}</span>
+                                                            <>
+                                                                <GeneralTooltip title="Task running time">
+                                                                    <span className="my-time-badge roboto-b2">{myItem.liveTime}</span>
+                                                                </GeneralTooltip>
+                                                            </>
+                                                            
                                                         }
                                                     </div>
                                                     <div className='my-area-a2 position-relative'>

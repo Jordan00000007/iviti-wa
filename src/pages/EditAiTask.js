@@ -51,9 +51,9 @@ import { ReactComponent as Image_Default } from '../assets/Image_Default.svg';
 import SourcePanel from '../components/Panel/SourcePanel';
 import DependOnSelectPanel from '../components/Panel/DependOnSelectPanel';
 
-import { getSourceFrame, setSourceId, getSourceWidthHeight, sourcesActions, resetFrameStatus,setDrawWidthHeight } from "../store/sources";
-import { areaSelected, areaRename, areaDelete, getAppSetting, setFileWidthHeight, areasActions, lineDataReset, setModelData, resetStatus, setSelectedApplication,setSelectedModel,lineADelete,resetDeleteStatus } from "../store/areas";
-import { fetchData, deleteTask, resetError,setTaskDeleteMessage } from "../store/tasks";
+import { getSourceFrame, setSourceId, getSourceWidthHeight, sourcesActions, resetFrameStatus, setDrawWidthHeight } from "../store/sources";
+import { areaSelected, areaRename, areaDelete, getAppSetting, setFileWidthHeight, areasActions, lineDataReset, setModelData, resetStatus, setSelectedApplication, setSelectedModel, lineADelete, resetDeleteStatus } from "../store/areas";
+import { fetchData, deleteTask, resetError, setTaskDeleteMessage } from "../store/tasks";
 
 
 import { Link, useParams } from 'react-router-dom';
@@ -99,7 +99,7 @@ function EditAiTask() {
     const taskTitleRef = useRef(null);
     const confidenceTitleRef = useRef(null);
     const dependOnTitle = useRef(null);
-    const customDrawingRef= useRef(null);
+    const customDrawingRef = useRef(null);
 
     const KeySRef = useRef(null);
     const KeyERef = useRef(null);
@@ -113,7 +113,7 @@ function EditAiTask() {
 
     const navigate = useNavigate();
 
- 
+
 
     const linePanelRef = {
         line1Ref: lineRelation1Ref,
@@ -172,12 +172,14 @@ function EditAiTask() {
     const [selectedApplication, setSelectedApplication] = useState('');
     const [showAreaRenameModal, setShowAreaRenameModal] = useState(false);
     const [showModelDeleteModal, setShowModelDeleteModal] = useState(false);
-    
+
     const [showTaskDeleteModal, setShowTaskDeleteModal] = useState(false);
     const [showLoadingModal, setShowLoadingModal] = useState(false);
 
     const [deleteModelUid, setDeleteModelUid] = useState(null);
     const [deleteModelName, setDeleteModelName] = useState('');
+
+    const [lineReady, setLineReady] = useState(false);
 
 
     const deviceArr = useSelector((state) => state.devices.options);
@@ -224,22 +226,22 @@ function EditAiTask() {
 
 
 
-    const fileMaxWidth = 860;
+    const fileMaxWidth = 854;
     const fileMaxHeight = 558;
 
     const handleImportModel = (event, value) => {
         fileRef.current.click();
     };
 
-    const handleModelDelete= (value) => {
-    
+    const handleModelDelete = (value) => {
+
         setDeleteModelUid(value.uid);
         setDeleteModelName(value.name);
         setShowModelDeleteModal(true);
     };
 
-    const handleModelDeleteExecute= () => {
-        
+    const handleModelDeleteExecute = () => {
+
         setShowModelDeleteModal(false);
         dispatch(deleteModel(deleteModelUid));
     };
@@ -294,7 +296,7 @@ function EditAiTask() {
         if (modelDeleteStatus === 'error') {
             setMessageClose();
             setMessageOpen(1, modelDeleteMessage);
-            
+
         }
         if (modelDeleteStatus === 'loading') {
             setMessageKeep(2, 'Delete model loading...');
@@ -341,6 +343,7 @@ function EditAiTask() {
             setShowAppSetting(false);
             log('---(2) handle model change')
             dispatch(setDependOn(JSON.parse(myDependOn.replace(/'/g, '"'))))
+            setShowAppSetting(false);
 
 
         }
@@ -351,7 +354,7 @@ function EditAiTask() {
     const handleApplicationChange = (event, value) => {
 
         log('--- handle application change ---')
-        if ((value !== -1)&&(value!=="")) {
+        if ((value !== -1) && (value !== "")) {
 
 
 
@@ -388,7 +391,7 @@ function EditAiTask() {
                     setBasicType(false);
 
                     //------------
-                    const fileMaxWidth = 804;
+                    const fileMaxWidth = 800;
                     const fileMaxHeight = 558;
                     const myWidth = parseInt(originWidth);
                     const myHeight = parseInt(originHeight);
@@ -401,12 +404,12 @@ function EditAiTask() {
                             fileSetWidth = fileMaxWidth;
                         }
                     }
-                   
+
 
                     dispatch(getSourceFrame({ "fileUid": fileUid, "basicType": false }));
 
 
-                  
+
                     dispatch(initData({ "w": fileSetWidth, "h": fileSetHeight }));
                 }
             }
@@ -529,44 +532,49 @@ function EditAiTask() {
         log('(5) check line relation')
         if (linePanel) {
 
-            lineRelation1Ref.current.className = "form-control roboto-b1 my-text-input";
-            lineRelation2Ref.current.className = "form-control roboto-b1 my-text-input";
-            lineRelationTitleRef.current.className = "my-area-p3-c3-1 d-flex flex-row roboto-h5";
+           
+            if (lineRelationTitleRef.current.getReady()) {
 
-            let foundIndex2 = -1;
-            lineRelationArr.forEach(function (item, idx) {
-                log('---------item')
-                log(item)
+                lineRelation1Ref.current.className = "form-control roboto-b1 my-text-input";
+                lineRelation2Ref.current.className = "form-control roboto-b1 my-text-input";
+                lineRelationTitleRef.current.setRedTitleTextFalse();
 
-                if (item[0].trim() === '') {
-                    foundIndex2 = idx;
-                }
-                if (item[1].trim() === '') {
-                    foundIndex2 = idx;
-                }
-            });
-            if (foundIndex2 >= 0) {
-                myPass = false;
-                dispatch(areaSelected(foundIndex2))
+                let foundIndex2 = -1;
+                lineRelationArr.forEach(function (item, idx) {
+                    log('---------item')
+                    log(item)
 
-                log('lineRelation1Ref.current.value')
-                log(lineRelation1Ref.current.value)
-                log('lineRelation2Ref.current.value')
-                log(lineRelation2Ref.current.value)
+                    if (item[0].trim() === '') {
+                        foundIndex2 = idx;
+                    }
+                    if (item[1].trim() === '') {
+                        foundIndex2 = idx;
+                    }
+                });
+                if (foundIndex2 >= 0) {
+                    myPass = false;
+                    dispatch(areaSelected(foundIndex2))
 
-                let myFlag = false;
-                if (lineRelation1Ref.current.value.trim() === '') {
-                    lineRelation1Ref.current.className = "form-control roboto-b1 my-text-input-warnning";
-                    myFlag = true;
-                }
 
-                if (lineRelation2Ref.current.value.trim() === '') {
-                    lineRelation2Ref.current.className = "form-control roboto-b1 my-text-input-warnning";
-                    myFlag = true;
+                    let myFlag = false;
+                    if (lineRelation1Ref.current.value.trim() === '') {
+                        lineRelation1Ref.current.className = "form-control roboto-b1 my-text-input-warnning";
+                        myFlag = true;
+                    }
+
+                    if (lineRelation2Ref.current.value.trim() === '') {
+                        lineRelation2Ref.current.className = "form-control roboto-b1 my-text-input-warnning";
+                        myFlag = true;
+                    }
+                    if (myFlag) {
+                        
+                        lineRelationTitleRef.current.setRedTitleTextTrue();
+                    }
                 }
-                if (myFlag) {
-                    lineRelationTitleRef.current.className = "my-area-p3-c3-1 d-flex flex-row roboto-h5 my-warnning";
-                }
+            }else{
+                log('no ready')
+                setLineReady(false);
+                lineRelationTitleRef.current.setRedText();
             }
 
         }
@@ -732,11 +740,11 @@ function EditAiTask() {
 
     const handleDeleteMode = (event) => {
 
-       
-        if (mode==='line'){
+
+        if (mode === 'line') {
             //dispatch(lineADelete());
             customDrawingRef.current.setLineDelete();
-        }else{
+        } else {
             dispatch(areaDelete());
         }
 
@@ -824,7 +832,7 @@ function EditAiTask() {
 
     };
 
-  
+
 
     useEffect(() => {
 
@@ -834,13 +842,13 @@ function EditAiTask() {
             dispatch(setTaskDeleteMessage(`${taskName} had been deleted.`));
             dispatch(resetError());
             navigate('/');
-            
+
         }
         if (taskDeleteStatus === 'error') {
             setShowTaskDeleteModal(false);
             setMessageClose();
             setMessageOpen(1, taskDeleteMessage);
-            
+
         }
         if (taskDeleteStatus === 'pending') {
             setMessageKeep(2, 'Delete task loading...');
@@ -856,13 +864,13 @@ function EditAiTask() {
             setShowTaskDeleteModal(false);
             setMessageClose();
             navigate('/');
-            
+
         }
         if (taskAddStatus === 'error') {
             setShowTaskDeleteModal(false);
             setMessageClose();
             setMessageOpen(1, taskAddMessage);
-            
+
         }
         if (taskAddStatus === 'pending') {
             setMessageKeep(2, 'Add task loading...');
@@ -876,13 +884,13 @@ function EditAiTask() {
         if (taskUpdateStatus === 'success') {
             setMessageClose();
             navigate('/');
-            
+
         }
         if (taskUpdateStatus === 'error') {
             setShowTaskDeleteModal(false);
             setMessageClose();
             setMessageOpen(1, taskUpdateMessage);
-            
+
         }
         if (taskUpdateStatus === 'pending') {
             setMessageKeep(2, 'Update task loading...');
@@ -955,8 +963,8 @@ function EditAiTask() {
         log(areaDeleteStatus)
         log(areaDeleteMessage)
 
-        if (areaDeleteMessage!==''){
-            setMessageOpen((areaDeleteStatus==='success')?0:1, areaDeleteMessage);
+        if (areaDeleteMessage !== '') {
+            setMessageOpen((areaDeleteStatus === 'success') ? 0 : 1, areaDeleteMessage);
             dispatch(resetDeleteStatus());
         }
 
@@ -1063,7 +1071,7 @@ function EditAiTask() {
             dispatch(resetError());
         }
 
-      
+
 
         if (taskStatus === 'add_new_task_error') {
             log('add new task error');
@@ -1082,20 +1090,20 @@ function EditAiTask() {
         log('originWidth=' + originWidth)
         log('originHeight=' + originHeight)
 
-         //------------
-         const fileMaxWidth = 804;
-         const fileMaxHeight = 558;
-         const myWidth = parseInt(originWidth);
-         const myHeight = parseInt(originHeight);
-         let fileSetWidth = Math.trunc((myWidth / myHeight) * fileMaxHeight);
-         let fileSetHeight = Math.trunc((myHeight / myWidth) * fileMaxWidth);
-         if (fileSetWidth <= fileMaxWidth) {
-             fileSetHeight = fileMaxHeight;
-         } else {
-             if (fileSetHeight <= fileMaxHeight) {
-                 fileSetWidth = fileMaxWidth;
-             }
-         }
+        //------------
+        const fileMaxWidth = 800;
+        const fileMaxHeight = 558;
+        const myWidth = parseInt(originWidth);
+        const myHeight = parseInt(originHeight);
+        let fileSetWidth = Math.trunc((myWidth / myHeight) * fileMaxHeight);
+        let fileSetHeight = Math.trunc((myHeight / myWidth) * fileMaxWidth);
+        if (fileSetWidth <= fileMaxWidth) {
+            fileSetHeight = fileMaxHeight;
+        } else {
+            if (fileSetHeight <= fileMaxHeight) {
+                fileSetWidth = fileMaxWidth;
+            }
+        }
         log('drawWidth=' + drawWidth)
         log('drawHeight=' + drawHeight)
         log('fileSetWidth=' + fileSetWidth)
@@ -1106,8 +1114,8 @@ function EditAiTask() {
         if ((sizeStatus === 'success') && (originWidth > 0) && (originHeight > 0) && (fileUid !== '')) {
             log('(a) fileUid------------')
             log(fileUid)
-           
-            dispatch(setDrawWidthHeight({ "maxWidth": 804, "maxHeight": 558 }));
+
+            dispatch(setDrawWidthHeight({ "maxWidth": 800, "maxHeight": 558 }));
             dispatch(getSourceFrame({ "fileUid": fileUid, "basicType": basicType }));
             dispatch(initData({ "w": fileSetWidth, "h": fileSetHeight }));
         }
@@ -1129,15 +1137,15 @@ function EditAiTask() {
 
             dispatch(setFileWidthHeight({ "drawWidth": drawWidth, "drawHeight": drawHeight }))
             dispatch(setModelData(modelData));
-           
+
             log('--selected model---')
             log(selectedModel)
-            dispatch(areasActions.setSelectedModel({"selectedModel":selectedModel}));
+            dispatch(areasActions.setSelectedModel({ "selectedModel": selectedModel }));
             dispatch(getAppSetting(taskUid));
             dispatch(resetFrameStatus());
 
             setShowAppSetting(true)
-            
+
         }
 
         if ((frameStatus === 'success') && (areaStatus === 'complete')) {
@@ -1213,15 +1221,34 @@ function EditAiTask() {
 
     // }, [selectedApplicationSlice]);
 
-    
+
 
     useEffect(() => {
 
         if ((sourceUid !== '') && (selectedModel !== '') && (selectedApplication !== '') && (taskUid === '')) {
             log('---(1) add task --- set show app setting true')
+            log('sourceUid='+sourceUid)
+            log('selectedModel='+selectedModel)
+            log('selectedApplication='+selectedApplication)
+            log('taskUid='+taskUid)
+
+            // check app options
+            let myFlag=true;
+            applicationOptions.forEach(item => {
+                if(item[0]===selectedApplication){
+                    myFlag=false;
+                }
+            });
+            if (myFlag) {
+                setSelectedApplication(null);
+                setShowAppSetting(false);
+            }else{
+                setShowAppSetting(true);
+            }
+
 
             //------------
-            const fileMaxWidth = 804;
+            const fileMaxWidth = 800;
             const fileMaxHeight = 558;
             const myWidth = parseInt(originWidth);
             const myHeight = parseInt(originHeight);
@@ -1238,7 +1265,7 @@ function EditAiTask() {
 
             dispatch(initData({ "w": fileSetWidth, "h": fileSetHeight }));
             dispatch(getSourceFrame({ "fileUid": fileUid, "basicType": basicType }));
-            setShowAppSetting(true);
+           
         }
 
 
@@ -1455,10 +1482,10 @@ function EditAiTask() {
                                                 </td>
                                             }
                                             <td className='my-area-p3-b' style={{ background: (basicType) ? 'black' : 'white' }}>
-                                                <div className='w-100 d-flex flex-column align-items-center'>
+                                                <div className='w-100 d-flex flex-column align-items-center justify-content-center'>
                                                     {
                                                         (fileUrl === '') &&
-                                                        <Image_Default style={{ width: (basicType) ? 856 : 806, height: 560, background: 'white', border: '0px solid white' }} />
+                                                        <Image_Default style={{ width: (basicType) ? 854 : 800, height: 560, background: 'white', border: '0px solid white' }} />
                                                     }
 
                                                     {/* {
@@ -1486,7 +1513,7 @@ function EditAiTask() {
                                                         </CustomDrawing>
                                                     }
 
-                                                  
+
                                                 </div>
                                             </td>
                                             <td className='my-area-p3-c'>
@@ -1508,7 +1535,7 @@ function EditAiTask() {
 
                                                     {
                                                         linePanel &&
-                                                        <LinePanel ref={linePanelRef} />
+                                                        <LinePanel ref={linePanelRef} setLineMode={handleLineMode} />
                                                     }
 
                                                 </div>
@@ -1522,7 +1549,7 @@ function EditAiTask() {
                     }
 
                     {
-                        ((!showAppSetting)&&(taskUid==='')) &&
+                        ((!showAppSetting) && (taskUid === '')) &&
                         <div className='roboto-b1' style={{ color: 'var(--on_color_2)', padding: '0px 8px' }}>
                             Please complete general section first.
                         </div>

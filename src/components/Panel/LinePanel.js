@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, forwardRef, useState } from 'react';
+import React, { useRef, useEffect, forwardRef, useState,useImperativeHandle } from 'react';
 import log from "../../utils/console";
 import CustomButton from '../../components/Buttons/CustomButton';
 import LabelButton from '../../components/Buttons/LabelButton';
@@ -19,6 +19,8 @@ const LinePanel = forwardRef((props, ref) => {
     const linePointArr= useSelector((state) => state.areas.linePointArr);
 
     const [ready, setReady] = useState(false);
+    const [redText, setRedText] = useState(false);
+    const [redTitleText, setRedTitleText] = useState(false);
 
     const dispatch = useDispatch();
 
@@ -65,11 +67,27 @@ const LinePanel = forwardRef((props, ref) => {
     //     setLineRelationArr(lineRelation);
     // }, [lineRelation]);
 
+    useImperativeHandle(lineTitleRef, () => ({
+        getReady: () => {
+           return ready;
+        },
+        setRedText: () => {
+            setRedText(true);
+        },
+        setRedTitleTextTrue: () => {
+            setRedTitleText(true);
+        },
+        setRedTitleTextFalse: () => {
+            setRedTitleText(false);
+        },
+     
+    }));
+
 
 
     return (
         <div className='my-area-p3-c3'>
-            <div className='my-area-p3-c3-1 d-flex flex-row roboto-h5' ref={lineTitleRef}>
+            <div className={redTitleText?'my-area-p3-c3-1 roboto-h5 my-warnning':'my-area-p3-c3-1 roboto-h5'} ref={lineTitleRef}>
                 Line relation (required)
             </div>
             {
@@ -87,13 +105,13 @@ const LinePanel = forwardRef((props, ref) => {
                 </div>
             </>
             }
-             {
+            {
             (!ready) &&
             <>
                 <div className='my-area-p3-c3-2 d-flex flex-column justify-content-center align-items-center'>
-                    <ToolIcon_Line className='my-tool-icon p-0 mb-1'/>
-                    <div style={{color:'var(--on_color_2)'}} className="roboto-b1">Use line tool to draw 2 lines</div>
-                    <div style={{color:'var(--on_color_2)'}} className="roboto-b1">and set relation between them.</div>
+                    <ToolIcon_Line className='my-tool-icon p-0 mb-1' onClick={props.setLineMode}/>
+                    <div style={{color:(redText)?'#B00020':'var(--on_color_2)'}} className="roboto-b1">Use line tool to draw 2 lines</div>
+                    <div style={{color:(redText)?'#B00020':'var(--on_color_2)'}} className="roboto-b1">and set relation between them.</div>
                 </div>
               
             </>

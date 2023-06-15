@@ -33,7 +33,7 @@ export const getSourceFrame = createAsyncThunk('sources/getSourceFrame', async (
     let {fileUid,basicType}=myData;
  
     const state = getState();
-    const fileMaxWidth = (basicType)?864:804;
+    const fileMaxWidth = (basicType)?854:800;
     const fileMaxHeight = 558;
     const myWidth = parseInt(state.sources.originWidth);
     const myHeight = parseInt(state.sources.originHeight);

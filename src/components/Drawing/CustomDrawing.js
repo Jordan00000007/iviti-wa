@@ -31,6 +31,11 @@ const CustomDrawing = forwardRef((props, ref) => {
     const areaEditingIndex = useSelector((state) => state.areas.areaEditingIndex);
     const areaDependOn = useSelector((state) => state.areas.areaDependOn);
 
+    const drawWidth = useSelector((state) => state.sources.drawWidth);
+    const drawHeight = useSelector((state) => state.sources.drawHeight);
+    const originWidth = useSelector((state) => state.sources.originWidth);
+    const originHeight = useSelector((state) => state.sources.originHeight);
+
 
     const polygonConstructorRef = React.useRef(null);
     const areaEditRef = React.useRef(null);
@@ -145,13 +150,27 @@ const CustomDrawing = forwardRef((props, ref) => {
         // log(areaDependOn)
     }, [areaNameArr,areaShapeArr,areaDependOn]);
 
-   
+   log('---props.width')
+   log(props.width)
+
+   log('originWidth')
+   log(originWidth)
+   log('originHeight')
+   log(originHeight)
+   log('drawWidth')
+   log(drawWidth)
+   log('drawHeight')
+   log(drawHeight)
+
+
 
     return (
-        <div style={{width:(props.basicType)?854:804,height:558,background:'var(--stream_empty)'}}  className="d-flex align-items-center justify-content-center">
+        <div style={{width:(props.basicType)?854:800,height:558,background:'var(--stream_empty)'}}  className="d-flex align-items-center justify-content-center">
             <Stage
-                height={props.height}
-                width={(props.basicType)?854:props.width}
+                // height={props.height}
+                // width={(props.basicType)?854:props.width}
+                height={drawHeight}
+                width={drawWidth}
                 className={(props.mode!=='select')?"custom-cursor":"arrow"}
                
             >
