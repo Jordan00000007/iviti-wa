@@ -31,7 +31,7 @@ const TaskCard = (props) => {
 
     const handleClickEdit = () => {
 
-        window.location.href=`/editTask/${props.task_uid}`;
+        window.location.href=`/editTask/${props.task_uid}/0`;
 
     };
 

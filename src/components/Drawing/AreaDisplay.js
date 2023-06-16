@@ -207,11 +207,13 @@ const AreaDisplay = forwardRef((props, ref) => {
                             .flatMap(item => [item.x, item.y])
                             .concat([item[0].x, item[0].y])}
                         onClick={event => {
-                            //
+                            log('area click')
                             if (props.mode === 'select') {
                                 handleAreaSelected(idx);
                                 setLineASelected(false);
                                 setLineBSelected(false);
+                                setLineAHover(false);
+                                setLineBHover(false);
                             }
                             //props.onClick(event, props.polygons[idx], props.polygonsName[idx], idx);
                         }}
@@ -270,7 +272,7 @@ const AreaDisplay = forwardRef((props, ref) => {
                         <>
                             <Group 
                                
-                                Draggable={true}
+                                Draggable={(idx === areaEditingIndex)?true:false}
                              
                                 onDragEnd={event => {
 
@@ -282,31 +284,46 @@ const AreaDisplay = forwardRef((props, ref) => {
                                     group.getLayer().draw();
                                     
                                 }}
+
+                                onDragMove={event => {
+                                    let group = event.target;
+                                    let hit=group.getLayer().getHitCanvas()
+                                    log('--- hit Object ---')
+                                    log(hit)
+                                    
+                                }}
                             >
                                 <>
                                     <Line
                                         strokeWidth={((lineASelected || lineAHover) && (idx === areaEditingIndex)) ? 6 : 3}
                                         stroke="blue"
+                                        hitStrokeWidth={25}
                                         opacity={1}
                                         fill="#E2E6EA"
                                         lineJoin="round"
                                         Draggable={false}
                                         points={linePointArr[idx][0]}
                                         onClick={event => {
-                                            setLineASelected(true);
-                                            setLineBSelected(false);
+                                            if (idx === areaEditingIndex){
+                                                setLineASelected(true);
+                                                setLineBSelected(false);
+                                            }
                                         }}
                                         onMouseDown={event => {
-                                            setLineASelected(true);
-                                            setLineBSelected(false);
+                                            if (idx === areaEditingIndex){
+                                                setLineASelected(true);
+                                                setLineBSelected(false);
+                                            }
                                         }}
                                         onMouseOver={event => {
-
-                                            setLineAHover(true);
+                                            if (idx === areaEditingIndex){
+                                                setLineAHover(true);
+                                            }
                                         }}
                                         onMouseLeave={event => {
-
-                                            setLineAHover(false);
+                                            if (idx === areaEditingIndex){
+                                                setLineAHover(false);
+                                            }
                                         }}
                                        
                                         closed={false}
@@ -332,12 +349,27 @@ const AreaDisplay = forwardRef((props, ref) => {
                                                 height={24}
                                                 lineHeight={1}
                                                 onClick={event => {
-                                                    setLineASelected(true);
-                                                    setLineBSelected(false);
+                                                    if (idx === areaEditingIndex){
+                                                        setLineASelected(true);
+                                                        setLineBSelected(false);
+                                                    }
                                                 }}
                                                 onMouseDown={event => {
-                                                    setLineASelected(true);
-                                                    setLineBSelected(false);
+                                                    if (idx === areaEditingIndex){
+                                                        setLineASelected(true);
+                                                        setLineBSelected(false);
+                                                    }
+                                                }}
+                                                onMouseOver={event =>  {
+                                                    if (idx === areaEditingIndex){
+                                                        setLineAHover(true); 
+                                                    }
+                                                }}
+                                                onMouseLeave={event => {
+                
+                                                    if (idx === areaEditingIndex){
+                                                        setLineAHover(false); 
+                                                    }
                                                 }}
 
                                             />
@@ -356,7 +388,7 @@ const AreaDisplay = forwardRef((props, ref) => {
                         <>
                             <Group 
                                
-                               Draggable={true}
+                               Draggable={(idx === areaEditingIndex)?true:false}
                               
                                onDragEnd={event => {
 
@@ -372,25 +404,36 @@ const AreaDisplay = forwardRef((props, ref) => {
                             <Line
                                 strokeWidth={((lineBSelected || lineBHover) && (idx === areaEditingIndex)) ? 6 : 3}
                                 stroke="blue"
+                                hitStrokeWidth={25}
                                 opacity={1}
                                 lineJoin="round"
                                 Draggable={props.lineMode}
                                 points={linePointArr[idx][1]}
                                 onClick={event => {
-                                    setLineBSelected(true);
-                                    setLineASelected(false);
+                                   
+
+                                    if (idx === areaEditingIndex){
+                                        setLineBSelected(true);
+                                        setLineASelected(false);
+                                    }
                                 }}
                                 onMouseDown={event => {
-                                    setLineASelected(false);
-                                    setLineBSelected(true);
+                                    if (idx === areaEditingIndex){
+                                        setLineBSelected(true);
+                                        setLineASelected(false);
+                                    }
                                 }}
                                 onMouseOver={event => {
+                                    if (idx === areaEditingIndex){
+                                        setLineBHover(true);
+                                    }
 
-                                    setLineBHover(true);
+                                    
                                 }}
                                 onMouseLeave={event => {
-
-                                    setLineBHover(false);
+                                    if (idx === areaEditingIndex){
+                                        setLineBHover(false);
+                                    }
                                 }}
                               
                                 onDragMove={event => {
@@ -422,6 +465,14 @@ const AreaDisplay = forwardRef((props, ref) => {
                                         onMouseDown={event => {
                                             setLineASelected(false);
                                             setLineBSelected(true);
+                                        }}
+                                        onMouseOver={event => {
+
+                                            setLineBHover(true);
+                                        }}
+                                        onMouseLeave={event => {
+        
+                                            setLineBHover(false);
                                         }}
                                     />
                                 </Label>

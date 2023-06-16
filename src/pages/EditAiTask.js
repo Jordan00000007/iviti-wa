@@ -84,6 +84,9 @@ function EditAiTask() {
 
     const [showType, setShowType] = useState(0);
     const [showText, setShowText] = useState('');
+
+    const [fromPage, setFromPage] = useState(0);
+
     const alertRef = useRef();
 
     const sourceRef = useRef(null);
@@ -590,7 +593,13 @@ function EditAiTask() {
     }
 
     const handleCancelClick = () => {
-        window.location.href = "/";
+     
+        if (fromPage==="1"){
+            window.location.href = `/inference/${taskUid}`;
+        }else{
+            window.location.href = "/";
+        }
+        
     }
 
     const handleSubmit = () => {
@@ -881,7 +890,11 @@ function EditAiTask() {
 
         if (taskUpdateStatus === 'success') {
             setMessageClose();
-            navigate('/');
+            if (fromPage==="1"){
+                navigate(`/inference/${taskUid}`);
+            }else{
+                navigate('/');
+            }
 
         }
         if (taskUpdateStatus === 'error') {
@@ -972,9 +985,15 @@ function EditAiTask() {
     // [01] get all options data
     useEffect(() => {
 
+        log('from page')
+        log(params.from)
+
         setShowLoadingModal(true);
         if (params.uuid) {
             setTaskUid(params.uuid);
+        }
+        if (params.from) {
+            setFromPage(params.from);
         }
         dispatch(getAllDevices());
         dispatch(getAllModels());

@@ -30,7 +30,7 @@ function App() {
             element: <EditAiTask />
         },
         {
-            path: "editTask/:uuid",
+            path: "editTask/:uuid/:from",
             element: <EditAiTask />
         },
         {

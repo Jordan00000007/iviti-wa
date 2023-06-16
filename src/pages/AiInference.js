@@ -19,7 +19,7 @@ import CustomTooltip from '../components/Tooltips/CustomTooltip';
 import { Link, useParams } from 'react-router-dom';
 import { useSelector, useDispatch } from "react-redux";
 import { fetchData, fetchTask, runTask, stopTask, addStream, deleteStream, deviceTemperature } from "../store/tasks";
-
+import { resetUpdateStatus } from "../store/areas";
 
 import { WebSocket } from '../components/Panel/WebSocket';
 
@@ -51,6 +51,11 @@ function AiInference() {
     const myData = useSelector((state) => state.tasks.data);
     const myStatus = useSelector((state) => state.tasks.status);
     const myIndex = myData.findIndex(item => item.task_uid === params.uuid);
+
+    const taskUpdateMessage = useSelector((state) => state.tasks.updateMessage);
+    const taskUpdateStatus = useSelector((state) => state.tasks.updateStatus);
+
+
     let myItem = myData[myIndex];
    
     if (myItem===undefined){
@@ -99,7 +104,7 @@ function AiInference() {
 
     const handleEditClick=()=>{
 
-        window.location.href=`/editTask/${params.uuid}`;
+        window.location.href=`/editTask/${params.uuid}/1`;
 
     }
 
@@ -146,6 +151,16 @@ function AiInference() {
 
 
     }, [myItem.status]);
+
+    useEffect(() => {
+
+        if ((taskUpdateMessage!=='')&&(taskUpdateStatus==='success')&&(myStatus==='success')){
+          
+            setMessageOpen((taskUpdateStatus==='success')?0:1, taskUpdateMessage);
+            dispatch(resetUpdateStatus());
+        }
+
+    }, [taskUpdateStatus,myStatus]);
 
    
     if (myStatus === 'success')
