@@ -153,20 +153,7 @@ const CustomDrawing = forwardRef((props, ref) => {
         // log(areaDependOn)
     }, [areaNameArr,areaShapeArr,areaDependOn]);
 
-   log('---props.width')
-   log(props.width)
-
-   log('originWidth')
-   log(originWidth)
-   log('originHeight')
-   log(originHeight)
-   log('drawWidth')
-   log(drawWidth)
-   log('drawHeight')
-   log(drawHeight)
-
-
-
+  
     return (
         <div style={{width:(props.basicType)?854:800,height:558,background:'var(--stream_empty)'}}  className="d-flex align-items-center justify-content-center">
             <Stage

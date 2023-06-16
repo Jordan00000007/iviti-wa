@@ -166,6 +166,10 @@ body{
     cursor: url('../assets/Cursor_Pen.svg') 6 6, auto;
 }
 
+.stop-cursor {
+    cursor: url('../assets/Cursor_Stop.svg') 6 6, auto;
+}
+
 
 .my-button-add {
     background-color: var(--highlight_1);

@@ -1,4 +1,5 @@
 import log from "../../utils/console";
+import {lineInPolygon} from "../../utils/geometric";
 import React, { useState, useEffect, useImperativeHandle, forwardRef, useRef } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { Circle, Rect, Layer, Line, Stage, Image, Label, Text, Tag, Group, Draggable, useStrictMode } from "react-konva";
@@ -6,7 +7,7 @@ import Konva from 'konva';
 import useImage from "use-image"
 import { areaSelected } from "../../store/areas";
 import LabelButton from '../../components/Buttons/LabelButton';
-import { lineADelete, lineBDelete, areaDelete,lineAUpdate,lineBUpdate } from "../../store/areas";
+import { lineADelete, lineBDelete, areaDelete,lineAUpdate,lineBUpdate,areaUpdate } from "../../store/areas";
 import { LegendToggle } from "@mui/icons-material";
 
 
@@ -28,6 +29,10 @@ const AreaDisplay = forwardRef((props, ref) => {
     const areaEditingIndex = useSelector((state) => state.areas.areaEditingIndex);
     const linePanel = useSelector((state) => state.areas.linePanel);
 
+
+    const drawWidth = useSelector((state) => state.sources.drawWidth);
+    const drawHeight = useSelector((state) => state.sources.drawHeight);
+
     const areaDependOn = useSelector((state) => state.areas.areaDependOn);
 
     const [selectedOrder, setSelectedOrder] = useState(1);
@@ -37,6 +42,9 @@ const AreaDisplay = forwardRef((props, ref) => {
     const [lineBSelected, setLineBSelected] = useState(false);
     const [lineAHover, setLineAHover] = useState(false);
     const [lineBHover, setLineBHover] = useState(false);
+
+    const [stopBubble, setStopBubble] = useState(false);
+
 
     const dispatch = useDispatch();
 
@@ -135,6 +143,113 @@ const AreaDisplay = forwardRef((props, ref) => {
         dispatch(lineBUpdate(tmpLine))
     }
 
+    const cloneData = (myPoly) => {
+
+        let myArr = [];
+        myPoly.forEach(function (item) {
+            let myItem = {};
+            myItem.x = item.x;
+            myItem.y = item.y;
+            myArr.push(myItem);
+        });
+
+        return myArr;
+
+    }
+
+    const updatePosition = (group) => {
+
+        const x=group.x();
+        const y=group.y();
+
+        let tmpPolygons = cloneData(areaShapeArr[areaEditingIndex]);
+    
+        let minX = 0;
+        let minY = 0;
+        let maxX = drawWidth;
+        let maxY = drawHeight;
+        tmpPolygons.forEach(function (item, idx) {
+            item.x = item.x + x;
+            item.y = item.y + y;
+            if (item.x < minX) minX = item.x;
+            if (item.y < minY) minY = item.y;
+            if (item.x > maxX) maxX = item.x;
+            if (item.y > maxY) maxY = item.y;
+
+        });
+        if (minX < 0) {
+            tmpPolygons.forEach(function (item, idx) {
+                item.x = item.x - minX;
+            });
+        }
+        if (minY < 0) {
+            tmpPolygons.forEach(function (item, idx) {
+                item.y = item.y - minY;
+            });
+        }
+        if (maxX > drawWidth) {
+            tmpPolygons.forEach(function (item, idx) {
+                item.x = item.x - (maxX - drawWidth);
+            });
+        }
+        if (maxY > drawHeight) {
+            tmpPolygons.forEach(function (item, idx) {
+                item.y = item.y - (maxY - drawHeight);
+            });
+        }
+        dispatch(areaUpdate(tmpPolygons));
+    
+        let tmpLineA = [];
+        tmpLineA.push(linePointArr[areaEditingIndex][0][0]+x);
+        tmpLineA.push(linePointArr[areaEditingIndex][0][1]+y);
+        tmpLineA.push(linePointArr[areaEditingIndex][0][2]+x);
+        tmpLineA.push(linePointArr[areaEditingIndex][0][3]+y);
+        if (minX < 0){
+            tmpLineA[0]=tmpLineA[0]-minX;
+            tmpLineA[2]=tmpLineA[2]-minX;
+        }
+        if (minY < 0){
+            tmpLineA[1]=tmpLineA[1]-minY;
+            tmpLineA[3]=tmpLineA[3]-minY;
+        }
+        if (maxX > drawWidth){
+            tmpLineA[0]=tmpLineA[0]- (maxX - drawWidth);
+            tmpLineA[2]=tmpLineA[2]- (maxX - drawWidth);
+        }
+        if (maxY > drawHeight){
+            tmpLineA[1]=tmpLineA[1]- (maxY - drawHeight);
+            tmpLineA[3]=tmpLineA[3]- (maxY - drawHeight);
+        }
+        dispatch(lineAUpdate(tmpLineA));
+
+        let tmpLineB = [];
+        tmpLineB.push(linePointArr[areaEditingIndex][1][0]+x);
+        tmpLineB.push(linePointArr[areaEditingIndex][1][1]+y);
+        tmpLineB.push(linePointArr[areaEditingIndex][1][2]+x);
+        tmpLineB.push(linePointArr[areaEditingIndex][1][3]+y);
+        if (minX < 0){
+            tmpLineB[0]=tmpLineB[0]-minX;
+            tmpLineB[2]=tmpLineB[2]-minX;
+        }
+        if (minY < 0){
+            tmpLineB[1]=tmpLineB[1]-minY;
+            tmpLineB[3]=tmpLineB[3]-minY;
+        }
+        if (maxX > drawWidth){
+            tmpLineB[0]=tmpLineB[0]- (maxX - drawWidth);
+            tmpLineB[2]=tmpLineB[2]- (maxX - drawWidth);
+        }
+        if (maxY > drawHeight){
+            tmpLineB[1]=tmpLineB[1]- (maxY - drawHeight);
+            tmpLineB[3]=tmpLineB[3]- (maxY - drawHeight);
+        }
+        dispatch(lineBUpdate(tmpLineB));
+
+        group.position({ x: 0, y: 0 });
+        group.getLayer().draw();
+
+
+    }
 
 
 
@@ -152,8 +267,6 @@ const AreaDisplay = forwardRef((props, ref) => {
     }, [lineName]);
 
     useEffect(() => {
-        log('--- line point data changed ---')
-        log(linePoint)
         setLinePointArr(linePoint);
     }, [linePoint]);
 
@@ -194,7 +307,30 @@ const AreaDisplay = forwardRef((props, ref) => {
             {areaShapeArr.map((item, idx) => (
 
                 (!(((props.mode === 'edit') || (props.mode === 'line')) && (areaEditingIndex === idx))) &&
-                <Group key={`polygon_${idx}`}>
+                <Group 
+                    key={`polygon_${idx}`}
+                    draggable={(idx === areaEditingIndex)?true:false}
+                    x={0}
+                    y={0}
+                    onDragStart={event => {
+                    }}
+                    onDragMove={event => {
+                      
+                    }}
+                    onDragEnd={event => {
+
+                        if(!stopBubble){
+                         
+                            const group = event.target;
+                            updatePosition(group);
+                        }
+                        setStopBubble(false);
+                    
+                    }}                
+                    onMouseDown={event => {
+                       
+                    }}
+                >
 
                     <Line
                         key={`area_${idx}`}
@@ -276,22 +412,41 @@ const AreaDisplay = forwardRef((props, ref) => {
                              
                                 onDragEnd={event => {
 
-                                    log('drag end')
-                                    event.evt.stopPropagation();
-                                    let group = event.target;
-                                    updateLineA(group.x(), group.y());
-                                    group.position({ x: 0, y: 0 });
-                                    group.getLayer().draw();
+                                    setStopBubble(true);
+                                  
+                                    const group = event.target;
+                                    const x = group.x();
+                                    const y = group.y();
+
+
+                                    let tmpLine=[
+                                        [linePoint[areaEditingIndex][0][0]+x,linePoint[areaEditingIndex][0][1]+y],
+                                        [linePoint[areaEditingIndex][0][2]+x,linePoint[areaEditingIndex][0][3]+y]
+                                    ];
+                                 
+                                    
+                                   
+                                    if (lineInPolygon(tmpLine,areaShapeArr[idx])){
+                                           
+                                        log('inside')
+
+                                        updateLineA(group.x(), group.y());
+                                        group.position({ x: 0, y: 0 });
+                                        group.getLayer().draw();
+                                     
+                                    }else{
+
+                                        log('outside')
+
+                                        updateLineA(0, 0);
+                                        group.position({ x: 0, y: 0 });
+                                        group.getLayer().draw();
+                                    }
+
                                     
                                 }}
 
-                                onDragMove={event => {
-                                    let group = event.target;
-                                    let hit=group.getLayer().getHitCanvas()
-                                    log('--- hit Object ---')
-                                    log(hit)
-                                    
-                                }}
+                              
                             >
                                 <>
                                     <Line
@@ -392,14 +547,32 @@ const AreaDisplay = forwardRef((props, ref) => {
                               
                                onDragEnd={event => {
 
-                                   log('drag end')
-                                   event.evt.stopPropagation();
+                                   setStopBubble(true);
+                                 
                                    const group = event.target;
-                                   updateLineB(group.x(), group.y());
-                                   group.position({ x: 0, y: 0 });
-                                   group.getLayer().draw();
+                                   const x = group.x();
+                                   const y = group.y();
+
+                                   let tmpLine=[
+                                       [linePoint[areaEditingIndex][1][0]+x,linePoint[areaEditingIndex][1][1]+y],
+                                       [linePoint[areaEditingIndex][1][2]+x,linePoint[areaEditingIndex][1][3]+y]
+                                   ];
+                                
+                                   if (lineInPolygon(tmpLine,areaShapeArr[idx])){
+                                          
+                                       updateLineB(group.x(), group.y());
+                                       group.position({ x: 0, y: 0 });
+                                       group.getLayer().draw();
+                                    
+                                   }else{
+                                       updateLineB(0, 0);
+                                       group.position({ x: 0, y: 0 });
+                                       group.getLayer().draw();
+                                   }
                                    
                                }}
+
+                               
                            >
                             <Line
                                 strokeWidth={((lineBSelected || lineBHover) && (idx === areaEditingIndex)) ? 6 : 3}
@@ -410,8 +583,6 @@ const AreaDisplay = forwardRef((props, ref) => {
                                 Draggable={props.lineMode}
                                 points={linePointArr[idx][1]}
                                 onClick={event => {
-                                   
-
                                     if (idx === areaEditingIndex){
                                         setLineBSelected(true);
                                         setLineASelected(false);
@@ -427,8 +598,6 @@ const AreaDisplay = forwardRef((props, ref) => {
                                     if (idx === areaEditingIndex){
                                         setLineBHover(true);
                                     }
-
-                                    
                                 }}
                                 onMouseLeave={event => {
                                     if (idx === areaEditingIndex){

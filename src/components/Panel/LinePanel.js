@@ -36,14 +36,6 @@ const LinePanel = forwardRef((props, ref) => {
     useEffect(() => {
 
         log('line areaEditingIndex change')
-
-        //line1Ref.current.defaultValue=lineRelationArr[areaEditingIndex];
-
-    }, [areaEditingIndex]);
-
-    useEffect(() => {
-
-        log('line areaEditingIndex change')
         // log(linePointArr[areaEditingIndex][0].length)
         // log(linePointArr[areaEditingIndex][1].length)
 
@@ -55,17 +47,10 @@ const LinePanel = forwardRef((props, ref) => {
             }
         }else{
             setReady(false);
-        }
-
-
-       
+        } 
 
     }, [linePointArr]);
 
-
-    // useEffect(() => {
-    //     setLineRelationArr(lineRelation);
-    // }, [lineRelation]);
 
     useImperativeHandle(lineTitleRef, () => ({
         getReady: () => {
