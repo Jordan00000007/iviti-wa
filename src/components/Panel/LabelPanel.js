@@ -11,6 +11,7 @@ const LabelPanel = (props) => {
     const handleShow = () => setShow(true);
     const showData = props.dependOnArr[props.index];
 
+ 
     if (showData) {
 
         if ((showData.length <= 3) && (showData.length > 0))
@@ -34,14 +35,21 @@ const LabelPanel = (props) => {
 
                     <Modal show={show} onHide={handleClose} aria-labelledby="contained-modal-title-vcenter" centered>
                         <Modal.Header>
-                            <Modal.Title className='roboto-h2'>{(props.area!==undefined)?props.area[1]:"N/A"} depend on</Modal.Title>
+                            {
+                                (props.basicType)&&
+                                <Modal.Title className='roboto-h2'>Depend on</Modal.Title>
+                            }
+                            {
+                                (!props.basicType)&&
+                                <Modal.Title className='roboto-h2'>{(props.area!==undefined)?props.area[1]:"N/A"} depend on</Modal.Title>
+                            }
                         </Modal.Header>
                         <Modal.Body>
                             <div className="container-fluid p-0" style={{width:450}}>
                                 <div className="row" style={{width:430,height:180,overflowY:'scroll'}}>
                                 <div className="col-12">
                                     {showData.map((item, index) => (
-                                        
+               
                                         <LabelButton name={item} key={index} type="list"/>
                                        
                                     ))}

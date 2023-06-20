@@ -275,7 +275,7 @@ const tasksSlice = createSlice({
 
                     log('--- fetch data fulfilled  ---')
                     log(action.payload)
-                    if (action.payload.message==="No task setup"){
+                    if (action.payload.message==="No task setup."){
                         //log('empty')
                         state.data = [];
                     }else{
@@ -377,11 +377,11 @@ const tasksSlice = createSlice({
                 //log(`--- add stream [${action.meta.arg}] fulfilled ---`);
                 //log(action);
                 if (action.payload.status===1){
-                    return updateTaskStatus(state,action.meta.arg,'running','set stream running success');
+                    return updateTaskStatus(state,action.meta.arg,'running','Set streaming running success.');
                 }else{
                     
                     if (action.payload.payload==='stream already exists'){
-                        return updateTaskStatus(state,action.meta.arg,'running','stream already exists');
+                        return updateTaskStatus(state,action.meta.arg,'running','Streaming already exists.');
                     }else{
                         return updateTaskStatus(state,action.meta.arg,'set_stream_add_error',action.payload.payload);
                     }
@@ -412,7 +412,7 @@ const tasksSlice = createSlice({
                 //log(`--- delete stream [${action.meta.arg}] fulfilled ---`);
                 //log(action.payload);
                 if (action.payload.status===1){
-                    return updateTaskStatus(state,action.meta.arg,'stop','set stream stop success');
+                    return updateTaskStatus(state,action.meta.arg,'stop','Set streaming stop success.');
                 }else{
                     return updateTaskStatus(state,action.meta.arg,'set_stream_delete_error',action.payload.payload);
                 }
@@ -449,7 +449,7 @@ const tasksSlice = createSlice({
                     state.addMessage=JSON.stringify(action.payload.data.data);
                 }else{
                     state.addStatus='error'
-                    state.addMessage='unknow error';
+                    state.addMessage='Unknow error.';
                 }
               
                 
@@ -488,7 +488,7 @@ const tasksSlice = createSlice({
                     state.updateMessage=action.payload.message;
                 }else{
                     state.updateStatus='error'
-                    state.updateMessage='unknow error';
+                    state.updateMessage='Unknow error.';
                 }
                    
             }
@@ -524,7 +524,7 @@ const tasksSlice = createSlice({
                 } else {
                     //return updateTaskStatus(state,action.meta.arg,'set_stream_delete_error');
                     log('--- fetch data unknow error ---')
-                    state.deleteMessage="Unknow error";
+                    state.deleteMessage="Unknow error.";
                     state.deleteStatus = 'error';
                 }
               
@@ -543,7 +543,7 @@ const tasksSlice = createSlice({
             deleteTask.rejected,
             (state, action ) => {
                 log(`--- delete task rejected ---`);
-                state.deleteMessage='Delete task rejected';
+                state.deleteMessage='Delete task rejected.';
                 state.deleteStatus='error';
             }
         )

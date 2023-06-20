@@ -26,6 +26,8 @@ const DependOnPanel = (props) => {
 
     useEffect(() => {
 
+      
+
         let myAreaNameArr=[];
         let myDependOnArr=[];
 
@@ -51,10 +53,13 @@ const DependOnPanel = (props) => {
 
     useEffect(() => {
 
-        if (areaNameArr.length >0) {
+        if (!props.basicType){
+            if (areaNameArr.length >0) {
             
-            areaRef.current.setSelectedValue(areaNameArr[0][0]);
+                areaRef.current.setSelectedValue(areaNameArr[0][0]);
+            }
         }
+       
 
     }, [areaNameArr]);
 
@@ -66,12 +71,15 @@ const DependOnPanel = (props) => {
                     Depend on
                 </div>
                 <div className='my-area-b2-1-2 d-flex justify-content-end'>
-                    <CustomSelect areaArr={areaNameArr} width="140" height="32" fontSize="15" onChange={handleSelectChange} ref={areaRef} />
+                    {
+                        (!props.basicType) &&
+                        <CustomSelect areaArr={areaNameArr} width="140" height="32" fontSize="15" onChange={handleSelectChange} ref={areaRef} />
+                    }
                 </div>
             </div>
             <div className='my-area-b2-2'>
                 <div className='my-area-b2-2-1'>
-                    <LabelPanel dependOnArr={dependOnArr} index={areaIndex} area={areaNameArr[areaIndex]} onClick={props.onClick}/>
+                    <LabelPanel dependOnArr={dependOnArr} index={areaIndex} area={areaNameArr[areaIndex]} onClick={props.onClick} basicType={props.basicType}/>
                 </div>
             </div>
         </div>

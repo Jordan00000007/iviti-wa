@@ -35,7 +35,9 @@ const LabelButton= forwardRef((props, ref) => {
     if (props.type === "list") {
         return (
            
+
             <button className='my-label-button-list roboto-b1' >
+                {/* <div style={{ width: 20, height: 20, background: item.color, borderRadius: 6 }} /> */}
                 {props.name}
             </button>
 

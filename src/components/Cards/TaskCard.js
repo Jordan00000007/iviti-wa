@@ -29,14 +29,16 @@ const TaskCard = (props) => {
     const dummyState = useRef(init);
     const toggleRef = useRef(null);
 
-    const handleClickEdit = () => {
+    const handleClickEdit = (e) => {
 
+        e.stopPropagation(); 
         window.location.href=`/editTask/${props.task_uid}/0`;
 
     };
 
-    const handleClickView = () => {
+    const handleClickView = (e) => {
 
+        e.stopPropagation(); 
         window.location.href=`/inference/${props.task_uid}`;
 
     };
@@ -65,7 +67,14 @@ const TaskCard = (props) => {
     }
 
 
+    const handleCardClick = (event) => {
 
+        log('handle card click')
+        if (!disabled){
+           window.location.href=`/inference/${props.task_uid}`;
+        }
+        
+    }
 
 
     useEffect(() => {
@@ -109,14 +118,14 @@ const TaskCard = (props) => {
    
     return (
         <div className="card border-0">
-            <div className="card-body my-card-l p-3">
+            <div className="card-body my-card-l p-3" style={{cursor:(disabled)?'arrow':'pointer'}} >
                 <div className="row p-1 gy-0">
-                    <div className="col-12 roboto-h4 mb-2 ">
+                    <div className="col-12 roboto-h4 mb-2 " onClick={handleCardClick}>
                         <CustomTooltip customClassName='roboto-h4'>
                             {props.nameTask}
                         </CustomTooltip>
                     </div>
-                    <div className="col-12 mb-2">
+                    <div className="col-12 mb-2" onClick={handleCardClick}>
                         <div className="card border-0">
                             <div className="card-body  my-card-m p-2">
                                 <div className="row p-1">
@@ -126,9 +135,11 @@ const TaskCard = (props) => {
                                         </div>
                                         <div className="d-flex flex-column gap-1">
 
-                                            <CustomTooltip customClassName='my-card-application-name'>
-                                                {props.nameApplication}
-                                            </CustomTooltip>
+                                            <div className='roboto-h6' style={{'whiteSpace':'nowrap'}}>
+                                                {props.nameApplication.toString().replace("_"," ").replace("_"," ")}
+                                            </div>
+                                           
+                                            
 
                                             <CustomTooltip customClassName='my-card-model-name'>
                                                 {props.nameModel}
@@ -146,7 +157,7 @@ const TaskCard = (props) => {
                         <div className="card border-0">
                             <div className="card-body my-card-s p-1">
                                 <div className="d-flex flex-row justify-content-between gap-1 mt-0 mb-2">
-                                    <div className="d-flex flex-row gap-2" style={{ paddingTop: '1px', paddingLeft: '8px' }}>
+                                    <div className="d-flex flex-row gap-2" style={{ paddingTop: '1px', paddingLeft: '8px' }} onClick={handleCardClick}>
                                         <div className="my-card-status roboto-b2" style={{ paddingTop: '2px' }}>
                                             Status
                                         </div>

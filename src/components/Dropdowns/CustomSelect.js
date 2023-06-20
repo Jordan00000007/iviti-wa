@@ -9,21 +9,57 @@ import KeyboardArrowDown from '@mui/icons-material/KeyboardArrowDown';
 import log from "../../utils/console";
 import { ReactComponent as Icon_Edit } from '../../assets/Icon_Edit.svg';
 import ListDivider from '@mui/joy/ListDivider';
+import { useIsFocusVisible } from '@mui/material';
 
 
 
 const CustomSelect = forwardRef((props, ref) => {
 
+    const theme1 = extendTheme({
+        components: {
+            JoySelect: {
+                styleOverrides: {
+                    root: ({ ownerState, theme }) => ({
+                        borderColor: '#979CB580',
+                    }),
+                },
+            },
+           
+        },
+    });
+
+    const theme2 = extendTheme({
+        components: {
+            JoySelect: {
+                styleOverrides: {
+                    root: ({ ownerState, theme }) => ({
+                        borderColor: '#979CB5',
+                    }),
+                },
+            },
+           
+        },
+    });
+
     const [placeHolder, setPlaceHolder] = useState(props.placeHolder);
     const [selectedValue, setSelectedValue] = useState('');
+    const [focus, setFocus] = useState(false);
 
   
     const handleSelectChange = (event, value) => {
 
-        // log(`${props.name} select change`);
-        // log(value)
+        log(`${props.name} select change`);
+        log(value)
         setSelectedValue(value);
         props.onChange(event,value);
+
+    };
+
+    const handleListBoxChange= (event, value) => {
+
+        log('list box changed '+event)
+        setFocus(event);
+       
 
     };
 
@@ -43,10 +79,13 @@ const CustomSelect = forwardRef((props, ref) => {
 
     return (
 
+        <CssVarsProvider theme={focus?theme2:theme1}>
         <Select
             indicator={<KeyboardArrowDown />}
             placeholder={placeHolder ? "--- please select ---" : ""}
             disabled={props.disabled}
+            
+            
             sx={{
                 width: parseInt(props.width),
                 fontSize: parseInt(props.fontSize),
@@ -67,14 +106,19 @@ const CustomSelect = forwardRef((props, ref) => {
                     border: "1px solid #979CB5",
                     backgroundColor: "var(--base_2)",
                 },
-
+              
+                
+                
             }}
             ref={ref}
             defaultValue={placeHolder?"":props.defaultValue}
             value={selectedValue}
             onChange={handleSelectChange}
+            onListboxOpenChange={handleListBoxChange.bind(this)}
+
             slotProps={{
 
+               
                 listbox: {
                     sx: {
 
@@ -123,7 +167,7 @@ const CustomSelect = forwardRef((props, ref) => {
             ))}
         </Select>
 
-
+        </CssVarsProvider>
     );
 });
 

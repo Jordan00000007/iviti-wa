@@ -62,29 +62,73 @@ const CustomSelectSource = forwardRef((props, ref) => {
 
     return (
         
-        <div>
-            <div className="input-group">
-                <input type="text" className={(props.disabled)?"form-control my-source-disable":"form-control my-source-input"} aria-label="Text input with dropdown button" placeholder='--- please select ---' disabled style={{ width: '200px', height: '52px' }} value={props.name}/>
-                <button className="btn dropdown-toggle my-source-input-button" type="button" aria-expanded="false" style={{
-                    borderLeft: '2px solid white',
-                    borderTop: '1px solid #979CB580',
-                    borderRight: '1px solid #979CB580',
-                    borderBottom: '1px solid #979CB580',
-                    width: '40px',
-                }}
+        <div style={{width:240,height:52}}>
+            <style>
+                {`
+                .my-input-group { 
+                    position: relative; 
+                    height: 32px;
+                }
+                
+                .my-source-input { 
+                    display: block; 
+                    background: #fff; 
+                    padding: 10px 10px 10px 10px; 
+                    width: 240px; 
+                    height: 52px;
+                    border: 1px solid ${(props.sourceMenu)?'var(--on_color_2)':'var(--on_color_2_t1)'};
+                    border-radius: 6px !important;
+                  
+                }
+                .my-source-input:hover { 
+                    border: 1px solid var(--on_color_2);   
+                }
+                .my-source-input:focus { 
+                    border: 1px solid var(--on_color_2)!important;  
+                    -webkit-box-shadow: none!important;
+                    -moz-box-shadow: none!important;
+                    box-shadow: none!important;
+                 
+                }
+                .my-source-input-button { 
+                    color: var(--on_color_2);
+                    position: absolute; 
+                    display: block; 
+                    left: 199px; 
+                    top: 3px; 
+                    height: 46px;
+                    width: 32x;
+                    z-index: 9; 
+                    border:1px solid white!important;
+                }
+                .icons{
+                    svg{
+                        color: #000;
+                        width: 50px;
+                        height: 50px;
+                    }
+                }
+
+             
+                `}
+            </style>
+            <div className="my-input-group">
+                <input type="text" className={(props.disabled)?"form-control my-source-disable":"form-control my-source-input"} aria-label="Text input with dropdown button" placeholder='--- please select ---' disabled  value={props.name}/>
+                <button className="btn dropdown-toggle my-source-input-button" type="button" aria-expanded="false" 
                 disabled={props.disabled}
                 onClick={handleSourceMenuClick}
                 ref={buttonRef}
                 >
                   
                     {
-                        expandSourceMenu && <FontAwesomeIcon icon={faChevronDown} className="my-chevron-icon" />
+                        expandSourceMenu && <FontAwesomeIcon icon={faChevronDown} className="my-chevron-icon" transform="shrink-3"/>
                     }
                     {
-                        (!expandSourceMenu) && <FontAwesomeIcon icon={faChevronUp} className="my-chevron-icon" />
+                        (!expandSourceMenu) && <FontAwesomeIcon icon={faChevronUp} className="my-chevron-icon" transform="shrink-3" />
                     }
 
                 </button>
+                
             </div>
         </div>
         

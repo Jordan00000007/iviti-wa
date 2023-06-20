@@ -174,7 +174,7 @@ body{
 .my-button-add {
     background-color: var(--highlight_1);
     color: var(--base_2);
-    padding: 4px 5px 4px 6px;
+    padding: 4px 5px 4px 5px;
     border: none;
     width: 32px;
     height: 32px;
@@ -189,7 +189,7 @@ body{
 .my-button-back {
     background-color: #00000012;
     color: var(--base_2);
-    padding: 4px 5px 4px 6px;
+    padding: 4px 5px 4px 5px;
     border: none;
     width: 32px;
     height: 32px;
@@ -203,7 +203,7 @@ body{
 .my-button-edit {
     background-color: var(--base_3);
     color: var(--on_color_1);
-    padding: 4px 5px 4px 6px;
+    padding: 6px 5px 5px 5px;
     border: none;
     width: 115px;
     height: 32px;
@@ -217,7 +217,7 @@ body{
 .my-button-view {
     background-color: var(--highlight_1);
     color: var(--base_2);
-    padding: 4px 5px 4px 6px;
+    padding: 6px 5px 5px 5px;
     border: none;
     width: 115px;
     height: 32px;
@@ -236,7 +236,7 @@ body{
 .my-button-cancel {
     background-color: var(--base_3);
     color: var(--on_color_1);
-    padding: 4px 5px 4px 6px;
+    padding: 6px 5px 5px 5px;
     border: none;
     width: 100px;
     height: 32px;
@@ -250,7 +250,7 @@ body{
 .my-button-submit {
     background-color: var(--highlight_1);
     color: var(--base_2);
-    padding: 4px 5px 4px 6px;
+    padding: 6px 5px 5px 5px;
     border: none;
     width: 100px;
     height: 32px;
@@ -264,7 +264,7 @@ body{
 .my-button-disable {
     background-color: #E0E1E666;
     color: #16272E29;
-    padding: 4px 5px 4px 6px;
+    padding: 6px 5px 5px 5px;
     border: none;
     width: 100px;
     height: 32px;
@@ -280,6 +280,7 @@ body{
     width: 66px;
     height: 24px;
     border-radius: 4px;
+    cursor: default!important;
 }
 
 .my-button-stop {
@@ -291,6 +292,7 @@ body{
     width: 66px;
     height: 24px;
     border-radius: 4px;
+    cursor: default!important;
 }
 
 .my-button-loading {
@@ -302,6 +304,7 @@ body{
     width: 66px;
     height: 24px;
     border-radius: 4px;
+    cursor: default!important;
 }
 
 .my-button-error {
@@ -313,6 +316,7 @@ body{
     width: 66px;
     height: 24px;
     border-radius: 4px;
+    cursor: default!important;
 }
 
 
@@ -381,9 +385,17 @@ body{
 .my-card-l {
     border: 1px solid gray;
     height: 254px;
+    width: 285px;
     box-shadow: 0px 0px 4px #CACBD733;
     border: 1px solid #E0E1E6;
     border-radius: 12px;
+
+}
+
+.my-card-l:hover {
+    border:1px solid rgba(22, 39, 46, 0.24);
+    box-shadow: rgba(0, 0, 0, 0.1) 1px 1px 8px;
+  
 
 }
 
@@ -584,13 +596,22 @@ body{
     border-radius: 4px;
 }
 
+.my-label-button-expand:hover {
+    background-color: #D1D2D4;
+}
+
 .my-label-button-close {
     color: var(--on_color_1);
     background-color: var(--bg_gray);
     width: 100px;
     height: 32px;
     border: 0px;
+    padding: 5px 5px 5px 5px;
     border-radius: 6px;
+}
+
+.my-label-button-close:hover {
+    background-color: #D1D2D4;
 }
 
 .my-label-button-list {
@@ -602,6 +623,11 @@ body{
     white-space: nowrap;
     margin-left: 10px !important;
     margin-bottom: 10px !important;
+    cursor: default!important;
+}
+
+.my-label-button-list:hover {
+    background-color: #D1D2D4;
 }
 
 .my-label-button-truncate {
@@ -613,6 +639,12 @@ body{
     white-space: nowrap;
     padding-left: 10px !important;
     padding-right: 10px !important;
+    cursor: default!important;
+}
+
+.my-label-button-truncate:hover {
+
+    background-color: #D1D2D4;
 }
 
 .my-label-button-line {
@@ -799,7 +831,7 @@ body{
 }
 
 .my-text-input:focus {
-    border-color: #979CB580 !important;
+    border-color: #979CB5 !important;
     -webkit-box-shadow: none !important;
     -moz-box-shadow: none !important;
     box-shadow: none !important;
@@ -845,9 +877,6 @@ body{
     height: 52px;
 }
 
-.my-source-input{
-    border-right: 0px!important;
-}
 
 .my-source-disable{
     
@@ -913,20 +942,8 @@ body{
     border: 1px solid #E0E1E6!important;
     border-radius: 12px!important; 
     box-shadow: 0px 0px 4px #CACBD733!important;
+    padding: 40px!important;
 }
-
-
-.my-source-input:hover+.my-source-input-button {
-    border-top: 1px solid #979CB5 !important;
-    border-right: 1px solid #979CB5 !important;
-    border-bottom: 1px solid #979CB5 !important;
-
-}
-
-.my-source-input-button {
-    background-color: white !important;
-}
-
 
 .my-input-title {
     color: var(--on_color_2);
@@ -1341,6 +1358,7 @@ input:checked+.my-toggle-slider:before {
     color: #7B7B93;
     width: 14px;
     height: 14px;
+    font-size: 20px!important;
 
 }
 

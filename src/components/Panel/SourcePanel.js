@@ -107,6 +107,11 @@ const SourcePanel = (props) => {
 
     }
 
+    const handleSourcePanelClick= (event, value) => {
+
+       event.stopPropagation();
+    }
+
 
     useEffect(() => {
 
@@ -152,7 +157,7 @@ const SourcePanel = (props) => {
 
 
     return (
-        <div className='my-source-panel position-absolute top-100 start-0' >
+        <div className='my-source-panel position-absolute top-100 start-0' onClick={handleSourcePanelClick}>
             <div style={{ position: 'relative' }}>
                 <CustomAlert message={showText} type={showType} ref={alertRef} interval={showInterval} width="375" height="18" />
                 <div style={{ position: 'absolute', width: 499, top: 0 }}>

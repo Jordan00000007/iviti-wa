@@ -103,9 +103,9 @@ function AllAiTasks() {
 
                             </div>
                         </div>
-                        <div className="row gy-4">
-                            {myData.map(item => (
-                                <div className="col-3" key={item.task_uid}>
+                        <div className="row p-0 g-3">
+                            {myData.map((item,idx) => (
+                                <div className="col-3" key={item.task_uid} style={{paddingBottom:5}} >
                                     <TaskCard
                                         task_uid={item.task_uid}
                                         nameTask={item.task_name}

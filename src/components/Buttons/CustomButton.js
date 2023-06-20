@@ -12,7 +12,7 @@ const CustomButton = (props) => {
 
         if (props.name==="edit"){
             return (
-                <button onClick={props.onClick} className="my-button-edit" >
+                <button onClick={props.onClick} className="my-button-edit" style={{width:parseInt(props.width)}} >
                     Edit
                 </button>
             )
@@ -34,6 +34,14 @@ const CustomButton = (props) => {
             )
         }
 
+        if (props.name==="confirm"){
+            return (
+                <button onClick={props.onClick} className="my-button-submit">
+                    OK
+                </button>
+            )
+        }
+
         if (props.name==="back"){
             return (
                 <button onClick={props.onClick} className="p-0 border-0">
@@ -44,7 +52,7 @@ const CustomButton = (props) => {
 
         if (props.name==="cancel"){
             return (
-                <button onClick={props.onClick} className="my-button-cancel p-0 border-0">
+                <button onClick={props.onClick} className="my-button-cancel">
                     Cancel
                 </button>
             )
@@ -54,13 +62,13 @@ const CustomButton = (props) => {
 
             if (props.disabled){
                 return (
-                    <button className="my-button-disable p-0 border-0">
+                    <button className="my-button-disable">
                         Add
                     </button>
                 )
             }else{
                 return (
-                    <button onClick={props.onClick} className="my-button-submit p-0 border-0">
+                    <button onClick={props.onClick} className="my-button-submit">
                         Add
                     </button>
                 )
@@ -70,7 +78,7 @@ const CustomButton = (props) => {
 
         if (props.name==="save"){
             return (
-                <button onClick={props.onClick} className="my-button-submit p-0 border-0">
+                <button onClick={props.onClick} className="my-button-submit">
                     Save
                 </button>
             )
@@ -78,7 +86,7 @@ const CustomButton = (props) => {
 
         if (props.name==="delete"){
             return (
-                <button onClick={props.onClick} className="my-button-submit p-0 border-0">
+                <button onClick={props.onClick} className="my-button-submit">
                     Delete
                 </button>
             )

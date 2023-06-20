@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import log from "../../utils/console";
 import { PropaneSharp } from '@mui/icons-material';
 
-const RemoteVideo = ({ uuid, status,onPlaying }) => {
+const RemoteVideo = ({ uuid, status,onPlaying,fullScreen }) => {
     const STREAM_SERVER = process.env.REACT_APP_STREAM_SERVER;
     const [remoteStream, setRemoteStream] = useState(null);
     const remoteVideoRef = useRef(null);
@@ -131,10 +131,10 @@ const RemoteVideo = ({ uuid, status,onPlaying }) => {
             onPlaying(false);
         }
         if (status === 'running') {
-            //setVideoMessage('');
+            setVideoMessage('Get streaming...');
         }
         if (status === 'stop') {
-            setVideoMessage('Switch on the AI task to view inference');
+            setVideoMessage('Switch on the AI task to view inference.');
             onPlaying(false);
         }
         if (status === 'set_task_stop_loading') {
@@ -159,16 +159,25 @@ const RemoteVideo = ({ uuid, status,onPlaying }) => {
         onPlaying(true);
     }
 
+    useEffect(() => {
+
+        if (fullScreen) {
+            //remoteVideoRef.current.requestFullScreen();
+        }else{
+            //remoteVideoRef.exitFullscreen();
+        }
+    }, [fullScreen]);
+
     return (
         <div style={{ position: 'relative' }}>
 
-            <video ref={remoteVideoRef} width="839px" height="604px" autoPlay muted className='my-video-player' onPlaying={myPlaying} onWaiting={myWaitting} >
+            <video ref={remoteVideoRef} width={(fullScreen)?window.innerWidth:"841px"} height={(fullScreen)?window.innerHeight:"604px"} autoPlay muted className='my-video-player' onPlaying={myPlaying} onWaiting={myWaitting} allow='fullscreen' >
                 Your browser does not support the video tag.
             </video>
 
             {
                 (videoMessage !== '') &&
-                <div style={{ position: 'absolute', top: 0, left: 0, width: 839, height: 604, zIndex:1, color:'#FFFFFF66'}} className='my-video-message d-flex justify-content-center align-items-center roboto-h5'>
+                <div style={{ position: 'absolute', top: 0, left: 0, width: 841, height: 604, zIndex:1, color:'#FFFFFF66'}} className='my-video-message d-flex justify-content-center align-items-center roboto-h5'>
                     <div>
                         {videoMessage}
                     </div>

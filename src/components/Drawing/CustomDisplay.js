@@ -26,6 +26,10 @@ const CustomDisplay = (props) => {
     // const drawWidth = 804;
     // const drawHeight = 558;
 
+    log('-------- draw width and height ------')
+    log(drawWidth)
+    log(drawHeight)
+
     const [areaNameArr, setAreaNameArr] = useState([])
     const [areaPointArr, setAreaPointArr] = useState([])
     const [lineNameArr, setLineNameArr] = useState([[,]])
@@ -199,11 +203,7 @@ const CustomDisplay = (props) => {
             setAreaPointArr(myAreaPointArr);
             setLineNameArr(myLineNameArr);
             setLinePointArr(myLinePointArr);
-            log(myAreaNameArr)
-            log('------myAreaPointArr')
-            log(myAreaPointArr)
-            log(myLineNameArr)
-            log(myLinePointArr)
+           
         }
 
     }, [applicationStatus, drawWidth, drawHeight]);
@@ -219,6 +219,7 @@ const CustomDisplay = (props) => {
                 onMouseOut={event => {
                     setShowAreas(false);
                 }}
+                onClick={props.onClick}
 
             >
                 {

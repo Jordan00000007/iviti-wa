@@ -25,6 +25,52 @@ const CustomSelect = forwardRef((props, ref) => {
 
     const dispatch = useDispatch();
 
+    const theme1 = extendTheme({
+        components: {
+            JoySelect: {
+                styleOverrides: {
+                    root: ({ ownerState, theme }) => ({
+                        borderColor: '#979CB580',
+                    }),
+                },
+            },
+            JoyChip: {
+                styleOverrides: {
+                    root: ({ ownerState, theme }) => ({
+                        ...(ownerState.color === 'ivit' && {
+                            color: '#FFFFFF',
+                            backgroundColor: '#E61F23',
+                        }),
+                    }),
+                },
+            },
+           
+        },
+    });
+
+    const theme2 = extendTheme({
+        components: {
+            JoySelect: {
+                styleOverrides: {
+                    root: ({ ownerState, theme }) => ({
+                        borderColor: '#979CB5',
+                    }),
+                },
+            },
+            JoyChip: {
+                styleOverrides: {
+                    root: ({ ownerState, theme }) => ({
+                        ...(ownerState.color === 'ivit' && {
+                            color: '#FFFFFF',
+                            backgroundColor: '#E61F23',
+                        }),
+                    }),
+                },
+            },
+           
+        },
+    });
+
     const theme = extendTheme({
         components: {
             JoyButton: {
@@ -52,8 +98,15 @@ const CustomSelect = forwardRef((props, ref) => {
 
     const [placeHolder, setPlaceHolder] = useState(props.placeHolder);
     const [selectedValue, setSelectedValue] = useState('');
+    const [focus, setFocus] = useState(false);
 
-  
+    const handleListBoxChange= (event, value) => {
+
+        log('list box changed '+event)
+        setFocus(event);
+       
+
+    };
 
 
     const handleSelectChange = (event, value) => {
@@ -93,7 +146,7 @@ const CustomSelect = forwardRef((props, ref) => {
 
 
     return (
-        <CssVarsProvider theme={theme}>
+        <CssVarsProvider theme={focus?theme2:theme1}>
             <Select
                 indicator={<KeyboardArrowDown />}
                 placeholder={placeHolder ? "--- please select ---" : ""}
@@ -124,6 +177,7 @@ const CustomSelect = forwardRef((props, ref) => {
                 defaultValue={placeHolder ? "" : props.defaultValue}
                 value={selectedValue}
                 onChange={handleSelectChange}
+                onListboxOpenChange={handleListBoxChange.bind(this)}
                 slotProps={{
 
                     listbox: {

@@ -32,10 +32,15 @@ function AiInference() {
     const [fps, setFps] = useState('N/A');
     const [liveTime, setLiveTime] = useState('0 day 0 hour 0 min');
     const fpsRef = useRef(null);
+    const videoPanelRef = useRef(null);
 
     const [showType, setShowType] = useState(0);
     const [showText, setShowText] = useState('test');
     const [playing, setplaying] = useState(false);
+
+    const [fullScreen, setFullScreen] = useState(false);
+
+    const [basicType, setBasicType] = useState(false);
 
     const [disabled, setDisabled] = useState(false);
 
@@ -114,6 +119,15 @@ function AiInference() {
 
     }
 
+    const handleVideoClick=()=>{
+
+        log('handle video click')
+        // setFullScreen(true);
+        // videoPanelRef.current.requestFullscreen();
+
+    }
+
+
     useEffect(() => {
         dispatch(fetchData());
         //dispatch(getAllModels());
@@ -123,6 +137,21 @@ function AiInference() {
     useEffect(() => {
 
         if (myItem !== undefined) {
+            
+            log('my item')
+            log(myItem)
+        
+            if (myItem.status!==null){
+                log('-------------')
+                log()
+                if (myItem.app_name[0].toLowerCase().indexOf('basic')>=0){
+                    setBasicType(true);
+                    log('set basic type true')
+                }
+            }
+
+          
+
             if ((myItem.status) && (myStatus === 'success')) {
                 if (myItem.status === 'set_task_run_success') {
                     log('add stream start')
@@ -189,7 +218,7 @@ function AiInference() {
                                
                                 {
                                     (myItem.status === 'stop')&&
-                                    <CustomButton name="edit" onClick={handleEditClick} />
+                                    <CustomButton name="edit" onClick={handleEditClick} width="100"/>
                                 }
                                     
                             
@@ -204,7 +233,7 @@ function AiInference() {
                                             <td className='my-area-a'>
                                                 <div className='w-100 '>
                                                     <div className='my-area-a1 d-flex justify-content-center align-items-center'>
-                                                        {
+                                                        {/* {
                                                             ((myItem.status==='running')&&(myItem.liveTime)) &&
                                                             <>
                                                                 <GeneralTooltip title="Task running time">
@@ -212,11 +241,11 @@ function AiInference() {
                                                                 </GeneralTooltip>
                                                             </>
                                                             
-                                                        }
+                                                        } */}
                                                     </div>
-                                                    <div className='my-area-a2 position-relative'>
-                                                        <RemoteVideo uuid={params.uuid} status={myItem.status} onPlaying={handlePlaying}/>
-                                                        <CustomDisplay uuid={myItem.source_uid} playing={playing}></CustomDisplay> 
+                                                    <div className='my-area-a2 position-relative' onChange={handleVideoClick} ref={videoPanelRef}>
+                                                        <RemoteVideo uuid={params.uuid} status={myItem.status} onPlaying={handlePlaying} fullScreen={fullScreen} />
+                                                        <CustomDisplay uuid={myItem.source_uid} playing={playing} onClick={handleVideoClick}></CustomDisplay> 
                                                     </div>
                                                     <div className='my-area-a3'>
 
@@ -282,7 +311,7 @@ function AiInference() {
                                                                             Application
                                                                         </div>
                                                                         <div className='my-area-b1-1-2 roboto-b1'>
-                                                                            {myItem.app_name}
+                                                                            {myItem.app_name.toString().replace("_"," ").replace("_"," ")}
                                                                         </div>
                                                                     </div>
                                                                     <div className='my-area-b1-1  d-flex justify-content-between'>
@@ -311,7 +340,7 @@ function AiInference() {
                                                                     </div>
 
                                                                 </div>
-                                                                <DependOnPanel uuid={params.uuid} onClick={handleLabelExpandClick} /> 
+                                                                <DependOnPanel uuid={params.uuid} onClick={handleLabelExpandClick} basicType={basicType}/> 
                                                                 <TemperaturePanel uuid={params.uuid} status={myItem.status} temp={temp}/>
                                                             </div>
                                                         </div>

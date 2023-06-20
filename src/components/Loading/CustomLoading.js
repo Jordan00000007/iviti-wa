@@ -9,6 +9,8 @@ const CustomLoading = () => {
                         display: flex;
                         justify-content: center;
                         align-items: center;
+                        width:120px;
+                        height:120px;
                         
                     }
 
@@ -22,8 +24,8 @@ const CustomLoading = () => {
                     }
 
                     .loading-text {
-                        top:35px;
-                        left:18px;
+                        top:50px;
+                        left:32px;
                     }
 
                     @keyframes spin {

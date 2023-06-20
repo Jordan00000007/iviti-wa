@@ -584,7 +584,7 @@ function EditAiTask() {
         log(myPass)
 
         if (!myPass) {
-            setMessageOpen(1, "Please fix the errors marked with red");
+            setMessageOpen(1, "Please fix the errors marked with red.");
         }
 
         //return false;
@@ -839,6 +839,18 @@ function EditAiTask() {
 
     };
 
+    const handleBodyClick= (event, value) => {
+
+        log('handle body click')
+
+        if (sourceMenu){
+            sourceRef.current.setButtonClick();
+        };
+    
+
+    };
+
+
 
 
     useEffect(() => {
@@ -1007,8 +1019,9 @@ function EditAiTask() {
 
             if (params.uuid !== undefined) {
                 dispatch(fetchData());
-            } else {
+            }else {
                 setShowLoadingModal(false);
+               
             }
         }
 
@@ -1298,7 +1311,7 @@ function EditAiTask() {
             />
             <CustomAlert message={showText} type={showType} ref={alertRef} />
             <div className="container p-0">
-                <div className="my-body">
+                <div className="my-body" onClick={handleBodyClick}>
                     <div className="row p-0 g-0 mb-2 mt-3">
                         <div className="col-12 d-flex justify-content-between align-items-center my-flex-gap">
 
@@ -1368,7 +1381,7 @@ function EditAiTask() {
                                 <div>
 
                                     {/* <CustomSelectSource name={sourceContent} width="240" height="52" fontSize="16" ref={sourceRef} onListboxOpenChange={handleSourceMenuToggle} placeHolder={true} disabled={(taskUid === '') ? false : true} /> */}
-                                    <CustomSelectSource name={sourceContent} width="240" height="52" fontSize="16" ref={sourceRef} onListboxOpenChange={handleSourceMenuToggle} placeHolder={true} />
+                                    <CustomSelectSource name={sourceContent} width="240" height="52" fontSize="16" ref={sourceRef} onListboxOpenChange={handleSourceMenuToggle} placeHolder={true} sourceMenu={sourceMenu} />
                                 </div>
                                 <div className='position-relative'>
                                     {
@@ -1602,8 +1615,8 @@ function EditAiTask() {
                 >
                     <div className='container-fluid'>
                         <div className='row'>
-                            <div className='col-12 roboto-h2 p-0' style={{ paddingTop: 20, paddingLeft: 20 }}>
-                                <div style={{ paddingTop: 20, paddingLeft: 20 }}>
+                            <div className='col-12 roboto-h2 p-0'>
+                                <div>
                                     Rename
                                 </div>
 
@@ -1611,7 +1624,7 @@ function EditAiTask() {
                         </div>
                         <div className='row'>
                             <div className='col-12 roboto-b1 p-0' style={{ color: 'var(--on_color_2)' }}>
-                                <div style={{ paddingTop: 25, paddingLeft: 20 }}>
+                                <div style={{ paddingTop: 24}}>
                                     Area name
                                 </div>
 
@@ -1619,14 +1632,14 @@ function EditAiTask() {
                         </div>
                         <div className='row'>
                             <div className='col-12 roboto-h2 p-0'>
-                                <div style={{ paddingTop: 5, paddingLeft: 20, paddingRight: 20 }}>
-                                    <CustomInput width="420" height="52" defaultValue={modifyAreaName} ref={areaRenameRef} onChange={() => { }} />
+                                <div style={{ paddingTop: 5}}>
+                                    <CustomInput width="418" height="52" defaultValue={modifyAreaName} ref={areaRenameRef} onChange={() => { }} />
                                 </div>
                             </div>
                         </div>
                         <div className='row'>
-                            <div className='col-12 d-flex justify-content-end '>
-                                <div style={{ paddingTop: 140, paddingRight: 8 }} className='d-flex gap-3'>
+                        <div className='col-12 d-flex justify-content-end' style={{padding:0}}>
+                                <div style={{ paddingTop: 145 }} className='d-flex gap-3'>
                                     <CustomButton name="cancel" onClick={() => {
                                         setShowAreaRenameModal(false);
                                     }} />
@@ -1647,8 +1660,8 @@ function EditAiTask() {
                 >
                     <div className='container-fluid'>
                         <div className='row'>
-                            <div className='col-12 roboto-h2 p-0' style={{ paddingTop: 20, paddingLeft: 20 }}>
-                                <div style={{ paddingTop: 20, paddingLeft: 20 }}>
+                            <div className='col-12 roboto-h2 p-0' style={{ paddingTop: 20}}>
+                                <div>
                                     Delete {taskName}
                                 </div>
 
@@ -1656,7 +1669,7 @@ function EditAiTask() {
                         </div>
                         <div className='row'>
                             <div className='col-12 roboto-b1 p-0' style={{ color: 'var(--on_color_1)' }}>
-                                <div style={{ paddingTop: 25, paddingLeft: 20 }}>
+                                <div style={{ paddingTop: 24}}>
                                     {taskName} will be deleted.
                                 </div>
 
@@ -1664,8 +1677,8 @@ function EditAiTask() {
                         </div>
 
                         <div className='row'>
-                            <div className='col-12 d-flex justify-content-end '>
-                                <div style={{ paddingTop: 205, paddingRight: 8 }} className='d-flex gap-3'>
+                            <div className='col-12 d-flex justify-content-end' style={{padding:0}}>
+                                <div style={{ paddingTop: 205}} className='d-flex gap-3'>
                                     <CustomButton name="cancel" onClick={() => {
                                         setShowTaskDeleteModal(false);
                                     }} />
@@ -1685,8 +1698,8 @@ function EditAiTask() {
                 >
                     <div className='container-fluid'>
                         <div className='row'>
-                            <div className='col-12 roboto-h2 p-0' style={{ paddingTop: 20, paddingLeft: 20 }}>
-                                <div style={{ paddingTop: 20, paddingLeft: 20 }}>
+                            <div className='col-12 roboto-h2 p-0'>
+                                <div>
                                     Delete {deleteModelName}
                                 </div>
 
@@ -1694,7 +1707,7 @@ function EditAiTask() {
                         </div>
                         <div className='row'>
                             <div className='col-12 roboto-b1 p-0' style={{ color: 'var(--on_color_1)' }}>
-                                <div style={{ paddingTop: 25, paddingLeft: 20 }}>
+                                <div style={{ paddingTop: 24}}>
                                     {deleteModelName} will be deleted.
                                 </div>
 
@@ -1702,8 +1715,8 @@ function EditAiTask() {
                         </div>
 
                         <div className='row'>
-                            <div className='col-12 d-flex justify-content-end '>
-                                <div style={{ paddingTop: 205, paddingRight: 8 }} className='d-flex gap-3'>
+                            <div className='col-12 d-flex justify-content-end' style={{padding:0}}>
+                                <div style={{ paddingTop: 205 }} className='d-flex gap-3'>
                                     <CustomButton name="cancel" onClick={() => {
                                         setShowModelDeleteModal(false);
                                     }} />
@@ -1721,11 +1734,14 @@ function EditAiTask() {
                 open={showLoadingModal}
             >
                 <ModalDialog
-                    sx={{ minWidth: 200, maxWidth: 200, minHeight: 200 }}
+                    sx={{ minWidth: 200, maxWidth: 200, minHeight: 200,layout:'center' }}
                 >
-                    <div style={{ width: 160, height: 160, background: 'white', paddingTop: 33, paddingLeft: 33 }}>
-                        <CustomLoading />
-                    </div>
+                    
+                        <div style={{width:0, height:0,background: 'white'}}>
+                            <CustomLoading />
+                        </div>
+                    
+                    
                 </ModalDialog>
             </Modal>
 

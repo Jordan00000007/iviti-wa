@@ -1,25 +1,90 @@
-import {ReactComponent as Logo} from '../../assets/logo.svg';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { ReactComponent as Logo } from '../../assets/logo.svg';
+import log from "../../utils/console";
+import CustomButton from '../../components/Buttons/CustomButton';
+import Modal from '@mui/joy/Modal';
+import ModalDialog from '@mui/joy/ModalDialog';
 
 function CustomHeader() {
 
-    const handleClick = (event) => {
-        console.log('Head Button clicked!');
-        //location.href="./inference"
-        if (event.detail === 2) {
-            console.log('double click');
-          }
+    const pathname = window.location.pathname;
+
+    const [showComfirmBackModal, setShowComfirmBackModal] = useState(false);
+
+    const handleLogoClick = (event) => {
+        log('Head Button clicked!');
+        log('current path=' + pathname)
+
+        if ((pathname.indexOf('addTask') >= 0)|| (pathname.indexOf('editTask') >= 0)) {
+            log('show message')
+            setShowComfirmBackModal(true);
+        }
+        else{
+            window.location.href="/";
+        }
+        
     };
 
-    return (
-        <div className="my-header">
+    const handleGoMainPage = (event) => {
+        window.location.href="/";
+    }
 
-            <div className="row p-0 g-0">
-                <div className="col-12 p-0" onClick={handleClick}>
-                    <Logo />
+    return (
+        <>
+
+            <div className="my-header">
+
+                <div className="row p-0 g-0">
+                    <div className="col-12 p-0">
+                        <Logo onClick={handleLogoClick} style={{ cursor: 'pointer' }} />
+                    </div>
                 </div>
+
             </div>
 
-        </div>
+
+
+
+            <Modal
+                open={showComfirmBackModal}
+            >
+                <ModalDialog
+                    sx={{ minWidth: 500, maxWidth: 500, minHeight: 400 }}
+                >
+                    <div className='container-fluid'>
+                        <div className='row'>
+                            <div className='col-12 roboto-h2 p-0'>
+                                <div>
+                                    Confirm back to main page?
+                                </div>
+
+                            </div>
+                        </div>
+                        <div className='row'>
+                            <div className='col-12 roboto-b1 p-0' style={{ color: 'var(--on_color_1)' }}>
+                                <div style={{ paddingTop: 24}}>
+                                Everything not saved will be lost.
+                                </div>
+
+                            </div>
+                        </div>
+
+                        <div className='row'>
+                            <div className='col-12 d-flex justify-content-end' style={{padding:0}}>
+                                <div style={{ paddingTop: 225}} className='d-flex gap-3'>
+                                    <CustomButton name="cancel" onClick={() => {
+                                        setShowComfirmBackModal(false);
+                                    }} />
+                                    <CustomButton name="confirm" onClick={handleGoMainPage} />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </ModalDialog>
+            </Modal>
+
+
+        </>
     )
 
 }

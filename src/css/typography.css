@@ -23,6 +23,16 @@
     font-size: 18px;
 }
 
+.roboto-h6 {
+    font-family: 'Roboto Medium';
+    font-size: 16px;
+}
+
+.roboto-h7 {
+    font-family: 'Roboto Medium';
+    font-size: 15px;
+}
+
 .roboto-b1 {
     font-family: 'Roboto'!important;
     font-size: 16px!important;
