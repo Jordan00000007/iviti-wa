@@ -43,13 +43,14 @@ https://github.com/MaxChangInnodisk/ivit-i-web-api-fast
 # Q & A
 * How to change port?
 
-(1) Modify nginx.conf file, find the server section and modify the listen port which you want to change.
+    1. Modify nginx.conf file, find the server section and modify the listen port which you want to change.
     ```
     server {
         listen 8001;
         listen [::]:8001;
     ```
-(2) Use docker-compose rebuild the image.
+    
+    2. Use docker-compose rebuild the image.
 
     ```
     sudo docker-compose -f docker-compose-pro.yml up -d
