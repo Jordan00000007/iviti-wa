@@ -1,7 +1,7 @@
 ![COVER](./assets/images/iVIT-I-Logo-B.png)
 
 # iVIT-I-Web-Application
-The AI solution provided by innodisk.
+The AI solution provdie by innodisk.
 This project need to go with backend API as following:
 https://github.com/MaxChangInnodisk/ivit-i-web-api-fast
 
@@ -40,5 +40,17 @@ https://github.com/MaxChangInnodisk/ivit-i-web-api-fast
 
     http://127.0.0.1/
 
+# Q & A
+* How to change port?
 
+(1) Modify nginx.conf file, find the server section and modify the listen port which you want to change.
+    ```
+    server {
+        listen 8001;
+        listen [::]:8001;
+    ```
+(2) Use docker-compose rebuild the image.
 
+    ```
+    sudo docker-compose -f docker-compose-pro.yml up -d
+    ```
