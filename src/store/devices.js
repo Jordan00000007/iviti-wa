@@ -27,6 +27,7 @@ const devicesSlice = createSlice({
             getAllDevices.fulfilled,
             (state, action) => {
                 log('--- get all devices fulfilled ---');
+                //log(action.payload.data)
                 if (action.payload.status_code===200){
                     let myData=[];
                     Object.keys(action.payload.data).map((e, i) => {

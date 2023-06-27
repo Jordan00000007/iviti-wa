@@ -73,15 +73,17 @@ const CustomSelectSource = forwardRef((props, ref) => {
                 .my-source-input { 
                     display: block; 
                     background: #fff; 
-                    padding: 10px 10px 10px 10px; 
+                    padding: 10px 40px 10px 10px; 
                     width: 240px; 
                     height: 52px;
                     border: 1px solid ${(props.sourceMenu)?'var(--on_color_2)':'var(--on_color_2_t1)'};
                     border-radius: 6px !important;
+                   
                   
                 }
                 .my-source-input:hover { 
                     border: 1px solid var(--on_color_2);   
+                    
                 }
                 .my-source-input:focus { 
                     border: 1px solid var(--on_color_2)!important;  
@@ -100,14 +102,10 @@ const CustomSelectSource = forwardRef((props, ref) => {
                     width: 32x;
                     z-index: 9; 
                     border:1px solid white!important;
+                    background: white;
+                  
                 }
-                .icons{
-                    svg{
-                        color: #000;
-                        width: 50px;
-                        height: 50px;
-                    }
-                }
+              
 
              
                 `}

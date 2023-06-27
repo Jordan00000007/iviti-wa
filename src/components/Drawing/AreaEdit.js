@@ -26,6 +26,8 @@ const AreaEdit = forwardRef((props, ref) => {
     const [cursorY, setCursorY] = useState(50);
     const [cursorVisible, setCursorVisible] = useState(false);
 
+    const [editingNode, setEditingNode] = useState(-1);
+
 
     const [lineADrawing, setLineADrawing] = useState(false);
     const [lineBDrawing, setLineBDrawing] = useState(false);
@@ -113,10 +115,7 @@ const AreaEdit = forwardRef((props, ref) => {
         }else{
             log('dont update')
             setStopBubble(true)
-            // log(group)
-            // group.position({ x: 0, y: 0 });
-            // group.getLayer().draw();
-            //areaShapeArr[areaEditingIndex]
+            
             setPolygons(areaShapeArr[areaEditingIndex]);
             setTransPoly(trans(areaShapeArr[areaEditingIndex]));
            
@@ -145,10 +144,6 @@ const AreaEdit = forwardRef((props, ref) => {
             if (item.y > drawHeight) polygons[idx].y = drawHeight;
 
         });
-
-        
-
-       
 
 
     }
@@ -222,6 +217,7 @@ const AreaEdit = forwardRef((props, ref) => {
 
     const updatePosition = (x, y) => {
 
+        //let tmpPolygons = cloneData(polygons);
         let tmpPolygons = polygons;
         let minX = 0;
         let minY = 0;
@@ -272,9 +268,7 @@ const AreaEdit = forwardRef((props, ref) => {
         setLineA(tmpLineA);
         setTransLineA(trans(tmpLineA));
 
-        log('tmpLineA')
-        log(tmpLineA)
-
+      
         let tmpLineB = lineB;
         tmpLineB.forEach(function (item, idx) {
             item.x = item.x + x;
@@ -367,7 +361,7 @@ const AreaEdit = forwardRef((props, ref) => {
                 (polygons !== []) &&
 
                 <Group
-                    draggable={false}
+                    draggable={(props.mode==='edit')?true:false}
                     x={0}
                     y={0}
                     onDragStart={event => {
@@ -376,20 +370,44 @@ const AreaEdit = forwardRef((props, ref) => {
                     }}
                     onDragEnd={event => {
 
-                       
-                        // if (!stopBubble) {
-                        //     log('group drag end')
-                        //     event.evt.stopPropagation();
-                        //     const group = event.target;
-                        //     updatePosition(group.x(), group.y());
+                        if (props.mode==='edit'){
 
-                        // }
+                            if (!stopBubble) {
+                                const group = event.target;
+                                log('update group drag end position')
+                                updatePosition(group.x(), group.y());
+                            }
+                            // log('group drag end')
+                            // event.evt.stopPropagation();
+                            // const group = event.target;
+                            // updatePosition(group.x(), group.y());
+                            setStopBubble(false);
+                            updateEditingData(polygons);
 
-                        
-                        // setStopBubble(false);
-                        //updateEditingData(polygons);
+                        }
+                     
 
                     }}
+                    onMouseOver={event=>{
+                        const container = event.target.getStage().container();
+                        container.className = "standard-cursor";
+                        if (props.mode==='edit'){
+                            container.className = "pen-cursor";
+                        }else{
+                            container.className = "standard-cursor";
+                        }
+                    }}
+                    onMouseMove={event=>{
+                       
+                    }}
+                    onMouseLeave={event=>{
+                      
+                    }}
+                    onMouseDown={event=>{
+                        
+                        
+                    }}
+
                 >
 
 
@@ -409,17 +427,19 @@ const AreaEdit = forwardRef((props, ref) => {
                     {/* Edit Polygon for Display */}
                     <Line
                         // for display
-                        strokeWidth={5}
+                        strokeWidth={0}
                         stroke="#FBB03B"
-                        opacity={0.15}
+                        opacity={0.16}
                         lineJoin="round"
-                        fill="red"
+                        fill="#E61F23"
                         points={transPoly}
                         onMouseUp={event => {
 
                             log('detect area mouse up')
                             log(props.lineMode)
                             log(lineADrawing)
+
+                            const container = event.target.getStage().container();
 
                             if (props.mode === 'line') {
 
@@ -433,6 +453,7 @@ const AreaEdit = forwardRef((props, ref) => {
                                     dispatch(lineAUpdate([lineA[0].x, lineA[0].y, x, y]))
                                     if (lineB.length === 2){
                                         props.onComplete();
+                                        container.className = "standard-cursor";
                                     }
 
                                 }
@@ -445,33 +466,44 @@ const AreaEdit = forwardRef((props, ref) => {
                                     setTransLineB(trans(lineB.concat([{ x: x, y: y }])))
                                     dispatch(lineBUpdate([lineB[0].x, lineB[0].y, x, y]))
                                     props.onComplete();
+                                    container.className = "standard-cursor";
                                 }
-                              
+                                container.className = "standard-cursor";
                             }
 
                         }}
                         onMouseDown={event => {
 
+                            const container = event.target.getStage().container();
+                            container.className = "selected-cursor";
                             if (props.mode === 'line') {
+
+                                log('on mouse down and line mode')
+                                container.className = "selected-cursor";
 
                                 if (lineA.length === 0) {
                                     log('start draw line a')
                                     setLineADrawing(true);
+                                    container.className = "selected-cursor";
                                     const x = event.evt.offsetX;
                                     const y = event.evt.offsetY;
                                     setNextPointA({ "x": x, "y": y });
                                     setLineA([{ "x": x, "y": y }]);
                                     setTransLineA(trans([{ "x": x, "y": y }]))
+                                    
 
                                 }
                                 if ((lineA.length === 2) && (lineB.length === 0)) {
-                                    log('start draw line b')
+                                    log('start draw line b');
+                                    container.className = "selected-cursor";
                                     setLineBDrawing(true);
+                                    
                                     const x = event.evt.offsetX;
                                     const y = event.evt.offsetY;
                                     setNextPointB({ "x": x, "y": y });
                                     setLineB([{ "x": x, "y": y }]);
-                                    setTransLineB(trans([{ "x": x, "y": y }]))
+                                    setTransLineB(trans([{ "x": x, "y": y }]));
+                                    
 
                                 }
                             }
@@ -479,17 +511,24 @@ const AreaEdit = forwardRef((props, ref) => {
                         }}
                         onMouseMove={event => {
 
+                            const container = event.target.getStage().container();
+
                             if (props.mode === 'line') {
 
+                                //container.className = "selected-cursor";
                                 if (lineADrawing === true) {
+                                    container.className = "selected-cursor";
                                     const x = event.evt.offsetX;
                                     const y = event.evt.offsetY;
                                     setNextPointA({ x, y })
+                                    
                                 }
                                 if (lineBDrawing === true) {
+                                    container.className = "selected-cursor";
                                     const x = event.evt.offsetX;
                                     const y = event.evt.offsetY;
-                                    setNextPointB({ x, y })
+                                    setNextPointB({ x, y });
+                                    
                                 }
                             }
 
@@ -497,12 +536,16 @@ const AreaEdit = forwardRef((props, ref) => {
                         closed={true}
                         tag={{ id: 1, name: 'hexagon' }}
 
-
                         onDragStart={event => {
-                            if (lineA === []) {
-                                log('start draw line')
-                            }
+                            const container = event.target.getStage().container();
+                            container.className = "selected-cursor";
+                        }}
 
+
+                        onDragMove={event => {
+
+                            const container = event.target.getStage().container();
+                            container.className = "selected-cursor";
                         }}
                         onDragEnd={event => {
                         }}
@@ -578,8 +621,6 @@ const AreaEdit = forwardRef((props, ref) => {
                             onMouseMove={
                                 event => {
 
-                                    log('mouse move...')
-    
                                     if (props.mode === 'edit') {
                                         setCursorX(event.evt.offsetX);
                                         setCursorY(event.evt.offsetY);
@@ -589,7 +630,7 @@ const AreaEdit = forwardRef((props, ref) => {
                                 }
                             }
                             onMouseOut={event => {
-                                log('mouse over...')
+                               
                                 setCursorVisible(false);
                                 setCursorX(-10);
                                 setCursorY(-10);
@@ -612,7 +653,7 @@ const AreaEdit = forwardRef((props, ref) => {
                                 y={item.y}
                                 order={idx}
                                 radius={radius}
-                                fill={'white'}
+                                fill={(editingNode===idx)?'red':'white'}
                                 stroke={'red'}
                                 strokeWidth={2}
                                 draggable={true}
@@ -625,9 +666,15 @@ const AreaEdit = forwardRef((props, ref) => {
                                 onMouseOut={event => {
                                     event.target.fill('white');
                                 }}
-                                onDragMove={event => {
+                                onDragStart={event => {
 
-                                    log('circle drag move')
+                                  
+                                    setEditingNode(event.target.attrs.order);
+                                    setCursorVisible(false);
+                                
+                                }}
+                                onDragMove={event => {
+                                    
                                     let tmp = cloneData(polygons);
                                     tmp[idx].x = event.target.attrs.x;
                                     tmp[idx].y = event.target.attrs.y;
@@ -635,15 +682,21 @@ const AreaEdit = forwardRef((props, ref) => {
                                     if (tmp[idx].y < 0) tmp[idx].y = 0;
                                     setPolygons(tmp);
                                     setTransPoly(trans(tmp));
+                                    setCursorVisible(false);
+
+                                  
 
                                 }}
                                 onDragEnd={event => {
 
+                                    setEditingNode(-1);
+                                    setCursorVisible(false);
+
+                                    event.target.fill('white');
                                     log('circle drag end')
                                     const order = parseInt(event.target.attrs.order);
                                     const group=event.target;
-                                    log('order')
-                                    log(order)
+                                   
                                     checkDelete({ "x": event.target.attrs.x, "y": event.target.attrs.y }, order,group);
                                     setStopBubble(true);
                                     //updateEditingData();
@@ -657,7 +710,7 @@ const AreaEdit = forwardRef((props, ref) => {
 
                     {/* Line A display */}
                     <Line
-                        strokeWidth={lineBSelected ? 5 : 3}
+                        strokeWidth={lineASelected ? 5 : 3}
                         stroke="blue"
                         opacity={1}
                         lineJoin="round"
@@ -672,8 +725,8 @@ const AreaEdit = forwardRef((props, ref) => {
                         (lineA.length === 2) &&
                         <Label x={lineA[1].x + 5} y={lineA[1].y + 5}>
                             <Tag
-                                fill={'white'}
-                                opacity={1}
+                                fill={'blue'}
+                                opacity={0.5}
                                 cornerRadius={10}
                                 stroke={"blue"}
                                 strokeWidth={2}
@@ -681,7 +734,7 @@ const AreaEdit = forwardRef((props, ref) => {
                             <Text text={`  ${lineNameArr[areaEditingIndex][0]}  `}
                                 fontSize={14}
                                 fontFamily="roboto"
-                                fill="blue"
+                                fill="white"
                                 padding={6}
                                 height={24}
                                 lineHeight={1}
@@ -708,8 +761,8 @@ const AreaEdit = forwardRef((props, ref) => {
                         (lineB.length === 2) &&
                         <Label x={lineB[1].x + 5} y={lineB[1].y + 5}>
                             <Tag
-                                fill={'white'}
-                                opacity={1}
+                                fill={'blue'}
+                                opacity={0.5}
                                 cornerRadius={10}
                                 stroke={'blue'}
                                 strokeWidth={2}
@@ -717,7 +770,7 @@ const AreaEdit = forwardRef((props, ref) => {
                             <Text text={`  ${lineNameArr[areaEditingIndex][1]}  `}
                                 fontSize={14}
                                 fontFamily="roboto"
-                                fill="blue"
+                                fill="white"
                                 padding={6}
                                 height={24}
                                 lineHeight={1}

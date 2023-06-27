@@ -100,6 +100,35 @@ const areaCreate = forwardRef((props, ref) => {
                     .concat([nextPoint.x, nextPoint.y])}
             />
 
+            <Line
+                strokeWidth={0}
+                opacity={0.16}
+                fill="#E61F23"
+                lineJoin="round"
+                closed={true}
+                points={points
+                    .flatMap(point => [point.x, point.y])
+                    .concat([nextPoint.x, nextPoint.y])}
+            />
+
+            {    
+                points.map((item, idx) => (
+                    <Circle
+                        key={`point_${idx}`}
+                        x={item.x}
+                        y={item.y}
+                        order={idx}
+                        radius={5}
+                        fill={'white'}
+                        stroke={'red'}
+                        strokeWidth={2}
+                        draggable={false}
+                        
+                    />
+                ))
+            }
+           
+
             <Rect
                 x={0}
                 y={0}
@@ -119,6 +148,9 @@ const areaCreate = forwardRef((props, ref) => {
                         const y = event.evt.offsetY
                         setNextPoint({ x, y })
                     }
+                    
+                    const container = event.target.getStage().container();
+                    container.className = (props.mode==='add')?"pen-cursor":"standard-cursor";
                 }}
             />
 

@@ -32,8 +32,6 @@ const setPaletteArr = () => {
 
 export const getAppSetting = createAsyncThunk('areas/getAppSetting', async (taskUid, { getState, requestId }) => {
    
-
-
     const response = await fetch(`${APP_URL}/${taskUid}`);
     return response.json();
 });

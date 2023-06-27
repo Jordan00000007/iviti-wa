@@ -49,7 +49,7 @@ const LinePanel = forwardRef((props, ref) => {
             setReady(false);
         } 
 
-    }, [linePointArr]);
+    }, [linePointArr,areaEditingIndex]);
 
 
     useImperativeHandle(lineTitleRef, () => ({

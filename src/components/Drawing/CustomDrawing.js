@@ -127,21 +127,27 @@ const CustomDrawing = forwardRef((props, ref) => {
         if (props.mode==='add'){
             handleAddButton();
             setLineMode(false);
+            areaDisplayRef.current.resetLineSelected();
         }
         if (props.mode==='delete'){
             handleClearButton();
             setLineMode(false);
+            areaDisplayRef.current.resetLineSelected();
         }
         if (props.mode==='edit'){
             //handleClearButton();
             setEditMode(true);
             setLineMode(false);
+            areaDisplayRef.current.resetLineSelected();
         }
         if (props.mode==='line'){
             //handleClearButton();
             setEditMode(true);
             setLineMode(true);
+            areaDisplayRef.current.resetLineSelected();
         }
+
+        
 
     }, [props]);
 
@@ -161,8 +167,8 @@ const CustomDrawing = forwardRef((props, ref) => {
                 // width={(props.basicType)?854:props.width}
                 height={drawHeight}
                 width={drawWidth}
-                className={(props.mode!=='select')?"custom-cursor":"arrow"}
-               
+                className={(props.mode==='add')?"pen-cursor":(props.mode==='line')?"stop-cursor":"standard-cursor"}
+                // style={{'caretColor': 'DeepPink'}}
             >
                 <Layer ref={layerRef}>
                     <Image image={image} />
@@ -191,6 +197,7 @@ const CustomDrawing = forwardRef((props, ref) => {
                                 //log(indexToAlphabet(idx))
                             }}
                             setMode={handleChangeMode}
+                            mode={props.mode}
                         />
                     }
 

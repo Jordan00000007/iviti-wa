@@ -233,9 +233,9 @@ const CustomDisplay = (props) => {
                                     key={`area_${idx}`}
                                     strokeWidth={0}
                                     stroke="red"
-                                    opacity={0.15}
+                                    opacity={0.16}
                                     lineJoin="round"
-                                    fill="red"
+                                    fill="#FBB03B"
                                     points={item}
                                     onClick={event => {
                                         //
@@ -256,7 +256,7 @@ const CustomDisplay = (props) => {
                                 />
                                 <Line
                                     key={`line_${idx}`}
-                                    strokeWidth={(mouseOverOrder === idx) ? 3 : 0}
+                                    strokeWidth={(mouseOverOrder === idx) ? 2.5 : 0}
                                     stroke="red"
                                     opacity={1}
                                     lineJoin="round"

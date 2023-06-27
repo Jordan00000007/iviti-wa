@@ -14,9 +14,43 @@ import EditIcon from '../../components/Icons/EditIcon';
 
 const CustomSelectArea = forwardRef((props, ref) => {
 
+    const theme1 = extendTheme({
+        components: {
+            JoySelect: {
+                styleOverrides: {
+                    root: ({ ownerState, theme }) => ({
+                        borderColor: '#979CB580',
+                    }),
+                },
+            },
+           
+        },
+    });
+
+    const theme2 = extendTheme({
+        components: {
+            JoySelect: {
+                styleOverrides: {
+                    root: ({ ownerState, theme }) => ({
+                        borderColor: '#979CB5',
+                    }),
+                },
+            },
+           
+        },
+    });
+
+    const handleListBoxChange= (event, value) => {
+
+        setFocus(event);
+
+    };
+
     const [placeHolder, setPlaceHolder] = useState(props.placeHolder);
     const [selectedValue, setSelectedValue] = useState(props.defaultValue);
     const [isHovered,setIsHovered]= useState(false);
+    const [focus, setFocus] = useState(false);
+
 
     //defaultValue
 
@@ -54,12 +88,14 @@ const CustomSelectArea = forwardRef((props, ref) => {
 
     return (
 
+        <CssVarsProvider theme={focus?theme2:theme1}>
         <Select
             indicator={<KeyboardArrowDown />}
             placeholder={placeHolder ? "--- please select ---" : ""}
             sx={{
                 width: parseInt(props.width),
                 fontSize: parseInt(props.fontSize),
+                fontFamily: 'roboto',
                 fontWeight: 400,
                 color: '#16272E',
                 fontFamily: 'Roboto',
@@ -83,6 +119,7 @@ const CustomSelectArea = forwardRef((props, ref) => {
             // defaultValue={placeHolder?"":0}
             value={props.defaultValue}
             onChange={props.onChange}
+            onListboxOpenChange={handleListBoxChange.bind(this)}
             slotProps={{
 
                 listbox: {
@@ -105,6 +142,7 @@ const CustomSelectArea = forwardRef((props, ref) => {
                 <Option value={-1}
                     sx={{
                         fontSize: parseInt(props.fontSize),
+                        fontFamily: 'roboto',
                         fontWeight: 400,
                         color: '#16272E',
                         backgroundColor: '#FAFAFD!important',
@@ -118,6 +156,7 @@ const CustomSelectArea = forwardRef((props, ref) => {
                 <Option value={item[0]} key={index} label={item[1]}
                     sx={{
                         fontSize: parseInt(props.fontSize),
+                        fontFamily: 'roboto',
                         fontWeight: 400,
                         color: '#16272E',
                         backgroundColor: '#FAFAFD!important',
@@ -148,7 +187,7 @@ const CustomSelectArea = forwardRef((props, ref) => {
                 </Option>
             ))}
         </Select>
-
+        </CssVarsProvider>
 
     );
 });

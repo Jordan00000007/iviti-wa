@@ -7,7 +7,7 @@ const SimpleLayout = ({ children }) => {
     const [innerHeight, setInnerHeight] = useState(window.innerHeight-56)
 
     const handleResize=(event)=>{
-        log('handle resize')
+       
         setInnerHeight(window.innerHeight-56)
     }
 

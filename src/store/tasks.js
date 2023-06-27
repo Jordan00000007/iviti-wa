@@ -105,7 +105,6 @@ export const addTask = createAsyncThunk('tasks/addTask', async (myData) => {
     return response.json();;
 });
 
-
 export const updateTask = createAsyncThunk('tasks/updateTask', async (myData) => {
     log(`--- add task start ---`);
     log(`${TASK_URL}`)
@@ -120,8 +119,6 @@ export const updateTask = createAsyncThunk('tasks/updateTask', async (myData) =>
 
     return response.json();;
 });
-
-
 
 export const deleteTask = createAsyncThunk('tasks/deleteTask', async (uuid) => {
     log(`--- delete task start ---`);
@@ -222,8 +219,6 @@ const updateTemperatureInfo=(state,uuid,message)=>{
     // }
 
 }
-
-
 
 const tasksSlice = createSlice({
     name: "tasks",

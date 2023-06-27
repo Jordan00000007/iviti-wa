@@ -74,6 +74,16 @@ const LabelButton= forwardRef((props, ref) => {
         )
     }
 
+    if (props.type === "clear") {
+        return (
+           
+            <button className={props.className} onClick={props.onClick} style={{width:parseInt(props.width),height:parseInt(props.height)}}>
+                {props.name}
+            </button>
+
+        )
+    }
+
     return (
 
         <button className={props.className} style={{width:parseInt(props.width),height:parseInt(props.height)}} onClick={props.onClick} ref={buttonRef}>

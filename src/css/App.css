@@ -105,9 +105,8 @@ div::-webkit-scrollbar-thumb {
 }
 
 .my-source-confirm {
-    width: 25px;
-    height: 25px;
-    top: -2px;
+    width: 30px;
+    height: 30px;
 }
 
 .my-header {
@@ -161,8 +160,23 @@ body{
     z-index: 0;
 }
 
+.my-tool-icon:hover {
+  
+    fill:var(--vivid_4);
+}
 
-.custom-cursor {
+.my-tool-icon-disable {
+    background-color: var(--bg_gray);
+    padding: 4px 5px 4px 6px;
+    border: none;
+    width: 32px;
+    height: 32px;
+    border-radius: 4px;
+    cursor: default;
+    fill:var(--on_color_1_t1);
+}
+
+.pen-cursor {
     cursor: url('../assets/Cursor_Pen.svg') 6 6, auto;
 }
 
@@ -170,6 +184,13 @@ body{
     cursor: url('../assets/Cursor_Stop.svg') 6 6, auto;
 }
 
+.selected-cursor {
+    cursor: url('../assets/Cursor_Select_Selected.svg') 6 6, auto;
+}
+
+.standard-cursor {
+    cursor: url('../assets/Cursor_Select_Standard.svg') 6 6, auto;
+}
 
 .my-button-add {
     background-color: var(--highlight_1);
@@ -571,6 +592,7 @@ body{
     border-top: 1px solid #E0E1E6;
     padding-top: 12px;
     padding-left: 20px;
+    padding-right: 20px;
 }
 
 .my-area-p3-c3-1 {
@@ -667,6 +689,7 @@ body{
     padding-left: 53px;
     padding-right: 53px;
     padding-bottom: 51px;
+    height:223px;
 
 }
 
@@ -681,6 +704,17 @@ body{
     background: var(--highlight_2);
 }
 
+.my-source-panel-clear {
+    background: var(--base_3);
+    color: var(--on_color_1);
+    border-radius: 6px;
+    border: 0px;
+}
+
+.my-source-panel-clear:hover {
+    background: #D1D2D4;
+}
+
 .my-source-input-tag {
     background: var(--base_2) !important;
     color: var(--on_color_2) !important;
@@ -693,7 +727,6 @@ body{
     padding-left: 13px !important;
     padding-top: 8px !important;
     width: 60px !important;
-    ;
     height: 32px;
     -webkit-box-shadow: none;
     -moz-box-shadow: none;
@@ -835,6 +868,10 @@ body{
     -webkit-box-shadow: none !important;
     -moz-box-shadow: none !important;
     box-shadow: none !important;
+}
+
+.my-text-input:disabled {
+   background: white!important;
 }
 
 .my-text-input:hover {
@@ -1177,6 +1214,24 @@ input:checked+.my-toggle-slider:before {
     border-radius: 6px;
     border: 0px;
     color: #16272E29;
+    
+}
+
+.my-source-panel-clear-enable {
+    background-color: var(--base_3);
+    border-radius: 6px;
+    border: 0px;
+    color: var(--on_color_1);
+}
+
+.my-source-panel-clear-enable:hover {
+    background-color: #D1D2D4;
+  
+}
+
+.my-source-panel-submit-disable:hover {
+    
+    cursor: url('../assets/Cursor_Stop.svg') 6 6, auto;
 }
 
 .form-select {

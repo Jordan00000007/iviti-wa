@@ -24,8 +24,6 @@ export const getV4l2Devices = createAsyncThunk('sources/getV4l2Devices', async (
     return response.json();
 });
 
-//getSourceFrame
-
 export const getSourceFrame = createAsyncThunk('sources/getSourceFrame', async (myData, { getState }) => {
 
     log('--- get source frame start ---')
@@ -52,8 +50,8 @@ export const getSourceFrame = createAsyncThunk('sources/getSourceFrame', async (
         myData.height=fileSetHeight;
         myData.width=fileSetWidth;
 
-        log('url=')
-        log(`${TASK_URL}/sources/${fileUid}/frame`)
+        // log('url=')
+        // log(`${TASK_URL}/sources/${fileUid}/frame`)
 
         const response = await fetch(`${TASK_URL}/sources/${fileUid}/frame`, {
             method: 'POST',
@@ -62,10 +60,24 @@ export const getSourceFrame = createAsyncThunk('sources/getSourceFrame', async (
             },
             body: JSON.stringify(myData),
         });
-      
-        const imageBlob = await response.blob();
-        myData.blob=imageBlob;
-        return myData;
+        log('response...')
+        log(response.status)
+        if (response.status===200){
+            const imageBlob = await response.blob();
+            myData.blob=imageBlob;
+            log('myData')
+            log(myData)
+            return myData;
+        }else if (response.status===500){
+            log('fetch source frame error...')
+            log(response)
+            return 'error';
+        }else{
+            log('fetch source frame unknow error...')
+            return 'error';
+        }
+       
+        
     } catch (error) {
 
         log(error)
@@ -92,11 +104,25 @@ export const getSourceWidthHeight = createAsyncThunk('sources/getSourceWitdhHeig
 
 });
 
+export const getSourceInfo = createAsyncThunk('sources/getSourceInfo', async (mySourceUid, ) => {
+
+    log('--- get source info start ---')
+    try {
+        const response = await fetch(`${TASK_URL}/sources/${mySourceUid}`);
+        return response.json();
+    } catch (error) {
+
+        log(error)
+        return error;
+    }
+
+});
+
 
 
 const sourcesSlice = createSlice({
     name: "sources",
-    initialState: { uploadStatus: 'idle', frameStatus:'idle' ,sizeStatus:'idle', data: [], uid: '', originWidth: 0, originHeight: 0, drawWidth: 0, drawHeight: 0, fileName: '', fileUrl: '', v4l2Data: [], v4l2Options: [], type:'', error: null },
+    initialState: { uploadStatus: 'idle', v4l2Status:'idle', frameStatus:'idle',frameMessage:'' ,sizeStatus:'idle',infoStatus:'idle',infoMessage:'', data: [], uid: '', originWidth: 0, originHeight: 0, drawWidth: 0, drawHeight: 0, fileName: '', fileUrl: '', v4l2Data: [], v4l2Options: [], type:'', error: null },
     reducers: {
 
         resetErrorMessage(state) {
@@ -108,6 +134,10 @@ const sourcesSlice = createSlice({
             state.fileName = '';
             state.fileUrl = '';
             state.uid = '';
+        },
+        resetV4l2Status(state) {
+        
+            state.v4l2Status = 'idle';
         },
         setSourceId(state,action) {
            
@@ -157,7 +187,7 @@ const sourcesSlice = createSlice({
                     state.uploadStatus = 'success';
                 }else if(action.payload.status_code === 500){
                     state.error=action.payload.message;
-                    state.uploadStatus = 'success';
+                    state.uploadStatus = 'error';
                 } else {
                     //return updateTaskStatus(state,action.meta.arg,'set_stream_delete_error');
                     log('--- upload source data other ---')
@@ -190,6 +220,8 @@ const sourcesSlice = createSlice({
                 if (action.payload.status_code === 200) {
 
                     log('--- get v4l2 fulfilled  ---')
+                    log(action.payload.data)
+
                     state.v4l2Data = action.payload.data;
                     state.status = 'success';
                     let myData = [];
@@ -197,14 +229,17 @@ const sourcesSlice = createSlice({
                         myData.push([action.payload.data[e], action.payload.data[e]])
                     })
                     state.v4l2Options = myData;
+                    state.v4l2Status='success';
                 }else if(action.payload.status_code === 500){
 
                     log(action.payload.message);
                     state.error = action.payload.message;
+                    state.v4l2Status='error';
 
                 } else {
                     //return updateTaskStatus(state,action.meta.arg,'set_stream_delete_error');
                     log('--- v4l2 other ---')
+                    state.v4l2Status='error';
                 }
 
             }
@@ -213,7 +248,7 @@ const sourcesSlice = createSlice({
             getV4l2Devices.pending,
             (state, { meta }) => {
                 log('--- get v4l2 pending ---');
-                state.status = 'loading';
+                state.v4l2Status='pending';
                 //return updateTaskStatus(state,meta.arg,'set_stream_delete_loading');
             }
         )
@@ -221,7 +256,7 @@ const sourcesSlice = createSlice({
             getV4l2Devices.rejected,
             (state, action) => {
                 log(`--- get v4l2 rejected ---`);
-                state.status = 'rejected';
+                state.v4l2Status = 'rejected';
                 // return updateTaskStatus(state,action.meta.arg,'set_stream_delete_error');
             }
         )
@@ -232,13 +267,19 @@ const sourcesSlice = createSlice({
             (state, action) => {
              
                 log('--- get source frame fulfilled  ---')
-                const {width,height,blob} = action.payload;
-                const myImage= URL.createObjectURL(blob);
-
-                state.fileUrl = myImage;
-                state.drawHeight=height;
-                state.drawWidth=width;
-                state.frameStatus='success';
+                log(action.payload)
+                if (action.payload!=='error'){
+                    const {width,height,blob} = action.payload;
+                    const myImage= URL.createObjectURL(blob);
+                    state.fileUrl = myImage;
+                    state.drawHeight=height;
+                    state.drawWidth=width;
+                    state.frameStatus='success';
+                }else{
+                    state.frameMessage='Fetch source frame error';
+                    state.frameStatus='error';
+                }
+               
 
             }
         )
@@ -247,7 +288,7 @@ const sourcesSlice = createSlice({
             (state, { meta }) => {
 
                 log('--- get source frame pending  ---')
-                state.frameStatus = 'loading';
+                state.frameStatus = 'pending';
                 //return updateTaskStatus(state,meta.arg,'set_stream_delete_loading');
             }
         )
@@ -265,12 +306,19 @@ const sourcesSlice = createSlice({
             getSourceWidthHeight.fulfilled,
             (state, action) => {
 
+                
                 const myData=action.payload.data;
+
+                log('get source info success')
+                
                 myData.forEach(function (item, idx) {
                 
                     if (item.uid===state.uid){
+                        log(item)
                         state.originWidth=parseInt(item.width);
                         state.originHeight=parseInt(item.height);
+                        state.type=item.type.toUpperCase();
+                        state.fileName=item.name;
                         
                     }
                 })
@@ -295,11 +343,54 @@ const sourcesSlice = createSlice({
             }
         )
 
+
+         // ---- get source info ---
+         builder.addCase(
+            getSourceInfo.fulfilled,
+            (state, action) => {
+
+                if (action.payload.status_code === 200) {
+
+                    log('--- get source info fulfilled  ---')
+                    log(action.payload.data)
+                    state.infoMessage = action.payload.data;
+                    state.infoStatus = 'success';
+                }else if(action.payload.status_code === 500){
+                    log('--- get source info error  ---')
+                    log(action.payload.message);
+                    state.infoMessage = action.payload.message;
+                    state.infoStatus = 'error';
+
+                } else {
+                    //return updateTaskStatus(state,action.meta.arg,'set_stream_delete_error');
+                    log('--- source info error other ---')
+                    state.infoMessage = 'unknow error';
+                    state.infoStatus = 'error';
+                }
+            }
+        )
+        builder.addCase(
+            getSourceInfo.pending,
+            (state, action) => {
+
+                log('--- get source info pending  ---')
+                state.infoStatus = 'loading';
+                
+            }
+        )
+        builder.addCase(
+            getSourceInfo.rejected,
+            (state, action) => {
+                log('--- get source info rejected  ---')
+                state.infoStatus = 'rejected';
+                
+            }
+        )
     },
 
 
 
 });
 export const sourcesActions = sourcesSlice.actions;
-export const { resetErrorMessage,resetFileName,setSourceId,resetFrameStatus,setDrawWidthHeight } = sourcesSlice.actions;
+export const { resetErrorMessage,resetFileName,resetV4l2Status,setSourceId,resetFrameStatus,setDrawWidthHeight } = sourcesSlice.actions;
 export default sourcesSlice.reducer;

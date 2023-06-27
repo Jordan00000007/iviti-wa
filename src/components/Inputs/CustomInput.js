@@ -14,7 +14,7 @@ const CustomInput  = forwardRef((props, ref) => {
 
     return (
         <div>
-             <input type="text" 
+            <input type="text" 
                 className="form-control roboto-b1 my-text-input" 
                 value={inputValue} 
                 onChange={(event)=>{
@@ -23,7 +23,11 @@ const CustomInput  = forwardRef((props, ref) => {
                 }} 
                 placeholder={props.placeholder}
                 style={{width:parseInt(props.width),height:parseInt(props.height)}} 
-                ref={ref}></input>
+                ref={ref}
+                disabled={props.disabled}
+            >
+
+            </input>
         </div>
     )
 });

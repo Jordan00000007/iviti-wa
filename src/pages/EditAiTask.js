@@ -51,7 +51,7 @@ import { ReactComponent as Image_Default } from '../assets/Image_Default.svg';
 import SourcePanel from '../components/Panel/SourcePanel';
 import DependOnSelectPanel from '../components/Panel/DependOnSelectPanel';
 
-import { getSourceFrame, setSourceId, getSourceWidthHeight, sourcesActions, resetFrameStatus, setDrawWidthHeight } from "../store/sources";
+import { getSourceFrame, getSourceInfo, setSourceId, getSourceWidthHeight, sourcesActions, resetFrameStatus, setDrawWidthHeight } from "../store/sources";
 import { areaSelected, areaRename, areaDelete, getAppSetting, setFileWidthHeight, areasActions, lineDataReset, setModelData, resetStatus, setSelectedApplication, setSelectedModel, lineADelete, resetDeleteStatus } from "../store/areas";
 import { fetchData, deleteTask, resetError, setTaskDeleteMessage } from "../store/tasks";
 
@@ -69,6 +69,7 @@ function EditAiTask() {
     const [applicationOptions, setApplicationOptions] = useState([]);
     const [sourceContent, setSourceContent] = useState('');
     const [sourceId, setSourceId] = useState(null);
+    const [sourceType, setSourceType] = useState('');
 
     const [showAppSetting, setShowAppSetting] = useState(false);
 
@@ -127,7 +128,7 @@ function EditAiTask() {
     const setMessageOpen = (showType, showText) => {
         setShowType(showType);
         setShowText(showText);
-        alertRef.current.setShowTrue();
+        alertRef.current.setShowTrue(3000);
 
     };
 
@@ -219,6 +220,10 @@ function EditAiTask() {
     const uploadStatus = useSelector((state) => state.sources.uploadStatus);
     const frameStatus = useSelector((state) => state.sources.frameStatus);
     const sizeStatus = useSelector((state) => state.sources.sizeStatus);
+    const taskSourceType = useSelector((state) => state.sources.type);
+
+    const infoMessage = useSelector((state) => state.sources.infoMessage);
+    const infoStatus = useSelector((state) => state.sources.infoStatus);
 
     const taskNameRef = useRef(null);
 
@@ -251,7 +256,7 @@ function EditAiTask() {
 
     useEffect(() => {
         setSourceContent(fileName);
-        if (fileName !== '') {
+        if ((uploadStatus==='success')&&(fileName !== '')) {
             // upload success, set menu close
             sourceRef.current.setButtonClick();
             setShowConfirm(true);
@@ -259,7 +264,7 @@ function EditAiTask() {
                 setShowConfirm(false);
             }, 1500);
         }
-    }, [fileName]);
+    }, [fileName,uploadStatus]);
 
     useEffect(() => {
 
@@ -841,17 +846,16 @@ function EditAiTask() {
 
     const handleBodyClick= (event, value) => {
 
-        log('handle body click')
-
         if (sourceMenu){
             sourceRef.current.setButtonClick();
         };
     
-
     };
 
-
-
+    const handleSourcePanelClose=()=>{
+        sourceRef.current.setButtonClick();
+        setShowAppSetting(false);
+    }   
 
     useEffect(() => {
 
@@ -1037,6 +1041,9 @@ function EditAiTask() {
 
             const { model_uid, model_type, task_name, model_setting, device, source_name, source_uid, app_name } = myItem;
 
+            log('--- (0) my item ---')
+            log(myItem);
+
             log('--- (1) set task name ---')
             log(task_name)
             setTaskName(task_name);
@@ -1111,6 +1118,9 @@ function EditAiTask() {
 
         }
 
+        
+        
+
     }, [taskStatus]);
 
     // [04] handle source width height and fetch picture
@@ -1145,6 +1155,11 @@ function EditAiTask() {
             log('(a) fileUid------------')
             log(fileUid)
 
+            log('--- source type ---')
+            log(taskSourceType)
+            setSourceType(taskSourceType)
+
+
             dispatch(setDrawWidthHeight({ "maxWidth": 800, "maxHeight": 558 }));
             dispatch(getSourceFrame({ "fileUid": fileUid, "basicType": basicType }));
             dispatch(initData({ "w": fileSetWidth, "h": fileSetHeight }));
@@ -1155,15 +1170,9 @@ function EditAiTask() {
     // [05] handle source frame and fetch app setting
     useEffect(() => {
 
-        log('frameStatus=' + frameStatus)
-        log('areaStatus=' + areaStatus)
+       
         if ((frameStatus === 'success') && (taskUid !== '') && (areaStatus === 'idle')) {
-            // log('taskUid=' + taskUid)
-            log('drawWidth=' + drawWidth)
-            log('drawHeight=' + drawHeight)
-            // log('modelData')
-            // log(modelData)
-            // log('fire fetch app setting-----------------------------')
+           
 
             dispatch(setFileWidthHeight({ "drawWidth": drawWidth, "drawHeight": drawHeight }))
             dispatch(setModelData(modelData));
@@ -1182,6 +1191,13 @@ function EditAiTask() {
             setShowAppSetting(true)
         }
 
+        if ((frameStatus === 'error')) {
+            setShowAppSetting(false);
+            setShowLoadingModal(false);
+            setMessageOpen(1, 'Fetch source frame error.');
+        }
+
+
     }, [frameStatus]);
 
     // [06] handle appsetting complete
@@ -1199,57 +1215,6 @@ function EditAiTask() {
 
     }, [areaStatus]);
 
-
-
-    // useEffect(() => {
-
-    //     if ((sourceStatus === 'success') && (taskUid !== '')) {
-    //         const myIndex = taskData.findIndex(item => item.task_uid === taskUid);
-    //         const myItem = taskData[myIndex];
-    //         const { source_uid } = myItem;
-    //         if (selectedApplication.toLowerCase().indexOf("basic") >= 0) {
-    //             setBasicType(true);
-    //             dispatch(getSourceFrame({ "fileUid": source_uid, "basicType": true }));
-    //         } else {
-    //             setBasicType(false);
-    //             dispatch(getSourceFrame({ "fileUid": source_uid, "basicType": false }));
-    //         }
-
-    //     }
-    //     if ((sourceStatus === 'success') && (taskUid === '')) {
-    //         dispatch(initData({ "w": drawWidth, "h": drawHeight }));
-    //     }
-
-    // }, [sourceStatus]);
-
-
-
-
-    // useEffect(() => {
-
-    //     if (selectedApplicationSlice.toLowerCase() === 'movement_zone') {
-    //         setLinePanel(true);
-    //         const myLinePanel = {};
-    //         myLinePanel.linePanel = true;
-    //         dispatch(areasActions.setLinePanel(myLinePanel))
-
-    //     } else {
-    //         setLinePanel(false);
-    //         const myLinePanel = {};
-    //         myLinePanel.linePanel = false;
-    //         dispatch(areasActions.setLinePanel(myLinePanel))
-    //         dispatch(areasActions.lineDataReset());
-
-    //     }
-
-    //     if (selectedApplicationSlice.toLowerCase().indexOf("basic") >= 0) {
-    //         setBasicType(true);
-    //     } else {
-    //         setBasicType(false);
-    //     }
-
-
-    // }, [selectedApplicationSlice]);
 
 
 
@@ -1302,6 +1267,8 @@ function EditAiTask() {
     }, [sourceUid, selectedModel, selectedApplication]);
 
 
+   
+
 
     return (
         <SimpleLayout>
@@ -1312,7 +1279,7 @@ function EditAiTask() {
             <CustomAlert message={showText} type={showType} ref={alertRef} />
             <div className="container p-0">
                 <div className="my-body" onClick={handleBodyClick}>
-                    <div className="row p-0 g-0 mb-2 mt-3">
+                    <div className="row p-0 g-0 mb-0 mt-3">
                         <div className="col-12 d-flex justify-content-between align-items-center my-flex-gap">
 
                             {
@@ -1342,7 +1309,7 @@ function EditAiTask() {
                     </div>
 
                     <div className="row py-0">
-                        <div className="col-12">
+                        <div className="col-12" style={{height:20}}>
                             <hr className="my-divider" />
                         </div>
                     </div>
@@ -1355,7 +1322,7 @@ function EditAiTask() {
                             </div>
                         </div>
 
-                        <div className="col-12 d-flex justify-content-start align-items-center my-flex-gap gap-3 py-3">
+                        <div className="col-12 d-flex justify-content-start align-items-center my-flex-gap gap-3 py-2 ">
                             <div>
                                 <div className='my-input-title roboto-b2 py-1' ref={taskTitleRef}>
                                     AI task name *
@@ -1365,7 +1332,7 @@ function EditAiTask() {
                                 </div>
                             </div>
                             <div>
-                                <div className='my-input-title roboto-b2 py-1 d-flex flex-row justify-content-between'>
+                                <div className='my-input-title roboto-b2 py-1 d-flex flex-row justify-content-between align-items-center'>
                                     <div>
                                         Source *
                                     </div>
@@ -1387,7 +1354,7 @@ function EditAiTask() {
                                     {
                                         sourceMenu &&
 
-                                        <SourcePanel />
+                                        <SourcePanel onClose={handleSourcePanelClose} />
 
                                     }
                                 </div>
@@ -1426,7 +1393,7 @@ function EditAiTask() {
                             </div>
                         </div>
 
-                        <div className="col-12 d-flex justify-content-start align-items-center my-flex-gap gap-3">
+                        <div className="col-12 d-flex justify-content-start align-items-center my-flex-gap gap-3 mt-3">
                             <div>
                                 <div className='my-input-title roboto-b2 py-1' ref={confidenceTitleRef}>
                                     Confidence * (0.01~0.99)
@@ -1457,8 +1424,8 @@ function EditAiTask() {
 
 
 
-                    <div className="row py-3 mt-3">
-                        <div className="col-12">
+                    <div className="row py-3 mt-0">
+                        <div className="col-12" style={{height:20}}>
                             <hr className="my-divider" />
                         </div>
                     </div>
@@ -1475,7 +1442,7 @@ function EditAiTask() {
                     {
                         showAppSetting &&
 
-                        <div className="row p-2 g-0 my-3 mb-4">
+                        <div className="row p-2 g-0 my-2 mb-4 mt-0">
                             <div className="col-12 d-flex justify-content-between my-area-container bdr">
 
                                 <table className='w-100' style={{ border: '1px' }}>
@@ -1506,7 +1473,7 @@ function EditAiTask() {
                                                         }
 
                                                         <DrawingTooltip title="Delete">
-                                                            <ToolIcon_Delete className={mode === 'delete' ? "my-tool-icon-selected p-0 mt-3 mb-1" : "my-tool-icon p-0 mt-3 mb-1"} onClick={handleDeleteMode} ref={KeyDRef} />
+                                                            <ToolIcon_Delete className={mode === 'select' ? "my-tool-icon p-0 mt-3 mb-1" : "my-tool-icon-disable p-0 mt-3 mb-1"} onClick={handleDeleteMode} ref={KeyDRef} />
                                                         </DrawingTooltip>
                                                     </div>
                                                 </td>

@@ -77,7 +77,7 @@ const DependOnSelectPanel = forwardRef((props, ref) => {
             <hr className="my-divider" style={{ marginTop: 13, marginBottom: 4 }} />
 
             <div className="row">
-                <div className="col-12" style={{maxHeight:props.basicType?(props.linePanel?264:400)+16:(props.linePanel?264:400),overflowY:'scroll',overflowX:'hidden'}}>
+                <div className="col-12" style={{maxHeight:props.basicType?(props.linePanel?264:400)+16:(props.linePanel?264:400),minHeight:props.basicType?(props.linePanel?264:400)+16:(props.linePanel?264:400),overflowY:'auto',overflowX:'hidden'}}>
 
                     {areaDependOn[areaEditingIndex].map((item, idx) => (
                         <DependOnItem data={item} key={idx} index={idx} onClick={handleToggleCheckBox} />

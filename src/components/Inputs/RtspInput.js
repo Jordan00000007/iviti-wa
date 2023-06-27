@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, forwardRef, useImperativeHandle } from 'react';
 import log from "../../utils/console";
 
 
-const RtspInput = (props) => {
+
+const RtspInput = forwardRef((props, ref) => {
 
     const [inputValue, setInputValue] = useState(props.defaultValue);
 
@@ -10,6 +11,15 @@ const RtspInput = (props) => {
         setInputValue(event.target.value)
         props.onChange(event);
     }
+
+    useImperativeHandle(ref, () => ({
+        
+        setInputValue: (myValue) => {
+           
+            setInputValue(myValue);
+
+        }
+    }));
 
     return (
 
@@ -62,6 +72,6 @@ const RtspInput = (props) => {
             </div>
         </>
     )
-}
+});
 
 export default RtspInput;

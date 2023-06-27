@@ -199,51 +199,58 @@ const AreaDisplay = forwardRef((props, ref) => {
         }
         dispatch(areaUpdate(tmpPolygons));
     
-        let tmpLineA = [];
-        tmpLineA.push(linePointArr[areaEditingIndex][0][0]+x);
-        tmpLineA.push(linePointArr[areaEditingIndex][0][1]+y);
-        tmpLineA.push(linePointArr[areaEditingIndex][0][2]+x);
-        tmpLineA.push(linePointArr[areaEditingIndex][0][3]+y);
-        if (minX < 0){
-            tmpLineA[0]=tmpLineA[0]-minX;
-            tmpLineA[2]=tmpLineA[2]-minX;
-        }
-        if (minY < 0){
-            tmpLineA[1]=tmpLineA[1]-minY;
-            tmpLineA[3]=tmpLineA[3]-minY;
-        }
-        if (maxX > drawWidth){
-            tmpLineA[0]=tmpLineA[0]- (maxX - drawWidth);
-            tmpLineA[2]=tmpLineA[2]- (maxX - drawWidth);
-        }
-        if (maxY > drawHeight){
-            tmpLineA[1]=tmpLineA[1]- (maxY - drawHeight);
-            tmpLineA[3]=tmpLineA[3]- (maxY - drawHeight);
-        }
-        dispatch(lineAUpdate(tmpLineA));
 
-        let tmpLineB = [];
-        tmpLineB.push(linePointArr[areaEditingIndex][1][0]+x);
-        tmpLineB.push(linePointArr[areaEditingIndex][1][1]+y);
-        tmpLineB.push(linePointArr[areaEditingIndex][1][2]+x);
-        tmpLineB.push(linePointArr[areaEditingIndex][1][3]+y);
-        if (minX < 0){
-            tmpLineB[0]=tmpLineB[0]-minX;
-            tmpLineB[2]=tmpLineB[2]-minX;
+        if (linePointArr[areaEditingIndex][0].length===4){
+            let tmpLineA = [];
+            tmpLineA.push(linePointArr[areaEditingIndex][0][0]+x);
+            tmpLineA.push(linePointArr[areaEditingIndex][0][1]+y);
+            tmpLineA.push(linePointArr[areaEditingIndex][0][2]+x);
+            tmpLineA.push(linePointArr[areaEditingIndex][0][3]+y);
+            if (minX < 0){
+                tmpLineA[0]=tmpLineA[0]-minX;
+                tmpLineA[2]=tmpLineA[2]-minX;
+            }
+            if (minY < 0){
+                tmpLineA[1]=tmpLineA[1]-minY;
+                tmpLineA[3]=tmpLineA[3]-minY;
+            }
+            if (maxX > drawWidth){
+                tmpLineA[0]=tmpLineA[0]- (maxX - drawWidth);
+                tmpLineA[2]=tmpLineA[2]- (maxX - drawWidth);
+            }
+            if (maxY > drawHeight){
+                tmpLineA[1]=tmpLineA[1]- (maxY - drawHeight);
+                tmpLineA[3]=tmpLineA[3]- (maxY - drawHeight);
+            }
+            dispatch(lineAUpdate(tmpLineA));
         }
-        if (minY < 0){
-            tmpLineB[1]=tmpLineB[1]-minY;
-            tmpLineB[3]=tmpLineB[3]-minY;
+
+        
+        if (linePointArr[areaEditingIndex][1].length===4){
+            let tmpLineB = [];
+            tmpLineB.push(linePointArr[areaEditingIndex][1][0]+x);
+            tmpLineB.push(linePointArr[areaEditingIndex][1][1]+y);
+            tmpLineB.push(linePointArr[areaEditingIndex][1][2]+x);
+            tmpLineB.push(linePointArr[areaEditingIndex][1][3]+y);
+            if (minX < 0){
+                tmpLineB[0]=tmpLineB[0]-minX;
+                tmpLineB[2]=tmpLineB[2]-minX;
+            }
+            if (minY < 0){
+                tmpLineB[1]=tmpLineB[1]-minY;
+                tmpLineB[3]=tmpLineB[3]-minY;
+            }
+            if (maxX > drawWidth){
+                tmpLineB[0]=tmpLineB[0]- (maxX - drawWidth);
+                tmpLineB[2]=tmpLineB[2]- (maxX - drawWidth);
+            }
+            if (maxY > drawHeight){
+                tmpLineB[1]=tmpLineB[1]- (maxY - drawHeight);
+                tmpLineB[3]=tmpLineB[3]- (maxY - drawHeight);
+            }
+            dispatch(lineBUpdate(tmpLineB));
         }
-        if (maxX > drawWidth){
-            tmpLineB[0]=tmpLineB[0]- (maxX - drawWidth);
-            tmpLineB[2]=tmpLineB[2]- (maxX - drawWidth);
-        }
-        if (maxY > drawHeight){
-            tmpLineB[1]=tmpLineB[1]- (maxY - drawHeight);
-            tmpLineB[3]=tmpLineB[3]- (maxY - drawHeight);
-        }
-        dispatch(lineBUpdate(tmpLineB));
+        
 
         group.position({ x: 0, y: 0 });
         group.getLayer().draw();
@@ -298,6 +305,11 @@ const AreaDisplay = forwardRef((props, ref) => {
                 dispatch(lineBDelete());
                 setLineBSelected(false);
             }
+        },
+
+        resetLineSelected:()=>{
+            setLineASelected(false);
+            setLineBSelected(false);
         }
 
     }));
@@ -312,7 +324,9 @@ const AreaDisplay = forwardRef((props, ref) => {
                     draggable={(idx === areaEditingIndex)?true:false}
                     x={0}
                     y={0}
+                   
                     onDragStart={event => {
+                        //if (props.mode === 'select') setSelectedOrder(idx);
                     }}
                     onDragMove={event => {
                       
@@ -328,7 +342,29 @@ const AreaDisplay = forwardRef((props, ref) => {
                     
                     }}                
                     onMouseDown={event => {
-                       
+                        const container = event.target.getStage().container();
+                        if (props.mode === 'select') {
+                            setSelectedOrder(idx);
+                            container.className = "selected-cursor";
+                        }
+                    }}
+                    onMouseOver={event=>{
+                        const container = event.target.getStage().container();
+                        if (props.mode==='line'){
+                            container.className = "stop-cursor";
+                        }else{
+                            container.className = (idx === areaEditingIndex)?"selected-cursor":"standard-cursor"
+                        }
+                        
+                    }}
+                    onMouseLeave={event=>{
+                        const container = event.target.getStage().container();
+                        
+                        if (props.mode==='line'){
+                            container.className = "stop-cursor";
+                        }else{
+                            container.className = "standard-cursor";
+                        }
                     }}
                 >
 
@@ -336,9 +372,10 @@ const AreaDisplay = forwardRef((props, ref) => {
                         key={`area_${idx}`}
                         strokeWidth={0}
                         stroke="red"
-                        opacity={0.15}
+                        opacity={0.16}
                         lineJoin="round"
-                        fill="red"
+                        className={"pen-cursor"}
+                        fill="#E61F23"
                         points={item
                             .flatMap(item => [item.x, item.y])
                             .concat([item[0].x, item[0].y])}
@@ -354,6 +391,12 @@ const AreaDisplay = forwardRef((props, ref) => {
                             //props.onClick(event, props.polygons[idx], props.polygonsName[idx], idx);
                         }}
                         //onClick={handleAreaSelected(idx)}
+                        onMouseDown={event => {
+
+                            //setSelected(true);
+                            if (props.mode === 'select') setSelectedOrder(idx);
+
+                        }}
                         onMouseOver={event => {
 
                             //setSelected(true);
@@ -369,7 +412,7 @@ const AreaDisplay = forwardRef((props, ref) => {
                     />
                     <Line
                         key={`line_${idx}`}
-                        strokeWidth={((mouseOverOrder === idx) || (selectedOrder === idx)) ? 3 : 0}
+                        strokeWidth={((mouseOverOrder === idx) || (selectedOrder === idx)) ? 2.5 : 0}
                         stroke="red"
                         opacity={1}
                         lineJoin="round"
@@ -383,8 +426,8 @@ const AreaDisplay = forwardRef((props, ref) => {
                         {/* <Label x={0} y={0} key={`label_${idx}`} onClick={(e)=>{log(e.target.parent)}}> */}
                         <Tag
                             key={`tag_${idx}`}
-                            fill={((mouseOverOrder === idx) || (selectedOrder === idx)) ? 'white' : 'red'}
-                            opacity={((mouseOverOrder === idx) || (selectedOrder === idx)) ? 1 : 0.5}
+                            fill={(((mouseOverOrder === idx)&&(selectedOrder !== idx)) || ((selectedOrder === idx)&&(!lineASelected)&&(!lineBSelected))) ? 'white' : 'red'}
+                            opacity={(((mouseOverOrder === idx)&&(selectedOrder !== idx)) || ((selectedOrder === idx)&&(!lineASelected)&&(!lineBSelected))) ? 1 : 0.5}
                             cornerRadius={10}
                             stroke='red'
                             strokeWidth={2}
@@ -393,10 +436,17 @@ const AreaDisplay = forwardRef((props, ref) => {
                             key={`text_${idx}`}
                             fontSize={14}
                             fontFamily="roboto"
-                            fill={((mouseOverOrder === idx) || (selectedOrder === idx)) ? 'red' : 'white'}
+                            fill={(((mouseOverOrder === idx)&&(selectedOrder !== idx)) || ((selectedOrder === idx)&&(!lineASelected)&&(!lineBSelected))) ? 'red' : 'white'}
                             padding={6}
                             height={24}
                             lineHeight={1}
+                            onClick={event => {
+                                
+                                setLineASelected(false);
+                                setLineBSelected(false);
+                                setSelectedOrder(idx);
+                                
+                            }}
 
                         />
 
@@ -489,8 +539,8 @@ const AreaDisplay = forwardRef((props, ref) => {
 
                                         <Label x={linePointArr[idx][0][2] + 5} y={linePointArr[idx][0][3] + 5}>
                                             <Tag
-                                                fill={((mouseOverOrder === idx) || (selectedOrder === idx)) ? 'white' : 'blue'}
-                                                opacity={((mouseOverOrder === idx) || (selectedOrder === idx)) ? 1 : 0.5}
+                                                fill={((lineASelected) && (selectedOrder === idx)) ? 'white' : 'blue'}
+                                                opacity={((lineASelected) && (selectedOrder === idx)) ? 1 : 0.5}
                                                 cornerRadius={10}
                                                 stroke={"blue"}
                                                 strokeWidth={2}
@@ -499,7 +549,7 @@ const AreaDisplay = forwardRef((props, ref) => {
                                             <Text text={`  ${lineNameArr[idx][0]}  `}
                                                 fontSize={14}
                                                 fontFamily="roboto"
-                                                fill={((mouseOverOrder === idx) || (selectedOrder === idx)) ? 'blue' : 'white'}
+                                                fill={((lineASelected) && (selectedOrder === idx)) ? 'blue' : 'white'}
                                                 padding={6}
                                                 height={24}
                                                 lineHeight={1}
@@ -614,8 +664,8 @@ const AreaDisplay = forwardRef((props, ref) => {
                                 (linePointArr[idx][1].length > 0) &&
                                 <Label x={linePointArr[idx][1][2] + 5} y={linePointArr[idx][1][3] + 5}>
                                     <Tag
-                                        fill={((mouseOverOrder === idx) || (selectedOrder === idx)) ? 'white' : 'blue'}
-                                        opacity={((mouseOverOrder === idx) || (selectedOrder === idx)) ? 1 : 0.5}
+                                        fill={((lineBSelected) && (selectedOrder === idx)) ? 'white' : 'blue'}
+                                        opacity={((lineBSelected) && (selectedOrder === idx)) ? 1 : 0.5}
                                         cornerRadius={10}
                                         stroke={"blue"}
                                         strokeWidth={2}
@@ -623,17 +673,23 @@ const AreaDisplay = forwardRef((props, ref) => {
                                     <Text text={`  ${lineNameArr[idx][1]}  `}
                                         fontSize={14}
                                         fontFamily="roboto"
-                                        fill={((mouseOverOrder === idx) || (selectedOrder === idx)) ? 'blue' : 'white'}
+                                        fill={((lineBSelected) && (selectedOrder === idx)) ? 'blue' : 'white'}
                                         padding={6}
                                         height={24}
                                         lineHeight={1}
                                         onClick={event => {
-                                            setLineASelected(false);
-                                            setLineBSelected(true);
+                                            if (idx === areaEditingIndex){
+                                                setLineASelected(false);
+                                                setLineBSelected(true);
+                                            }
+                                            
                                         }}
                                         onMouseDown={event => {
-                                            setLineASelected(false);
-                                            setLineBSelected(true);
+                                         
+                                            if (idx === areaEditingIndex){
+                                                setLineASelected(false);
+                                                setLineBSelected(true);
+                                            }
                                         }}
                                         onMouseOver={event => {
 

@@ -13,6 +13,13 @@ import LabelButton from '../../components/Buttons/LabelButton';
 import { useDispatch } from "react-redux";
 import DeleteIcon from '../../components/Icons/DeleteIcon';
 
+import List from '@mui/joy/List';
+import ListItem from '@mui/joy/ListItem';
+import ListSubheader from '@mui/joy/ListSubheader';
+import ListItemButton from '@mui/joy/ListItemButton';
+import Sheet from '@mui/joy/Sheet';
+
+
 
 
 
@@ -154,6 +161,7 @@ const CustomSelect = forwardRef((props, ref) => {
                 sx={{
                     width: parseInt(props.width),
                     fontSize: parseInt(props.fontSize),
+                    fontFamily: 'roboto',
                     fontWeight: 400,
                     color: '#16272E',
                     fontFamily: 'Roboto',
@@ -200,6 +208,7 @@ const CustomSelect = forwardRef((props, ref) => {
                     <Option value={-1}
                         sx={{
                             fontSize: parseInt(props.fontSize),
+                            fontFamily: 'roboto',
                             fontWeight: 400,
                             color: '#16272E',
                             backgroundColor: '#FAFAFD!important',
@@ -208,12 +217,14 @@ const CustomSelect = forwardRef((props, ref) => {
                     >--- please select ---</Option>
                 }
 
+              
 
                 {props.areaArr.map((item, index) => (
 
                     <Option value={item[0]} key={index} label={item[1]}
                         sx={{
                             fontSize: parseInt(props.fontSize),
+                            fontFamily: 'roboto',
                             fontWeight: 400,
                             color: '#16272E',
                             backgroundColor: '#FAFAFD!important',
@@ -249,12 +260,13 @@ const CustomSelect = forwardRef((props, ref) => {
 
                 ))}
 
-                <ListDivider key="divider" inset="gutter"/>
+                <ListDivider key="divider" />
                 <Option
                     value={-2}
                     key="import"
                     sx={{
                         fontSize: parseInt(props.fontSize),
+                        fontFamily: 'roboto',
                         fontWeight: 400,
                         color: '#16272E',
                         backgroundColor: '#FAFAFD!important',
@@ -283,6 +295,9 @@ const CustomSelect = forwardRef((props, ref) => {
                     </ListItemDecorator>
 
                 </Option>
+
+
+              
 
 
             </Select>

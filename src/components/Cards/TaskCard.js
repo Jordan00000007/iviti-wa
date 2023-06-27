@@ -176,11 +176,11 @@ const TaskCard = (props) => {
                     <div className="col-12 mt-1 d-flex justify-content-between">
                         { ((myItem.status === 'stop')||(myItem.status.indexOf("error")>=0)) &&
                             
-                            <CustomButton onClick={handleClickEdit} disabled={myItem.status === 'running' ? true : false} name="edit" />
+                            <CustomButton onClick={handleClickEdit} disabled={myItem.status === 'running' ? true : false} name="edit" width="115"/>
                             
                         }
                        
-                        <CustomButton onClick={handleClickView} status={myItem.status} name="view" disabled={disabled} />
+                        <CustomButton onClick={handleClickView} status={myItem.status} name="view" disabled={disabled} width="115"/>
                        
                     </div>
                 </div>
