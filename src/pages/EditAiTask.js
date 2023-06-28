@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import SimpleLayout from '../components/Layouts/SimpleLayout';
 import CustomButton from '../components/Buttons/CustomButton';
 import CustomAlert from '../components/Alerts/CustomAlert';
+import UndoAlert from '../components/Alerts/UndoAlert';
 import DrawingTooltip from '../components/Tooltips/DrawingTooltip';
 
 import CustomInput from '../components/Inputs/CustomInput';
@@ -52,7 +53,7 @@ import SourcePanel from '../components/Panel/SourcePanel';
 import DependOnSelectPanel from '../components/Panel/DependOnSelectPanel';
 
 import { getSourceFrame, getSourceInfo, setSourceId, getSourceWidthHeight, sourcesActions, resetFrameStatus, setDrawWidthHeight } from "../store/sources";
-import { areaSelected, areaRename, areaDelete, getAppSetting, setFileWidthHeight, areasActions, lineDataReset, setModelData, resetStatus, setSelectedApplication, setSelectedModel, lineADelete, resetDeleteStatus } from "../store/areas";
+import { areaSelected, areaRename, areaDelete, getAppSetting, setFileWidthHeight, areasActions, lineDataReset, setModelData, resetStatus, setSelectedApplication, setSelectedModel, lineADelete, resetDeleteStatus,resetLineADeleteStatus,resetLineBDeleteStatus } from "../store/areas";
 import { fetchData, deleteTask, resetError, setTaskDeleteMessage } from "../store/tasks";
 
 
@@ -89,6 +90,7 @@ function EditAiTask() {
     const [fromPage, setFromPage] = useState(0);
 
     const alertRef = useRef();
+    const undoAlertRef = useRef();
 
     const sourceRef = useRef(null);
     const modelRef = useRef(null);
@@ -132,6 +134,13 @@ function EditAiTask() {
 
     };
 
+    const setUndoMessageOpen = (showType, showText) => {
+        setShowType(showType);
+        setShowText(showText);
+        undoAlertRef.current.setShowTrue(10000);
+
+    };
+
     const setMessageKeep = (showType, showText) => {
         setShowType(showType);
         setShowText(showText);
@@ -163,6 +172,12 @@ function EditAiTask() {
 
     const areaDeleteStatus = useSelector((state) => state.areas.deleteStatus);
     const areaDeleteMessage = useSelector((state) => state.areas.deleteMessage);
+
+    const lineADeleteStatus = useSelector((state) => state.areas.lineADeleteStatus);
+    const lineADeleteMessage = useSelector((state) => state.areas.lineADeleteMessage);
+
+    const lineBDeleteStatus = useSelector((state) => state.areas.lineBDeleteStatus);
+    const lineBDeleteMessage = useSelector((state) => state.areas.lineBDeleteMessage);
 
 
 
@@ -991,11 +1006,47 @@ function EditAiTask() {
         log(areaDeleteMessage)
 
         if (areaDeleteMessage !== '') {
-            setMessageOpen((areaDeleteStatus === 'success') ? 0 : 1, areaDeleteMessage);
+           
+            if (areaDeleteStatus === 'success'){
+                setUndoMessageOpen(0, areaDeleteMessage);
+            }else{
+                setMessageOpen(1, areaDeleteMessage);
+            }
+
             dispatch(resetDeleteStatus());
         }
 
     }, [areaDeleteStatus]);
+
+    useEffect(() => {
+
+        if (lineADeleteMessage !== '') {
+           
+            if (lineADeleteStatus === 'success'){
+                setUndoMessageOpen(0, lineADeleteMessage);
+            }else{
+                setMessageOpen(1, lineADeleteMessage);
+            }
+
+            dispatch(resetLineADeleteStatus());
+        }
+
+    }, [lineADeleteStatus]);
+
+    useEffect(() => {
+
+        if (lineBDeleteMessage !== '') {
+           
+            if (lineBDeleteStatus === 'success'){
+                setUndoMessageOpen(0, lineBDeleteMessage);
+            }else{
+                setMessageOpen(1, lineBDeleteMessage);
+            }
+
+            dispatch(resetLineBDeleteStatus());
+        }
+
+    }, [lineBDeleteStatus]);
 
 
     // [01] get all options data
@@ -1276,6 +1327,7 @@ function EditAiTask() {
                 keyName="s,e,a,l,d"
                 onKeyDown={handleKeyDown.bind(this)}
             />
+            <UndoAlert message={showText} type={showType} ref={undoAlertRef} />
             <CustomAlert message={showText} type={showType} ref={alertRef} />
             <div className="container p-0">
                 <div className="my-body" onClick={handleBodyClick}>

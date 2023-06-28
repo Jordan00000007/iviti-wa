@@ -30,6 +30,16 @@ const setPaletteArr = () => {
     return (myColorList);
 }
 
+const cloneArr = (targetArr) => {
+    
+    let myArr=[];
+    targetArr.forEach(element => {
+        myArr.push(element)    
+    });
+    return myArr;
+   
+}
+
 export const getAppSetting = createAsyncThunk('areas/getAppSetting', async (taskUid, { getState, requestId }) => {
    
     const response = await fetch(`${APP_URL}/${taskUid}`);
@@ -42,17 +52,31 @@ const areasSlice = createSlice({
         status: 'idle', 
         drawWidth:0, 
         drawHeight:0, 
+
         areaNameArr: [[0, 'Area 1']], 
-        
+        areaNameArrPast: [[0, 'Area 1']], 
+
         areaShapeArr: [[]], 
+        areaShapeArrPast: [[]], 
        
         linePanel: false,
         lineNameArr: [['Line 1A','Line 1B']], 
+        lineNameArrPast: [['Line 1A','Line 1B']], 
+
         linePointArr: [[[],[]]], 
+        linePointArrPast: [[[],[]]], 
+
         lineRelationArr:[['','']], 
+        lineRelationArrPast:[['','']], 
 
         areaDependOn: [[{ "name": "name", "checked": true, "key": 0, "color": "white" }]], 
+        areaDependOnPast: [[{ "name": "name", "checked": true, "key": 0, "color": "white" }]], 
+
+
         areaEditingIndex: 0, 
+        areaEditingIndexPast: 0,
+
+
         areaMaxNumber: 1, 
         paletteArr: setPaletteArr(),
         modelData:'N/A',
@@ -61,6 +85,13 @@ const areasSlice = createSlice({
         
         deleteStatus:'idle',
         deleteMessage:'',
+
+        lineADeleteStatus:'idle',
+        lineADeleteMessage:'',
+
+        lineBDeleteStatus:'idle',
+        lineBDeleteMessage:'',
+
 
         addStatus:'idle',
         addMessage:'',
@@ -179,6 +210,16 @@ const areasSlice = createSlice({
         },
         areaDelete(state, action) {
             log('area delete')
+
+            state.areaEditingIndexPast=state.areaEditingIndex;
+            state.areaNameArrPast=cloneArr(state.areaNameArr);
+            state.areaShapeArrPast=cloneArr(state.areaShapeArr);
+            state.areaDependOnPast=cloneArr(state.areaDependOn);
+            state.lineNameArrPast=cloneArr(state.lineNameArr);
+            state.linePointArrPast=cloneArr(state.linePointArr);
+            state.lineRelationArrPast=cloneArr(state.lineRelationArr);
+
+
             if (state.areaNameArr.length>1){
                 const idx=state.areaEditingIndex;
                 const areaName=state.areaNameArr[idx][1];
@@ -204,11 +245,50 @@ const areasSlice = createSlice({
             }
            
         },
+        areaUndo(state, action) {
+
+            state.areaNameArr=cloneArr(state.areaNameArrPast);
+            state.areaShapeArr=cloneArr(state.areaShapeArrPast);
+            state.areaDependOn=cloneArr(state.areaDependOnPast);
+            state.lineNameArr=cloneArr(state.lineNameArrPast);
+            state.linePointArr=cloneArr(state.linePointArrPast);
+            state.lineRelationArr=cloneArr(state.lineRelationArrPast);
+            
+            state.areaEditingIndex=state.areaEditingIndexPast;
+
+            log('line point array...')
+            log(cloneArr(state.linePointArrPast))
+            
+        },
         lineADelete(state, action) {
+
+            state.areaEditingIndexPast=state.areaEditingIndex;
+            state.areaNameArrPast=cloneArr(state.areaNameArr);
+            state.areaShapeArrPast=cloneArr(state.areaShapeArr);
+            state.areaDependOnPast=cloneArr(state.areaDependOn);
+            state.lineNameArrPast=cloneArr(state.lineNameArr);
+            state.linePointArrPast=cloneArr(state.linePointArr);
+            state.lineRelationArrPast=cloneArr(state.lineRelationArr);
+
+            state.lineADeleteMessage=`${state.lineNameArr[state.areaEditingIndex][0]} has been deleted`;
+            state.lineADeleteStatus='success'
             log('line A delete')
             state.linePointArr[state.areaEditingIndex][0]=[];
+
+            
         },
         lineBDelete(state, action) {
+
+            state.areaEditingIndexPast=state.areaEditingIndex;
+            state.areaNameArrPast=cloneArr(state.areaNameArr);
+            state.areaShapeArrPast=cloneArr(state.areaShapeArr);
+            state.areaDependOnPast=cloneArr(state.areaDependOn);
+            state.lineNameArrPast=cloneArr(state.lineNameArr);
+            state.linePointArrPast=cloneArr(state.linePointArr);
+            state.lineRelationArrPast=cloneArr(state.lineRelationArr);
+
+            state.lineBDeleteMessage=`${state.lineNameArr[state.areaEditingIndex][1]} has been deleted`;
+            state.lineBDeleteStatus='success'
             log('line B delete')
             state.linePointArr[state.areaEditingIndex][1]=[];
         },
@@ -272,6 +352,14 @@ const areasSlice = createSlice({
         resetUpdateStatus(state,action){
             state.updateStatus='idle';
             state.updateMessage='';
+        },
+        resetLineADeleteStatus(state,action){
+            state.lineADeleteStatus='idle';
+            state.lineADeleteMessage='';
+        },
+        resetLineBDeleteStatus(state,action){
+            state.lineBDeleteStatus='idle';
+            state.lineBDeleteMessage='';
         },
         setSelectedModel(state,action){
 
@@ -422,5 +510,5 @@ const areasSlice = createSlice({
     }
 });
 export const areasActions = areasSlice.actions;
-export const { initData, setDependOn, toggleSelectAll, toggleDependOnItem, areaInsert, areaSelected, areaRename, areaUpdate, areaDelete, lineAUpdate, lineBUpdate,lineARelationUpdate,lineBRelationUpdate,setFileWidthHeight,lineUpdate,setLinePanel,lineDataReset,setModelData,resetStatus,resetDeleteStatus,resetAddStatus,resetUpdateStatus,setSelectedApplication,setSelectedModel,lineADelete,lineBDelete } = areasSlice.actions;
+export const { initData, setDependOn, toggleSelectAll, toggleDependOnItem, areaInsert, areaSelected, areaRename, areaUpdate, areaDelete, areaUndo, lineAUpdate, lineBUpdate,lineARelationUpdate,lineBRelationUpdate,setFileWidthHeight,lineUpdate,setLinePanel,lineDataReset,setModelData,resetStatus,resetDeleteStatus,resetAddStatus,resetUpdateStatus,setSelectedApplication,setSelectedModel,lineADelete,lineBDelete,resetLineADeleteStatus,resetLineBDeleteStatus } = areasSlice.actions;
 export default areasSlice.reducer;

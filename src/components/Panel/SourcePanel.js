@@ -8,7 +8,7 @@ import CustomSelect from '../../components/Dropdowns/CustomSelect';
 import { uploadSourceData, getV4l2Devices, resetErrorMessage, resetFileName,resetV4l2Status } from "../../store/sources";
 
 import { useSelector, useDispatch } from "react-redux";
-import CustomAlert from '../../components/Alerts/CustomAlertSmall';
+import CustomAlertSmall from '../../components/Alerts/CustomAlertSmall';
 import CustomInput from '../Inputs/CustomInput';
 
 
@@ -214,7 +214,7 @@ const SourcePanel = (props) => {
     return (
         <div className='my-source-panel position-absolute top-100 start-0' onClick={handleSourcePanelClick}>
             <div style={{ position: 'relative' }}>
-                <CustomAlert message={showText} type={showType} ref={alertRef} interval={showInterval} width="375" height="18" />
+                <CustomAlertSmall message={showText} type={showType} ref={alertRef} interval={showInterval} width="375" height="18" />
                 <div style={{ position: 'absolute', width: 499, top: 0 }}>
                     <ul className="nav nav-tabs flex-nowrap" id="myTab" role="tablist">
                         <li className="nav-item" role="presentation">

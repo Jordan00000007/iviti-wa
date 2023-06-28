@@ -71,7 +71,7 @@ const CustomAlertSmall = forwardRef((props, ref) => {
                                 // height:parseInt(props.height)*5,
                                 color: '#F8F8F8',
                                 backgroundColor: 'var(--on_color_1)',
-                                height:28,
+                              
                                 width:395,
                                 padding:0,
                             }
@@ -87,9 +87,9 @@ const CustomAlertSmall = forwardRef((props, ref) => {
                     
                 >
                     <div className='roboto-b2'>
-                        <CustomTooltip>
+                        
                             {props.message}
-                        </CustomTooltip>
+                        
                     </div>
                 </Alert>
         </Box>

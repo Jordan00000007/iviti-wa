@@ -1234,6 +1234,13 @@ input:checked+.my-toggle-slider:before {
     cursor: url('../assets/Cursor_Stop.svg') 6 6, auto;
 }
 
+.my-undo{
+    color: var(--vivid_2);
+    padding-top:4px;
+    padding-right: 15px;
+    cursor: pointer;
+}
+
 .form-select {
     background-color: var(--base_2) !important;
     color: var(--on_color_1) !important;
@@ -1361,11 +1368,11 @@ input:checked+.my-toggle-slider:before {
 .MuiChip-variantOutlined:hover{
     background-color: #0000000F!important;
 }
-/* 
+ 
 .MuiAlert-root{
-    padding:0px;
-    width: 50px!important;
-} */
+    padding: 3px !important;;
+   
+} 
 /* .MuiSelect-button{
     opacity: 0.5!important;
 } */
