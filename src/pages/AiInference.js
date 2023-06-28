@@ -233,7 +233,7 @@ function AiInference() {
                                             <td className='my-area-a'>
                                                 <div className='w-100 '>
                                                     <div className='my-area-a1 d-flex justify-content-center align-items-center'>
-                                                        {/* {
+                                                        {
                                                             ((myItem.status==='running')&&(myItem.liveTime)) &&
                                                             <>
                                                                 <GeneralTooltip title="Task running time">
@@ -241,7 +241,7 @@ function AiInference() {
                                                                 </GeneralTooltip>
                                                             </>
                                                             
-                                                        } */}
+                                                        }
                                                     </div>
                                                     <div className='my-area-a2 position-relative' onChange={handleVideoClick} ref={videoPanelRef}>
                                                         <RemoteVideo uuid={params.uuid} status={myItem.status} onPlaying={handlePlaying} fullScreen={fullScreen} />

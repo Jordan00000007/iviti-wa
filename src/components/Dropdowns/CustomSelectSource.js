@@ -96,10 +96,10 @@ const CustomSelectSource = forwardRef((props, ref) => {
                     color: var(--on_color_2);
                     position: absolute; 
                     display: block; 
-                    left: 199px; 
+                    left: 198px; 
                     top: 3px; 
                     height: 46px;
-                    width: 32x;
+                    width: 30x;
                     z-index: 9; 
                     border:1px solid white!important;
                     background: white;
