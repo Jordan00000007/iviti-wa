@@ -13,7 +13,7 @@ export const WebSocket = (props) => {
     const wsProtocol=window.location.protocol==="http:"?'ws:':'wss:';
     
     /* important : 直連websocket服務時,url字串最後不能加斜線,使用nginx做proxy連接websocket服務時一定要加斜線 */
-    const wsUrl = (WEBSOCKET_SERVER===""?`${wsProtocol}//${window.location.hostname}`:WEBSOCKET_SERVER)+`/ws`+(WEBSOCKET_SERVER===""?"/":"");
+    const wsUrl = (WEBSOCKET_SERVER===""?`${wsProtocol}//${window.location.hostname}:${window.location.port}`:WEBSOCKET_SERVER)+`/ws`+(WEBSOCKET_SERVER===""?"/":"");
     
     //window.location.protocol
 
