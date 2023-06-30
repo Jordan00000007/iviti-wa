@@ -30,6 +30,14 @@ export const deleteModel = createAsyncThunk('models/deleteModel', async (uid) =>
     return response.json();
 });
 
+export const deleteProcess = createAsyncThunk('models/deleteProcess', async (uid) => {
+   
+    const response = await fetch(`${TASK_URL}/process/${uid}`, {
+        method: 'DELETE'
+    });
+    return response.json();
+});
+
 
 export const getAllModels = createAsyncThunk('models/getAllModels', async () => {
     const response = await fetch(`${TASK_URL}/models`);
@@ -39,8 +47,14 @@ export const getAllModels = createAsyncThunk('models/getAllModels', async () => 
 
 const modelsSlice = createSlice({
     name: "models",
-    initialState: { status: 'idle', data: [], options: [], error: null, importStatus:'idel',importMessage:'',deleteStatus:'idel',deleteMessage:'' },
+    initialState: { status: 'idle', data: [], options: [], error: null, importStatus:'idel', importMessage:'', importUid:'', deleteStatus:'idel',deleteMessage:'' },
     reducers: {
+        resetProcessStatus(state) {
+        
+            state.importUid = '';
+            state.importMessage='';
+            state.importStatus='idel';
+        },
     },
     extraReducers: (builder) => {
 
@@ -102,8 +116,10 @@ const modelsSlice = createSlice({
                     // })
                     
                     log('response data')
-                    log(action.payload.message)
+                    log(action.payload)
+                    log(action.payload.data.uid)
 
+                    state.importUid=action.payload.data.uid;
                     state.importMessage = 'Import model success';
                     state.importStatus = 'success';
 
@@ -191,6 +207,47 @@ const modelsSlice = createSlice({
             }
         )
 
+        // ---- delete process ---
+        builder.addCase(
+            deleteProcess.fulfilled,
+            (state, action) => {
+
+
+                if (action.payload.status_code===200){
+                    
+                    log('--- delete process success ---')
+                    log(action.payload.message)
+
+                }else if (action.payload.status_code===500){
+                    
+                    log('--- delete process other error ---')
+                    log(action.payload.message)
+
+                    
+                }else{
+                    //return updateTaskStatus(state,action.meta.arg,'set_stream_delete_error');
+                    log('--- delete process other error ---')
+                    
+                }
+                
+            }
+        )
+        builder.addCase(
+            deleteProcess.pending,
+            (state, {meta}) => {
+                log('--- delete process pending ---');
+               
+               
+            }
+        )
+        builder.addCase(
+            deleteProcess.rejected,
+            (state, action ) => {
+                log(`--- delete process rejected ---`);
+               
+                
+            }
+        )
 
     },
 
@@ -198,4 +255,5 @@ const modelsSlice = createSlice({
 
 });
 export const modelsActions = modelsSlice.actions;
+export const { resetProcessStatus } = modelsSlice.actions;
 export default modelsSlice.reducer;

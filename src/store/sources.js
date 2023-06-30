@@ -29,7 +29,8 @@ export const getSourceFrame = createAsyncThunk('sources/getSourceFrame', async (
     log('--- get source frame start ---')
  
     let {fileUid,basicType}=myData;
- 
+
+    
     const state = getState();
     const fileMaxWidth = (basicType)?854:800;
     const fileMaxHeight = 558;

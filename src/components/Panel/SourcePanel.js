@@ -145,7 +145,7 @@ const SourcePanel = (props) => {
                 setCameraLoading(false);
                 setShowType(1);
                 setShowText(errorMessage);
-                setShowInterval(3000);
+                setShowInterval(6000);
                 alertRef.current.setShowTrue();
                 dispatch(resetErrorMessage());
             }
@@ -213,8 +213,11 @@ const SourcePanel = (props) => {
 
     return (
         <div className='my-source-panel position-absolute top-100 start-0' onClick={handleSourcePanelClick}>
+           
             <div style={{ position: 'relative' }}>
-                <CustomAlertSmall message={showText} type={showType} ref={alertRef} interval={showInterval} width="375" height="18" />
+                <div style={{ position: 'absolute', width: 496,height: 250, top: 3, left: 3 }} className='d-flex align-items-end justify-content-center p-2'>
+                    <CustomAlertSmall message={showText} type={showType} ref={alertRef} interval={showInterval} width="375" height="18" />
+                </div>
                 <div style={{ position: 'absolute', width: 499, top: 0 }}>
                     <ul className="nav nav-tabs flex-nowrap" id="myTab" role="tablist">
                         <li className="nav-item" role="presentation">

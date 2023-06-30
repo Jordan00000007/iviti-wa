@@ -3,6 +3,7 @@ import update from 'react-addons-update';
 import log from "../utils/console";
 import moment from 'moment';
 import palette from '../utils/palette.json';
+import { cloneDeep } from 'lodash-es';
 
 
 
@@ -30,15 +31,6 @@ const setPaletteArr = () => {
     return (myColorList);
 }
 
-const cloneArr = (targetArr) => {
-    
-    let myArr=[];
-    targetArr.forEach(element => {
-        myArr.push(element)    
-    });
-    return myArr;
-   
-}
 
 export const getAppSetting = createAsyncThunk('areas/getAppSetting', async (taskUid, { getState, requestId }) => {
    
@@ -211,13 +203,13 @@ const areasSlice = createSlice({
         areaDelete(state, action) {
             log('area delete')
 
-            state.areaEditingIndexPast=state.areaEditingIndex;
-            state.areaNameArrPast=cloneArr(state.areaNameArr);
-            state.areaShapeArrPast=cloneArr(state.areaShapeArr);
-            state.areaDependOnPast=cloneArr(state.areaDependOn);
-            state.lineNameArrPast=cloneArr(state.lineNameArr);
-            state.linePointArrPast=cloneArr(state.linePointArr);
-            state.lineRelationArrPast=cloneArr(state.lineRelationArr);
+            state.areaEditingIndexPast=cloneDeep(state.areaEditingIndex);
+            state.areaNameArrPast=cloneDeep(state.areaNameArr);
+            state.areaShapeArrPast=cloneDeep(state.areaShapeArr);
+            state.areaDependOnPast=cloneDeep(state.areaDependOn);
+            state.lineNameArrPast=cloneDeep(state.lineNameArr);
+            state.linePointArrPast=cloneDeep(state.linePointArr);
+            state.lineRelationArrPast=cloneDeep(state.lineRelationArr);
 
 
             if (state.areaNameArr.length>1){
@@ -247,45 +239,43 @@ const areasSlice = createSlice({
         },
         areaUndo(state, action) {
 
-            state.areaNameArr=cloneArr(state.areaNameArrPast);
-            state.areaShapeArr=cloneArr(state.areaShapeArrPast);
-            state.areaDependOn=cloneArr(state.areaDependOnPast);
-            state.lineNameArr=cloneArr(state.lineNameArrPast);
-            state.linePointArr=cloneArr(state.linePointArrPast);
-            state.lineRelationArr=cloneArr(state.lineRelationArrPast);
-            
-            state.areaEditingIndex=state.areaEditingIndexPast;
+            state.areaNameArr=cloneDeep(state.areaNameArrPast);
+            state.areaShapeArr=cloneDeep(state.areaShapeArrPast);
+            state.areaDependOn=cloneDeep(state.areaDependOnPast);
+            state.lineNameArr=cloneDeep(state.lineNameArrPast);
+            state.linePointArr=cloneDeep(state.linePointArrPast);
+            state.lineRelationArr=cloneDeep(state.lineRelationArrPast);
+            state.areaEditingIndex=cloneDeep(state.areaEditingIndexPast);
 
-            log('line point array...')
-            log(cloneArr(state.linePointArrPast))
-            
         },
         lineADelete(state, action) {
 
-            state.areaEditingIndexPast=state.areaEditingIndex;
-            state.areaNameArrPast=cloneArr(state.areaNameArr);
-            state.areaShapeArrPast=cloneArr(state.areaShapeArr);
-            state.areaDependOnPast=cloneArr(state.areaDependOn);
-            state.lineNameArrPast=cloneArr(state.lineNameArr);
-            state.linePointArrPast=cloneArr(state.linePointArr);
-            state.lineRelationArrPast=cloneArr(state.lineRelationArr);
+            state.areaEditingIndexPast=cloneDeep(state.areaEditingIndex);
+            state.areaNameArrPast=cloneDeep(state.areaNameArr);
+            state.areaShapeArrPast=cloneDeep(state.areaShapeArr);
+            state.areaDependOnPast=cloneDeep(state.areaDependOn);
+            state.lineNameArrPast=cloneDeep(state.lineNameArr);
+            state.linePointArrPast=cloneDeep(state.linePointArr);
+            state.lineRelationArrPast=cloneDeep(state.lineRelationArr);
 
             state.lineADeleteMessage=`${state.lineNameArr[state.areaEditingIndex][0]} has been deleted`;
             state.lineADeleteStatus='success'
             log('line A delete')
             state.linePointArr[state.areaEditingIndex][0]=[];
 
+          
+
             
         },
         lineBDelete(state, action) {
 
-            state.areaEditingIndexPast=state.areaEditingIndex;
-            state.areaNameArrPast=cloneArr(state.areaNameArr);
-            state.areaShapeArrPast=cloneArr(state.areaShapeArr);
-            state.areaDependOnPast=cloneArr(state.areaDependOn);
-            state.lineNameArrPast=cloneArr(state.lineNameArr);
-            state.linePointArrPast=cloneArr(state.linePointArr);
-            state.lineRelationArrPast=cloneArr(state.lineRelationArr);
+            state.areaEditingIndexPast=cloneDeep(state.areaEditingIndex);
+            state.areaNameArrPast=cloneDeep(state.areaNameArr);
+            state.areaShapeArrPast=cloneDeep(state.areaShapeArr);
+            state.areaDependOnPast=cloneDeep(state.areaDependOn);
+            state.lineNameArrPast=cloneDeep(state.lineNameArr);
+            state.linePointArrPast=cloneDeep(state.linePointArr);
+            state.lineRelationArrPast=cloneDeep(state.lineRelationArr);
 
             state.lineBDeleteMessage=`${state.lineNameArr[state.areaEditingIndex][1]} has been deleted`;
             state.lineBDeleteStatus='success'

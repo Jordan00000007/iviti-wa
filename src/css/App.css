@@ -1175,9 +1175,9 @@ input:checked+.my-toggle-slider:before {
     padding: 10px;
     border: 0px;
     display: block; */
-    position: relative;
-    top: 210px;
-    left: 52px;
+    /* position: relative;
+    top: 210px; 
+    left: 52px;*/
     display: block;
 }
 

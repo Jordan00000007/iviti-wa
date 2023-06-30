@@ -1,4 +1,5 @@
-import React, { useState, useEffect, forwardRef, useImperativeHandle, useRef } from 'react'
+import React, { useState, useEffect, forwardRef, useImperativeHandle, useRef } from 'react';
+import { useSelector, useDispatch } from "react-redux";
 import { extendTheme, CssVarsProvider } from '@mui/joy/styles';
 import ListItemDecorator from '@mui/joy/ListItemDecorator';
 import Chip from '@mui/joy/Chip';
@@ -10,7 +11,6 @@ import log from "../../utils/console";
 import { ReactComponent as Icon_Edit } from '../../assets/Icon_Edit.svg';
 import ListDivider from '@mui/joy/ListDivider';
 import LabelButton from '../../components/Buttons/LabelButton';
-import { useDispatch } from "react-redux";
 import DeleteIcon from '../../components/Icons/DeleteIcon';
 
 import List from '@mui/joy/List';
@@ -18,19 +18,13 @@ import ListItem from '@mui/joy/ListItem';
 import ListSubheader from '@mui/joy/ListSubheader';
 import ListItemButton from '@mui/joy/ListItemButton';
 import Sheet from '@mui/joy/Sheet';
+import { findKey,findIndex } from 'lodash-es';
 
 
-
-
-
-
-
-
-
-
-const CustomSelect = forwardRef((props, ref) => {
+const CustomSelectModel = forwardRef((props, ref) => {
 
     const dispatch = useDispatch();
+  
 
     const theme1 = extendTheme({
         components: {
@@ -105,6 +99,7 @@ const CustomSelect = forwardRef((props, ref) => {
 
     const [placeHolder, setPlaceHolder] = useState(props.placeHolder);
     const [selectedValue, setSelectedValue] = useState('');
+    const [selectedText, setSelectedText] = useState('');
     const [focus, setFocus] = useState(false);
 
     const handleListBoxChange= (event, value) => {
@@ -135,21 +130,38 @@ const CustomSelect = forwardRef((props, ref) => {
         props.modelDelete(value);
     }
  
-
- 
-
     useImperativeHandle(ref, () => ({
         getSelectedValue: () => {
             // log(`${props.name} get selected value`)
             return selectedValue;
         },
         setSelectedValue: (myValue) => {
-            // log(`${props.name} set selected value`)
-            // log(myValue)
+         
             setSelectedValue(myValue);
 
+        },
+        setSelectedText: (myText) => {
+           
+            setSelectedText(myText);
+           
         }
     }));
+
+    useEffect(() => {
+     
+        const myIndex=findIndex(props.areaArr, function(myItem){ return myItem[1] === selectedText; });
+        if (myIndex>=0){
+            const myModelUid=props.areaArr[myIndex][0];
+           
+            if (selectedValue!==myModelUid){
+                setSelectedValue(myModelUid);
+                props.onChange(null, myModelUid);
+            }
+
+        }
+
+
+    }, [props.areaArr,selectedText]);
 
 
     return (
@@ -218,6 +230,10 @@ const CustomSelect = forwardRef((props, ref) => {
                 }
 
               
+                  
+                  
+
+
 
                 {props.areaArr.map((item, index) => (
 
@@ -293,11 +309,9 @@ const CustomSelect = forwardRef((props, ref) => {
                         </Chip>
                         
                     </ListItemDecorator>
-
+                    
                 </Option>
-
-
-              
+               
 
 
             </Select>
@@ -307,4 +321,4 @@ const CustomSelect = forwardRef((props, ref) => {
     );
 });
 
-export default CustomSelect;
+export default CustomSelectModel;

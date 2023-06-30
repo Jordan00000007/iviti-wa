@@ -4,6 +4,7 @@ import SimpleLayout from '../components/Layouts/SimpleLayout';
 import CustomButton from '../components/Buttons/CustomButton';
 import CustomAlert from '../components/Alerts/CustomAlert';
 import UndoAlert from '../components/Alerts/UndoAlert';
+import ProgressAlert from '../components/Alerts/ProgressAlert';
 import DrawingTooltip from '../components/Tooltips/DrawingTooltip';
 
 import CustomInput from '../components/Inputs/CustomInput';
@@ -29,6 +30,11 @@ import Tooltip from '@mui/joy/Tooltip';
 import { Image } from "react-konva";
 import useImage from "use-image";
 import Hotkeys from "react-hot-keys";
+
+
+
+
+
 
 
 import log from "../utils/console";
@@ -91,6 +97,7 @@ function EditAiTask() {
 
     const alertRef = useRef();
     const undoAlertRef = useRef();
+    const progressAlertRef = useRef();
 
     const sourceRef = useRef(null);
     const modelRef = useRef(null);
@@ -140,6 +147,26 @@ function EditAiTask() {
         undoAlertRef.current.setShowTrue(10000);
 
     };
+
+    const setProgressMessageOpen = (showType, showText) => {
+        setShowType(showType);
+        setShowText(showText);
+        progressAlertRef.current.setShowTrue(10000);
+       
+    };
+
+    const setProgressMessageKeep = (showType, showText) => {
+       
+        progressAlertRef.current.setType(showType);
+        progressAlertRef.current.setMessage(showText);
+        progressAlertRef.current.setShowKeep();
+
+    };
+
+    const setProgressMessageClose = (showType, showText) => {
+        progressAlertRef.current.setShowClose();
+    };
+
 
     const setMessageKeep = (showType, showText) => {
         setShowType(showType);
@@ -284,14 +311,18 @@ function EditAiTask() {
     useEffect(() => {
 
         if (modelImportStatus === 'success') {
-            setMessageClose();
-            setMessageOpen(0, modelImportMessage);
+            //setMessageClose();
+            //setMessageOpen(0, modelImportMessage);
+            
+            const importName = fileRef.current.value.toString().replace("C:\\fakepath\\","").split(".")[0];
+            modelRef.current.setSelectedText(importName);
+             
             fileRef.current.value = "";
 
-            setTimeout(() => {
-                dispatch(getAllModels());
+            // setTimeout(() => {
+            //     dispatch(getAllModels());
 
-            }, 3000);
+            // }, 3000);
         }
         if (modelImportStatus === 'error') {
             setMessageClose();
@@ -299,7 +330,7 @@ function EditAiTask() {
             fileRef.current.value = "";
         }
         if (modelImportStatus === 'loading') {
-            setMessageKeep(2, 'Import model loading...');
+            setProgressMessageKeep(2, 'Import model loading...');
         }
 
 
@@ -377,7 +408,7 @@ function EditAiTask() {
     const handleApplicationChange = (event, value) => {
 
         log('--- handle application change ---')
-        if ((value !== -1) && (value !== "")) {
+        if ((value !== -1) && (value !== "")&& (value !== null)) {
 
 
 
@@ -428,12 +459,15 @@ function EditAiTask() {
                         }
                     }
 
+                    log('--- fileUid ---')
+                    log(fileUid)
 
-                    dispatch(getSourceFrame({ "fileUid": fileUid, "basicType": false }));
+                    if (fileUid!==''){
+                        dispatch(getSourceFrame({ "fileUid": fileUid, "basicType": false }));
+                        dispatch(initData({ "w": fileSetWidth, "h": fileSetHeight }));
+                    }
 
-
-
-                    dispatch(initData({ "w": fileSetWidth, "h": fileSetHeight }));
+                   
                 }
             }
         }
@@ -941,9 +975,6 @@ function EditAiTask() {
 
     }, [taskUpdateStatus]);
 
-
-
-
     useEffect(() => {
 
         if ((taskUid !== '') && (modelType !== '') && (applicationData !== [])) {
@@ -969,11 +1000,6 @@ function EditAiTask() {
 
     }, [taskUid, modelType, applicationData]);
 
-
-
-
-
-
     useEffect(() => {
 
         if (modelType !== '') {
@@ -997,7 +1023,6 @@ function EditAiTask() {
         }
 
     }, [deviceStatus]);
-
 
     useEffect(() => {
 
@@ -1329,6 +1354,7 @@ function EditAiTask() {
             />
             <UndoAlert message={showText} type={showType} ref={undoAlertRef} />
             <CustomAlert message={showText} type={showType} ref={alertRef} />
+            <ProgressAlert message={showText} type={showType} ref={progressAlertRef} />
             <div className="container p-0">
                 <div className="my-body" onClick={handleBodyClick}>
                     <div className="row p-0 g-0 mb-0 mt-3">
