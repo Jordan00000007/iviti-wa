@@ -7,6 +7,15 @@ services: # services 關鍵字後面列出 web, redis 兩項專案中的服務
       dockerfile: Dockerfile # Build 在同一資料夾的 Dockerfile（描述 Image 要組成的 yaml 檔案）成 container
     image: jordan007/iviti-wa:v013
     container_name: iviti-wa
-    network_mode: host
-    
+    ports:
+      - "8080:8001" # 外部露出開放的 port 對應到 docker container 的 port
+    networks:
+      ivit_net:
+        ipv4_address: 172.40.0.4
 
+networks:
+  ivit_net:
+    name: ivit_net
+    ipam:
+      config:
+        - subnet: 172.40.0.0/24
