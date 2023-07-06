@@ -4,7 +4,7 @@ import log from "../../utils/console";
 // function ToggleButton({ onChange, status }) {
 const ToggleButton = forwardRef((props, ref) => {
 
-    const [isChecked, setIsChecked] = useState(props.status === "running" ? true : false);
+    const [isChecked, setIsChecked] = useState(props.status === "run" ? true : false);
     const [disabled, setDisabled] = useState(false);
 
     const handleCheckboxChange = (event) => {
@@ -28,7 +28,7 @@ const ToggleButton = forwardRef((props, ref) => {
 
     useEffect(() => {
 
-        if (props.status==='running') setDisabled(false);
+        if (props.status==='run') setDisabled(false);
         if (props.status==='stop') setDisabled(false);
         if (props.status.indexOf('error')>=0){
             setDisabled(false);

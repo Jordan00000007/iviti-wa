@@ -234,7 +234,7 @@ function AiInference() {
                                                 <div className='w-100 '>
                                                     <div className='my-area-a1 d-flex justify-content-center align-items-center'>
                                                         {
-                                                            ((myItem.status==='running')&&(myItem.liveTime)) &&
+                                                            ((myItem.status==='run')&&(myItem.liveTime)) &&
                                                             <>
                                                                 <GeneralTooltip title="Task running time">
                                                                     <span className="my-time-badge roboto-b2">{myItem.liveTime}</span>
@@ -335,7 +335,7 @@ function AiInference() {
                                                                             FPS
                                                                         </div>
                                                                         <div className='my-area-b1-1-2 roboto-b1'>
-                                                                            {((myItem.status==='running')&&(myItem.fps))?myItem.fps:"N/A"}
+                                                                            {((myItem.status==='run')&&(myItem.fps))?myItem.fps:"N/A"}
                                                                         </div>
                                                                     </div>
 

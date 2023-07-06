@@ -95,7 +95,7 @@ const RemoteVideo = ({ uuid, status,onPlaying,fullScreen }) => {
         log(`--- status : ${status} ---`)
         let timer=null;
 
-        if (status==='running'){
+        if (status==='run'){
 
             //clearTimeout(myTimer);
             //getStreaming();
@@ -130,7 +130,7 @@ const RemoteVideo = ({ uuid, status,onPlaying,fullScreen }) => {
             setVideoMessage('Loading...');
             onPlaying(false);
         }
-        if (status === 'running') {
+        if (status === 'run') {
             setVideoMessage('Get streaming...');
         }
         if (status === 'stop') {

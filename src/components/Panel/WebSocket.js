@@ -76,7 +76,7 @@ export const WebSocket = (props) => {
         
         let timer=null;
 
-        if (props.status==='running'){
+        if (props.status==='run'){
   
             timer=setInterval(() => {
 

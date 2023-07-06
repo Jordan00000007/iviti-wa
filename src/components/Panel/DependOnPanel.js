@@ -17,7 +17,7 @@ const DependOnPanel = (props) => {
 
     const handleSelectChange = (event,value) => {
         log(`--- select change to index ${value} ---`);
-        setAreaIndex(value);
+        if (value!==null) setAreaIndex(value);
     };
 
     const myArea = useSelector((state) => state.applications.areas);
@@ -26,7 +26,8 @@ const DependOnPanel = (props) => {
 
     useEffect(() => {
 
-      
+        log('my area ---------')
+        log(myArea)
 
         let myAreaNameArr=[];
         let myDependOnArr=[];
@@ -35,6 +36,9 @@ const DependOnPanel = (props) => {
             myAreaNameArr.push([index,item.name]);
             myDependOnArr.push(item.depend_on)
         });
+
+        log('myDependOnArr ---------')
+        log(myDependOnArr)
  
         setAreaNameArr(myAreaNameArr);
         setDependOnArr(myDependOnArr);

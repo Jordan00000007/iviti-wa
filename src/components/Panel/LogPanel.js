@@ -6,7 +6,7 @@ import LabelButton from '../../components/Buttons/LabelButton';
 const LogPanel = (props) => {
   
     
-    if ((props.data!==[])&&(props.status==='running'))
+    if ((props.data!==[])&&(props.status==='run'))
     return (
         <div className='d-flex flex-column my-frame-container roboto-b1'>
             <div className='my-log-container'>
@@ -51,7 +51,7 @@ const LogPanel = (props) => {
     //     </div>
     // )
 
-    if ((props.status!=='running')&&(props.status!=='stop')){
+    if ((props.status!=='run')&&(props.status!=='stop')){
       
         if ((props.status.indexOf('run')>0)||(props.status.indexOf('add')>0))
         return (

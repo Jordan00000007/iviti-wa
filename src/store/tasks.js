@@ -146,8 +146,8 @@ const updateTaskStatus=(state,uuid,myStatus,myMessage)=>{
     const updatedArray = update(current(state).data, {
         [indexToUpdate]: {
             status: { $apply: status => myStatus },
-            apiError: { $apply: apiError => (((myStatus!=='running')&&(myStatus!=='stop'))?myMessage:'') },
-            apiSuccess : { $apply: apiSuccess => ((myStatus==='running')||(myStatus==='stop')?myMessage:'') },
+            apiError: { $apply: apiError => (((myStatus!=='run')&&(myStatus!=='stop'))?myMessage:'') },
+            apiSuccess : { $apply: apiSuccess => ((myStatus==='run')||(myStatus==='stop')?myMessage:'') },
         }
     });
     return {
@@ -372,11 +372,11 @@ const tasksSlice = createSlice({
                 //log(`--- add stream [${action.meta.arg}] fulfilled ---`);
                 //log(action);
                 if (action.payload.status===1){
-                    return updateTaskStatus(state,action.meta.arg,'running','Set streaming running success.');
+                    return updateTaskStatus(state,action.meta.arg,'run','Set streaming running success.');
                 }else{
                     
                     if (action.payload.payload==='stream already exists'){
-                        return updateTaskStatus(state,action.meta.arg,'running','Streaming already exists.');
+                        return updateTaskStatus(state,action.meta.arg,'run','Streaming already exists.');
                     }else{
                         return updateTaskStatus(state,action.meta.arg,'set_stream_add_error',action.payload.payload);
                     }

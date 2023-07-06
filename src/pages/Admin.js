@@ -1,5 +1,6 @@
 import SimpleLayout from '../components/Layouts/SimpleLayout';
 import CustomButton from '../components/Buttons/CustomButton';
+import ColorPicker from '../components/ColorPicker/ColorPicker';
 import { Link } from 'react-router-dom';
 const TASK_SERVER = process.env.REACT_APP_TASK_SERVER;
 const STREAM_SERVER = process.env.REACT_APP_STREAM_SERVER;

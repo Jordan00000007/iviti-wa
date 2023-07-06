@@ -7,7 +7,7 @@ const StatusButton = ({ name }) => {
 
    // const {name}=props;
   
-        if (name==="running"){
+        if (name==="run"){
             return (
                 <button className="my-button-run">
                     Run

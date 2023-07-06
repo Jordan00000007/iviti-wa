@@ -79,7 +79,7 @@ const TaskCard = (props) => {
 
     useEffect(() => {
         // Compare the old state with the new state
-        if ((myItem.status==='running')||(myItem.status==='stop')||(myItem.status.indexOf('error')>=0)) {
+        if ((myItem.status==='run')||(myItem.status==='stop')||(myItem.status.indexOf('error')>=0)) {
             
            setDisabled(false)
         } 
@@ -176,7 +176,7 @@ const TaskCard = (props) => {
                     <div className="col-12 mt-1 d-flex justify-content-between">
                         { ((myItem.status === 'stop')||(myItem.status.indexOf("error")>=0)) &&
                             
-                            <CustomButton onClick={handleClickEdit} disabled={myItem.status === 'running' ? true : false} name="edit" width="115"/>
+                            <CustomButton onClick={handleClickEdit} disabled={myItem.status === 'run' ? true : false} name="edit" width="115"/>
                             
                         }
                        

@@ -23,7 +23,7 @@ const TemperaturePanel = (props) => {
             </div>
             <div className='my-area-b3-2 d-flex justify-content-end'>
                 <div className='my-area-b3-2-1 roboto-h1 d-flex justify-content-end align-items-center'>
-                    {props.status==='running'?myTemp:'N/A'}
+                    {props.status==='run'?myTemp:'N/A'}
                 </div>
                 <div className='my-area-b3-2-2 roboto-b2 d-flex justify-content-end align-items-center'>
                     °C

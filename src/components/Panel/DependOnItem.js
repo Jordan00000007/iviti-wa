@@ -27,13 +27,21 @@ const DependOnItem = (props) => {
 
     }
 
+    const handleColorChange= (event) => {
+        
+        log('handle color change')
+        log(event.target.style.background)
+        log(event.target.name)
+
+    }
+
     return (
         <div>
             <div className="row ">
                 <div className="col-12 d-flex justify-content-between align-items-center">
                     <div className='d-flex flex-row gap-2 align-items-center'>
                         <div>
-                            <div style={{ width: 20, height: 20, background: areaDependOnItem.color, borderRadius: 6 }} />
+                            <div style={{ width: 20, height: 20, background: areaDependOnItem.color, borderRadius: 6,cursor:'pointer'}} onClick={handleColorChange} name={areaDependOnItem.name}/>
                         </div>
                         <div style={{ width: 210 }}>
                             <CustomTooltip>

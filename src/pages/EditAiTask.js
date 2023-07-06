@@ -7,6 +7,8 @@ import UndoAlert from '../components/Alerts/UndoAlert';
 import ProgressAlert from '../components/Alerts/ProgressAlert';
 import DrawingTooltip from '../components/Tooltips/DrawingTooltip';
 
+import ColorPicker from '../components/ColorPicker/ColorPicker';
+
 import CustomInput from '../components/Inputs/CustomInput';
 import LinePanel from '../components/Panel/LinePanel';
 import CustomDrawing from '../components/Drawing/CustomDrawing';
@@ -221,6 +223,7 @@ function EditAiTask() {
 
     const [showTaskDeleteModal, setShowTaskDeleteModal] = useState(false);
     const [showLoadingModal, setShowLoadingModal] = useState(false);
+    const [showColorModal, setShowColorModal] = useState(false);
 
     const [deleteModelUid, setDeleteModelUid] = useState(null);
     const [deleteModelName, setDeleteModelName] = useState('');
@@ -1784,6 +1787,21 @@ function EditAiTask() {
                     
                         <div style={{width:0, height:0,background: 'white'}}>
                             <CustomLoading />
+                        </div>
+                    
+                    
+                </ModalDialog>
+            </Modal>
+
+            <Modal
+                open={showColorModal}
+            >
+                <ModalDialog
+                    sx={{ minWidth: 200, maxWidth: 200, minHeight: 200,layout:'center' }}
+                >
+                    
+                        <div style={{width:0, height:0,background: 'white'}}>
+                            <ColorPicker/>
                         </div>
                     
                     
