@@ -991,10 +991,10 @@ function EditAiTask() {
             });
             setApplicationOptions(myAppOptions);
             log('---(3) set application selected data')
-            log(app_name[0])
-            setSelectedApplication(app_name[0]);
+            log(app_name)
+            setSelectedApplication(app_name);
 
-            (app_name[0].toLowerCase() === 'movement_zone') ? setLinePanel(true) : setLinePanel(false);
+            (app_name.toLowerCase() === 'movement_zone') ? setLinePanel(true) : setLinePanel(false);
         }
 
 
@@ -1147,9 +1147,9 @@ function EditAiTask() {
             modelRef.current.setSelectedValue(model_uid);
 
             log('--- (7) set application ---')
-            log(app_name[0])
-            setSelectedApplication(app_name[0]);
-            applicationRef.current.setSelectedValue(app_name[0]);
+            log(app_name)
+            setSelectedApplication(app_name);
+            applicationRef.current.setSelectedValue(app_name);
 
             log('--- (8) set model type ---')
             log(model_type)
