@@ -41,7 +41,7 @@ const devicesSlice = createSlice({
                     //return updateTemperatureInfo(state,action.meta.arg,action.payload.data);
                 }else if (action.payload.status_code===500){
                     
-                    state.error=JSON.stringify(action.payload.data)
+                    state.error=JSON.stringify(action.payload)
                     state.status = 'error';
                 
                 }else{
