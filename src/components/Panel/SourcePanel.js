@@ -193,9 +193,15 @@ const SourcePanel = (props) => {
 
     useEffect(() => {
 
+        log('fileName----------')
+        log(fileName)
+
         if ((typeRTSP)&&(fileName!=='')&&(type==='RTSP')&&(fileName!==null)){
             
-            rtspInputRef.current.setInputValue(fileName.replace("rtsp://",""));
+            //rtspInputRef.current.setInputValue(fileName.replace("rtsp://",""));
+            if (rtspInputRef.current){
+                rtspInputRef.current.setInputValue(fileName.replace("rtsp://",""));
+            }
            
         }
 
