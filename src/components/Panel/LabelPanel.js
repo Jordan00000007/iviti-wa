@@ -16,9 +16,7 @@ const LabelPanel = (props) => {
 
     if (showData) {
 
-        log('--- show data ---')
-        log(showData)
-
+     
         if ((showData.length <= 3) && (showData.length > 0))
             return (
                 <div style={{ gap: '10px', display: 'flex' }}>

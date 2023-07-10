@@ -214,7 +214,10 @@ function EditAiTask() {
 
 
     const modelStatus = useSelector((state) => state.models.status);
+    
     const deviceStatus = useSelector((state) => state.devices.status);
+    const deviceError = useSelector((state) => state.devices.error);
+
     const applicationStatus = useSelector((state) => state.applications.status);
 
     const [selectedModel, setSelectedModel] = useState('');
@@ -1057,9 +1060,15 @@ function EditAiTask() {
             deviceRef.current.setSelectedValue(deviceArr[0][0]);
         }
 
+        if (deviceStatus==='error'){
+            setMessageOpen(1, deviceError);   
+            setShowLoadingModal(false);
+        }
+
     }, [deviceStatus]);
 
     useEffect(() => {
+
 
         log('delete ----')
         log(areaDeleteStatus)
@@ -1071,6 +1080,7 @@ function EditAiTask() {
                 setUndoMessageOpen(0, areaDeleteMessage);
             }else{
                 setMessageOpen(1, areaDeleteMessage);
+               
             }
 
             dispatch(resetDeleteStatus());

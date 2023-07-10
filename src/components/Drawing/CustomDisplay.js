@@ -26,9 +26,6 @@ const CustomDisplay = (props) => {
     // const drawWidth = 804;
     // const drawHeight = 558;
 
-    log('-------- draw width and height ------')
-    log(drawWidth)
-    log(drawHeight)
 
     const [areaNameArr, setAreaNameArr] = useState([])
     const [areaPointArr, setAreaPointArr] = useState([])

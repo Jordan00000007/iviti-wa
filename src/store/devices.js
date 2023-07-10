@@ -27,7 +27,8 @@ const devicesSlice = createSlice({
             getAllDevices.fulfilled,
             (state, action) => {
                 log('--- get all devices fulfilled ---');
-                //log(action.payload.data)
+                log(action.payload.data)
+
                 if (action.payload.status_code===200){
                     let myData=[];
                     Object.keys(action.payload.data).map((e, i) => {
@@ -38,9 +39,16 @@ const devicesSlice = createSlice({
                     state.status = 'success';
                     
                     //return updateTemperatureInfo(state,action.meta.arg,action.payload.data);
+                }else if (action.payload.status_code===500){
+                    
+                    state.error=JSON.stringify(action.payload.data)
+                    state.status = 'error';
+                
                 }else{
                     //return updateTaskStatus(state,action.meta.arg,'set_stream_delete_error');
                     log('--- other ---')
+                    state.error='unknow';
+                    state.status = 'error';
                 }
                 
             }
