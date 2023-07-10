@@ -11,14 +11,7 @@ const LabelPanel = (props) => {
     const handleShow = () => setShow(true);
     const showData = props.dependOnArr[props.index];
 
-    log('--- show data ---')
-    log(showData)
-
-    log('--- props.index ---')
-    log(props.index)
-
-    log('--- props.dependOnArr ---')
-    log(props.dependOnArr)
+   
 
 
     if (showData) {

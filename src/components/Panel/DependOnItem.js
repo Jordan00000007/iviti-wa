@@ -31,7 +31,11 @@ const DependOnItem = (props) => {
         
         log('handle color change')
         log(event.target.style.background)
-        log(event.target.name)
+        log(event.target.getAttribute('name'))
+
+        const myColor=event.target.style.background;
+        const myName=event.target.getAttribute('name');
+        props.onColorChange(myName,myColor)
 
     }
 

@@ -61,7 +61,7 @@ import SourcePanel from '../components/Panel/SourcePanel';
 import DependOnSelectPanel from '../components/Panel/DependOnSelectPanel';
 
 import { getSourceFrame, getSourceInfo, setSourceId, getSourceWidthHeight, sourcesActions, resetFrameStatus, setDrawWidthHeight } from "../store/sources";
-import { areaSelected, areaRename, areaDelete, getAppSetting, setFileWidthHeight, areasActions, lineDataReset, setModelData, resetStatus, setSelectedApplication, setSelectedModel, lineADelete, resetDeleteStatus,resetLineADeleteStatus,resetLineBDeleteStatus } from "../store/areas";
+import { areaSelected, areaRename, areaDelete, getAppSetting, setFileWidthHeight, areasActions, lineDataReset, setModelData, resetStatus, setSelectedApplication, setSelectedModel, lineADelete, resetDeleteStatus,resetLineADeleteStatus,resetLineBDeleteStatus, updateLabelColor } from "../store/areas";
 import { fetchData, deleteTask, resetError, setTaskDeleteMessage } from "../store/tasks";
 
 
@@ -115,6 +115,8 @@ function EditAiTask() {
     const confidenceTitleRef = useRef(null);
     const dependOnTitle = useRef(null);
     const customDrawingRef = useRef(null);
+    const colorRef = useRef(null);
+
 
     const KeySRef = useRef(null);
     const KeyERef = useRef(null);
@@ -229,6 +231,9 @@ function EditAiTask() {
     const [deleteModelName, setDeleteModelName] = useState('');
 
     const [lineReady, setLineReady] = useState(false);
+
+    const [color, setColor] = useState('');
+    const [label, setLabel] = useState('');
 
 
     const deviceArr = useSelector((state) => state.devices.options);
@@ -482,6 +487,21 @@ function EditAiTask() {
         if (value !== null) {
             //setSelectedDevice(value)
         }
+    };
+
+    const handlePickColorComplete= (event) => {
+
+        //dispatch(areaSelected(idx))
+        log('update color on label')
+
+        log(colorRef.current.getColor())
+        const myData={};
+        myData.name=label;
+        myData.color=colorRef.current.getColor();
+
+        dispatch(updateLabelColor(myData))
+
+        setShowColorModal(false);
     };
 
     const handleAreaChange = (event, idx) => {
@@ -908,6 +928,18 @@ function EditAiTask() {
         sourceRef.current.setButtonClick();
         setShowAppSetting(false);
     }   
+
+    const handleColorChange= (myName, myColor) => {
+
+        log('handle Color Change')
+        log(myName)
+        log(myColor)
+        setColor(myColor);
+        setLabel(myName);
+        setShowColorModal(true);
+        
+    
+    };
 
     useEffect(() => {
 
@@ -1607,7 +1639,7 @@ function EditAiTask() {
                                                         }
                                                     </div>
                                                     <div className='my-area-p3-c2'>
-                                                        <DependOnSelectPanel linePanel={linePanel} basicType={basicType} ref={dependOnTitle} areaDependOn={areaDependOn} />
+                                                        <DependOnSelectPanel linePanel={linePanel} basicType={basicType} ref={dependOnTitle} areaDependOn={areaDependOn} onColorChange={handleColorChange}/>
                                                         {/* <DependOnSelectPanel dependOn={[]} linePanel={linePanel}/> */}
                                                     </div>
 
@@ -1797,14 +1829,28 @@ function EditAiTask() {
                 open={showColorModal}
             >
                 <ModalDialog
-                    sx={{ minWidth: 200, maxWidth: 200, minHeight: 200,layout:'center' }}
+                    sx={{ minWidth: 500, maxWidth: 500, minHeight: 400 }}
                 >
-                    
-                        <div style={{width:0, height:0,background: 'white'}}>
-                            <ColorPicker/>
+                        <div className='container-fluid'>
+                        <div className='row'>
+                        <div className='col-12 d-flex justify-content-start' style={{padding:0}}>
+                        
+                            <ColorPicker defaultValue={color} ref={colorRef}/>
+                        
                         </div>
-                    
-                    
+                        </div>
+
+                        <div className='row'>
+                        <div className='col-12 d-flex justify-content-end' style={{padding:0}}>
+                                <div style={{ paddingTop: 20 }} className='d-flex gap-3'>
+                                    <CustomButton name="cancel" onClick={() => {
+                                        setShowColorModal(false);
+                                    }} />
+                                    <CustomButton name="save" onClick={handlePickColorComplete} />
+                                </div>
+                            </div>
+                        </div>
+                        </div>
                 </ModalDialog>
             </Modal>
 

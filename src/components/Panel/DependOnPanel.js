@@ -26,9 +26,6 @@ const DependOnPanel = (props) => {
 
     useEffect(() => {
 
-        log('my area ---------')
-        log(myArea)
-
         let myAreaNameArr=[];
         let myDependOnArr=[];
 
@@ -37,9 +34,7 @@ const DependOnPanel = (props) => {
             myDependOnArr.push(item.depend_on)
         });
 
-        log('myDependOnArr ---------')
-        log(myDependOnArr)
- 
+    
         setAreaNameArr(myAreaNameArr);
         setDependOnArr(myDependOnArr);
 

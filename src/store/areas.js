@@ -360,6 +360,23 @@ const areasSlice = createSlice({
         setSelectedApplication(state,action){
             state.selectedApplication=action.payload.applicationName;
         },
+        updateLabelColor(state,action){
+            log('update label color')
+           
+            const {name,color}=action.payload
+        
+            log(state.areaDependOn)
+
+            state.areaDependOn.forEach(function(item){
+                item.forEach(function(item2){
+                    log(item2)
+                    log('------')
+                    if (item2.name===name) item2.color=color;
+                });
+            });
+
+
+        },
     },
     extraReducers: (builder) => {
 
@@ -369,6 +386,12 @@ const areasSlice = createSlice({
         (state, action) => {
           
             log('--- get app setting fulfilled ---')
+            log(action.payload)
+            log(action.payload.data[0].app_setting.application.palette)
+            const myPalette=action.payload.data[0].app_setting.application.palette;
+            log(myPalette['applea'])
+
+            log('----------------------------')
            
             state.selectedApplication=action.payload.data[0].name;
 
@@ -399,7 +422,12 @@ const areasSlice = createSlice({
                     myItem.name = item2;
                     myItem.checked = false;
                     myItem.key = idx2;
-                    myItem.color = state.paletteArr[idx2];
+                    //myItem.color = state.paletteArr[idx2];
+                    if (myPalette[item2]!==undefined){
+                        myItem.color = rgbToHex(myPalette[item2][2],myPalette[item2][1],myPalette[item2][0]);
+                    }else{
+                        myItem.color = state.paletteArr[idx2];
+                    }
                     item1.depend_on.forEach((item3, idx3) => {
                         if (item2===item3){
                             myItem.checked = true;
@@ -500,5 +528,5 @@ const areasSlice = createSlice({
     }
 });
 export const areasActions = areasSlice.actions;
-export const { initData, setDependOn, toggleSelectAll, toggleDependOnItem, areaInsert, areaSelected, areaRename, areaUpdate, areaDelete, areaUndo, lineAUpdate, lineBUpdate,lineARelationUpdate,lineBRelationUpdate,setFileWidthHeight,lineUpdate,setLinePanel,lineDataReset,setModelData,resetStatus,resetDeleteStatus,resetAddStatus,resetUpdateStatus,setSelectedApplication,setSelectedModel,lineADelete,lineBDelete,resetLineADeleteStatus,resetLineBDeleteStatus } = areasSlice.actions;
+export const { initData, setDependOn, toggleSelectAll, toggleDependOnItem, areaInsert, areaSelected, areaRename, areaUpdate, areaDelete, areaUndo, lineAUpdate, lineBUpdate,lineARelationUpdate,lineBRelationUpdate,setFileWidthHeight,lineUpdate,setLinePanel,lineDataReset,setModelData,resetStatus,resetDeleteStatus,resetAddStatus,resetUpdateStatus,setSelectedApplication,setSelectedModel,lineADelete,lineBDelete,resetLineADeleteStatus,resetLineBDeleteStatus,updateLabelColor } = areasSlice.actions;
 export default areasSlice.reducer;

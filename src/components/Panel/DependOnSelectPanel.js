@@ -59,6 +59,16 @@ const DependOnSelectPanel = forwardRef((props, ref) => {
         //setAreaDependOn(myData);
     }
 
+    const handleColorChange = (myName,myColor) => {
+
+        log('handle Color Change')
+        log(myName)
+        log(myColor)
+        props.onColorChange(myName,myColor)
+      
+       
+    }
+
     return (
         <>
             <div className="row ">
@@ -80,7 +90,7 @@ const DependOnSelectPanel = forwardRef((props, ref) => {
                 <div className="col-12" style={{maxHeight:props.basicType?(props.linePanel?264:400)+16:(props.linePanel?264:400),minHeight:props.basicType?(props.linePanel?264:400)+16:(props.linePanel?264:400),overflowY:'auto',overflowX:'hidden'}}>
 
                     {areaDependOn[areaEditingIndex].map((item, idx) => (
-                        <DependOnItem data={item} key={idx} index={idx} onClick={handleToggleCheckBox} />
+                        <DependOnItem data={item} key={idx} index={idx} onClick={handleToggleCheckBox} onColorChange={handleColorChange}/>
                     ))}
 
                 </div>
