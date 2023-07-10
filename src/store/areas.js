@@ -389,7 +389,7 @@ const areasSlice = createSlice({
             log(action.payload)
             log(action.payload.data[0].app_setting.application.palette)
             const myPalette=action.payload.data[0].app_setting.application.palette;
-            log(myPalette['applea'])
+          
 
             log('----------------------------')
            

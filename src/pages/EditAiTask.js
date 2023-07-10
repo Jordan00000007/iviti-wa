@@ -695,6 +695,11 @@ function EditAiTask() {
             postData.device = deviceRef.current.getSelectedValue();
             postData.app_name = selectedApplication;
 
+
+            if (selectedApplication.toLowerCase().indexOf("basic")>=0){
+                setBasicType(true);
+            }
+
             // Get App Setting
             let areas = [];
             let myPalette = [];
@@ -717,6 +722,7 @@ function EditAiTask() {
                 });
 
                 let myShape = [];
+
                 if (!basicType) {
                     areaShapeArr[idx].forEach(function (item, idx) {
                         let shape = [];
@@ -1196,6 +1202,14 @@ function EditAiTask() {
             setSelectedApplication(app_name);
             applicationRef.current.setSelectedValue(app_name);
 
+            if (app_name.toLowerCase().indexOf("basic")>=0){
+                setBasicType(true);
+                log('set basic')
+            }else{
+                setBasicType(false);
+                log('no set basic')
+            }
+
             log('--- (8) set model type ---')
             log(model_type)
             setModelType(model_type);
@@ -1203,9 +1217,9 @@ function EditAiTask() {
             dispatch(sourcesActions.setSourceId(source_uid));
             dispatch(getSourceWidthHeight());
 
-            (app_name[0].toLowerCase().indexOf("basic") >= 0) ? setBasicType(true) : setBasicType(false);
+            (app_name.toLowerCase().indexOf("basic") >= 0) ? setBasicType(true) : setBasicType(false);
 
-            if (app_name[0].toLowerCase() === 'movement_zone') {
+            if (app_name.toLowerCase() === 'movement_zone') {
                 const myLinePanel = {};
                 myLinePanel.linePanel = true;
                 dispatch(areasActions.setLinePanel(myLinePanel));
