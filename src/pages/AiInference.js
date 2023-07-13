@@ -122,7 +122,7 @@ function AiInference() {
     const handleVideoClick=()=>{
 
         log('handle video click')
-        // setFullScreen(true);
+        setFullScreen(true);
         // videoPanelRef.current.requestFullscreen();
 
     }
@@ -243,7 +243,7 @@ function AiInference() {
                                                             
                                                         }
                                                     </div>
-                                                    <div className='my-area-a2 position-relative' onChange={handleVideoClick} ref={videoPanelRef}>
+                                                    <div className={fullScreen?'my-area-a2':'my-area-a2 position-relative'} onChange={handleVideoClick} ref={videoPanelRef}>
                                                         <RemoteVideo uuid={params.uuid} status={myItem.status} onPlaying={handlePlaying} fullScreen={fullScreen} />
                                                         <CustomDisplay uuid={myItem.source_uid} playing={playing} onClick={handleVideoClick}></CustomDisplay> 
                                                     </div>

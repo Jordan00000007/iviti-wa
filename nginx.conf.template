@@ -26,7 +26,7 @@ http {
   keepalive_requests 10000;
   #gzip  on;
 
-  client_max_body_size 500m;
+  client_max_body_size 0;
 
   #include /etc/nginx/conf.d/*.conf;
 
@@ -45,7 +45,7 @@ http {
     listen ${NGINX_PORT};
     server_name IVIT_I;
 
-    client_max_body_size 500m;
+    client_max_body_size 0;
 
     # 定義domain的位置，如果location跟這邊不同，代理轉發就可能出問題
     proxy_set_header Host $host;

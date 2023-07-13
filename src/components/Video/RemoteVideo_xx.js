@@ -1,21 +1,22 @@
 import React, { useState, useEffect, useRef } from 'react';
 import log from "../../utils/console";
+import { PropaneSharp } from '@mui/icons-material';
 
-const RemoteVideo = ({ uuid, status }) => {
+const RemoteVideo = ({ uuid, status,onPlaying,fullScreen }) => {
     const STREAM_SERVER = process.env.REACT_APP_STREAM_SERVER;
     const [remoteStream, setRemoteStream] = useState(null);
     const remoteVideoRef = useRef(null);
-    const [videoMessage, setVideoMessage] = useState('Switch on the AI task to view inference');
+    const [videoMessage, setVideoMessage] = useState('Loading...');
+    const [intervalId, setIntervalId] = useState(null);
 
 
-    useEffect(() => {
+    
+    const getStreaming = () => {
 
-        //setVideoMessage('loading...');
-        log(`--- status : ${status} ---`)
+        //log('--- remote video start ---')
 
-        // Create RTCPeerConnection
-        //log('(1) Create RTCPeerConnection')
-        const peerConnection = new RTCPeerConnection({
+         //log('(1) Create RTCPeerConnection')
+         const peerConnection = new RTCPeerConnection({
             iceServers: [{
                 urls: ['stun:stun.l.google.com:19302']
             }],
@@ -27,7 +28,7 @@ const RemoteVideo = ({ uuid, status }) => {
 
         //log("(3) Define Negotiation");
         peerConnection.onnegotiationneeded = async function handleNegotiationNeeded() {
-
+  
             //log('(3-1) Create Offer');
             // 建立請求
             const offer = await peerConnection.createOffer()
@@ -39,45 +40,78 @@ const RemoteVideo = ({ uuid, status }) => {
             // 使用 http 與 remote 進行請求，需要透過 sdp 去請求
 
             const trg_url = `${STREAM_SERVER}/stream/${uuid}/channel/0/webrtc`;
+  
+            fetch(trg_url, {
+                method: "POST",
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8',
+                },
+                body: 'data=' + btoa(offer.sdp)
+            })
+            .then((response) => response.text())
+            .then((body) => {
+                
+                peerConnection.setRemoteDescription(
+                    new RTCSessionDescription({
+                        type: 'answer',
+                        sdp: atob(decodeURIComponent(body))
+                        //decodeURIComponent
+                    }))
 
-            if (status === 'run') {
-                fetch(trg_url, {
-                    method: "POST",
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8',
-                    },
-                    body: 'data=' + btoa(offer.sdp)
-                })
-                    .then((response) => response.text())
-                    .then((body) => {
-                        peerConnection.setRemoteDescription(
-                            new RTCSessionDescription({
-                                type: 'answer',
-                                sdp: atob(body)
-                            }))
-                    })
-                    .catch(function (err) {
-                        log('--- err ---')
-                        log(err)
-                    });
-            }
-
-
-
+                   
+            })
+            .catch(function (err) {
+                log('--- err ---')
+                log(err)
+            });
         }
-
 
         //log("(4) Define Track Event");
         peerConnection.ontrack = function (event) {
 
-            if (status === 'run') {
-                setRemoteStream(event.streams[0]);
-            } else {
-                setRemoteStream(null);
-            }
+            //log('--- track info ---')
+            //log(event.streams[0])
+
+            setRemoteStream(event.streams[0]);
+
+            // if (status === 'running') {
+            //     setRemoteStream(event.streams[0]);
+            // } else {
+            //     setRemoteStream(null);
+            // }
+
+           
         }
+  
+
+    }
 
 
+
+    useEffect(() => {
+
+        //setVideoMessage('loading...');
+        
+        log(`--- status : ${status} ---`)
+        let timer=null;
+
+        if (status==='run'){
+
+            //clearTimeout(myTimer);
+            //getStreaming();
+            timer=setInterval(() => {
+                
+                getStreaming();
+
+            }, 5000);
+
+            setIntervalId(timer);
+
+
+        }
+            
+        return () => clearInterval(timer);
+           
     }, [status]);
 
     useEffect(() => {
@@ -92,48 +126,67 @@ const RemoteVideo = ({ uuid, status }) => {
 
     useEffect(() => {
 
-        if (status==='set_task_run_loading') {
-            setVideoMessage('loading...');
+        if (status === 'set_task_run_loading') {
+            setVideoMessage('Loading...');
+            onPlaying(false);
         }
-        if (status==='run') {
-            setVideoMessage('');
+        if (status === 'run') {
+            setVideoMessage('Get streaming...');
         }
-        if (status==='stop') {
-            setVideoMessage('Switch on the AI task to view inference');
+        if (status === 'stop') {
+            setVideoMessage('Switch on the AI task to view inference.');
+            onPlaying(false);
         }
-        if (status==='set_task_stop_loading') {
-            setVideoMessage('stoping...');
+        if (status === 'set_task_stop_loading') {
+            setVideoMessage('Stoping...');
+            onPlaying(false);
         }
-        
+
     }, [status]);
 
-    const myWaitting=()=>{
+    const myWaitting = () => {
         log('waitting');
         //setVideoMessage('loading...');
     }
 
-    const myPlaying=()=>{
+    const myPlaying = () => {
         log('playing');
         //setVideoMessage('loading...');
+        
+        setVideoMessage('');
+        clearInterval(intervalId);
+        setIntervalId(null);
+        onPlaying(true);
     }
 
+    useEffect(() => {
+
+        if (fullScreen) {
+            //remoteVideoRef.current.requestFullScreen();
+        }else{
+            //remoteVideoRef.current.exitFullscreen();
+        }
+    }, [fullScreen]);
+
     return (
-        <div style={{position:'relative'}}>
-            {   (status==='run') &&
-                <video ref={remoteVideoRef} width="839px" height="604px" autoPlay muted className='my-video-player' onPlaying={myPlaying} onWaiting={myWaitting} >
-                    Your browser does not support the video tag.
-                </video>
-            }
+        <div style={{ position: 'relative' }}>
+
+            <video ref={remoteVideoRef} width={(fullScreen)?window.innerWidth:"841px"} height={(fullScreen)?window.innerHeight:"604px"} autoPlay muted className='my-video-player' onPlaying={myPlaying} onWaiting={myWaitting} allow='fullscreen' >
+                Your browser does not support the video tag.
+            </video>
+
             {
-                (status!=='run') &&
-                <div style={{position:'absolute',top: 0,left: 0,width:839 ,height:604,zIndex: 1,color:'#FFFFFF66'}} className='my-video-message d-flex justify-content-center align-items-center roboto-h5'>
+                (videoMessage !== '') &&
+                <div style={{ position: 'absolute', top: 0, left: 0, width: 841, height: 604, zIndex:1, color:'#FFFFFF66'}} className='my-video-message d-flex justify-content-center align-items-center roboto-h5'>
                     <div>
                         {videoMessage}
                     </div>
                 </div>
             }
+                
             
-        </div>
+            
+        </div >
 
     );
 };

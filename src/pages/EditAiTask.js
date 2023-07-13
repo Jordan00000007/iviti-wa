@@ -898,7 +898,8 @@ function EditAiTask() {
         }
         if (e.code === 'KeyD') {
 
-            dispatch(areaDelete());
+            //dispatch(areaDelete());
+            handleDeleteMode();
         }
 
     };
