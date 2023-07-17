@@ -162,16 +162,16 @@ const RemoteVideo = ({ uuid, status,onPlaying,fullScreen }) => {
     useEffect(() => {
 
         if (fullScreen) {
-            //remoteVideoRef.current.requestFullScreen();
+            //remoteVideoRef.current.webkitRequestFullscreen();
         }else{
-            //remoteVideoRef.current.exitFullscreen();
+            //remoteVideoRef.exitFullscreen();
         }
     }, [fullScreen]);
 
     return (
-        <div style={{ position: fullScreen?'absolute':'relative' }}>
+        <div style={{ position: 'relative' }}>
 
-            <video ref={remoteVideoRef} autoPlay muted className={fullScreen?'my-video-player-full':'my-video-player'} onPlaying={myPlaying} onWaiting={myWaitting} allow='fullscreen' >
+            <video ref={remoteVideoRef} width={(fullScreen)?window.innerWidth:"841px"} height={(fullScreen)?window.innerHeight:"604px"} autoPlay muted className='my-video-player' onPlaying={myPlaying} onWaiting={myWaitting} allow='fullscreen' >
                 Your browser does not support the video tag.
             </video>
 

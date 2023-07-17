@@ -20,7 +20,7 @@ div::-webkit-scrollbar-track {
 
     margin: 2px;
     border-radius: 10px;
-    background: rgba(224, 225, 230, 0.376);
+    background: rgba(59, 58, 32, 0.678);
 
 }
 
@@ -1388,19 +1388,6 @@ input:checked+.my-toggle-slider:before {
 
 .my-video-player {
     background-color: var(--stream_empty);
-    width:841px;
-    height:604px;
-   
-}
-
-.my-video-player-full {
-    background-color: var(--stream_empty);
-    object-fit: cover;
-    position: 'absolute';
-    top: 0px;
-    left: 0px;
-    bottom:0px;
-    left:0px;
 }
 
 .my-video-message {

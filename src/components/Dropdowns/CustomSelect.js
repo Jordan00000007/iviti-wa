@@ -137,6 +137,11 @@ const CustomSelect = forwardRef((props, ref) => {
 
                         },
                     },
+                    button: {
+                        sx: {
+                            overflow:'hidden',
+                        },
+                    },
 
 
                 }}

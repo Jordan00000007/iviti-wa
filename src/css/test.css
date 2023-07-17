@@ -1,0 +1,53 @@
+.example {
+    padding: 10px;
+    height: 200px;
+    width: 95%;
+    background-color: #1c87c9;
+}
+
+.example p {
+    visibility: hidden;
+    text-align: center;
+    color: #eeeeee;
+    font-size: 3em;
+}
+
+.example:-webkit-full-screen {
+    background-color: #8ebf42;
+    width: 100vw;
+    height: 100vh;
+}
+
+.example:-webkit-full-screen p {
+    visibility: visible;
+}
+
+.example:-moz-full-screen {
+    background-color: #8ebf42;
+    width: 100vw;
+    height: 100vh;
+}
+
+.example:-moz-full-screen p {
+    visibility: visible;
+}
+
+.example:-ms-fullscreen {
+    background-color: #8ebf42;
+    width: 100vw;
+    height: 100vh;
+}
+
+.example:-ms-fullscreen p {
+    visibility: visible;
+}
+
+.example:fullscreen {
+    background-color: #8ebf42;
+    width: 100vw;
+    height: 100vh;
+}
+
+.example:fullscreen p {
+    visibility: visible;
+}

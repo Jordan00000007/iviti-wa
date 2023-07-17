@@ -23,11 +23,14 @@ import { resetUpdateStatus } from "../store/areas";
 
 import { WebSocket } from '../components/Panel/WebSocket';
 
+import { FullScreen, useFullScreenHandle } from "react-full-screen";
+
 
 
 
 function AiInference() {
 
+    const handle = useFullScreenHandle();
 
     const [fps, setFps] = useState('N/A');
     const [liveTime, setLiveTime] = useState('0 day 0 hour 0 min');
@@ -122,10 +125,31 @@ function AiInference() {
     const handleVideoClick=()=>{
 
         log('handle video click')
-        setFullScreen(true);
-        // videoPanelRef.current.requestFullscreen();
+        //setFullScreen(true);
+        if ((playing)&&(!handle.active)){
+            handle.enter();
+        }
+        
+        //videoPanelRef.current.webkitRequestFullscreen();
 
     }
+
+    useEffect(() => {
+       
+        log('full screen?')
+        log(handle.active)
+
+        if (handle.active){
+            setFullScreen(true);
+        }else{
+            setFullScreen(false);
+        }
+        
+        
+
+
+
+    }, [handle]);
 
 
     useEffect(() => {
@@ -243,10 +267,13 @@ function AiInference() {
                                                             
                                                         }
                                                     </div>
+                                                    <FullScreen handle={handle}>
                                                     <div className={fullScreen?'my-area-a2':'my-area-a2 position-relative'} onChange={handleVideoClick} ref={videoPanelRef}>
                                                         <RemoteVideo uuid={params.uuid} status={myItem.status} onPlaying={handlePlaying} fullScreen={fullScreen} />
-                                                        <CustomDisplay uuid={myItem.source_uid} playing={playing} onClick={handleVideoClick}></CustomDisplay> 
+                                                        <CustomDisplay uuid={myItem.source_uid} playing={playing} onClick={handleVideoClick} fullScreen={fullScreen}></CustomDisplay> 
                                                     </div>
+                                                    </FullScreen>
+                                                    
                                                     <div className='my-area-a3'>
 
                                                     </div>
