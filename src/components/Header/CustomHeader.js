@@ -10,21 +10,17 @@ function CustomHeader() {
     const pathname = window.location.pathname;
 
     const [showComfirmBackModal, setShowComfirmBackModal] = useState(false);
-    const [homePage, setHomePage] = useState(true);
 
     const handleLogoClick = (event) => {
         log('Head Button clicked!');
         log('current path=' + pathname)
 
-
         if ((pathname.indexOf('addTask') >= 0)|| (pathname.indexOf('editTask') >= 0)) {
             log('show message')
             setShowComfirmBackModal(true);
-           
         }
         else{
             window.location.href="/";
-            
         }
         
     };
@@ -33,21 +29,6 @@ function CustomHeader() {
         window.location.href="/";
     }
 
-    useEffect(() => {
-
-        log('current path=' + pathname)
-
-        if ((pathname.indexOf('addTask') >= 0)|| (pathname.indexOf('editTask') >= 0)|| (pathname.indexOf('inference') >= 0)) {
-          
-            setHomePage(false);
-        }
-        else{
-           
-            setHomePage(true);
-        }
-     
-    }, [pathname]);
-
     return (
         <>
 
@@ -55,16 +36,7 @@ function CustomHeader() {
 
                 <div className="row p-0 g-0">
                     <div className="col-12 p-0">
-                          
-                        {
-                            (homePage)&&
-                            <a href="./"><Logo style={{ cursor: 'pointer' }} /></a>
-                        }
-                        {
-                            (!homePage)&&
-                            <Logo onClick={handleLogoClick} style={{ cursor: 'pointer' }} />
-                        }
-                        
+                        <Logo onClick={handleLogoClick} style={{ cursor: 'pointer' }} />
                     </div>
                 </div>
 
