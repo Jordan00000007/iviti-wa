@@ -258,6 +258,19 @@ const tasksSlice = createSlice({
             state.deleteMessage=action.payload;
             
         },
+        setTaskStatus(state,action){
+            log('reducer update task status....');
+            log(action.payload.source_uid);
+            log(action.payload.status);
+            log(action.payload.message);
+
+            const indexToUpdate = state.data.findIndex(item => item.source_uid === action.payload.source_uid);
+            state.data[indexToUpdate].status=action.payload.status;
+            state.data[indexToUpdate].apiError=action.payload.message;
+            state.data[indexToUpdate].apiSuccess='';
+
+
+        }
     },
     extraReducers: (builder) => {
 
@@ -549,5 +562,5 @@ const tasksSlice = createSlice({
 
 });
 export const tasksActions = tasksSlice.actions;
-export const { resetError,setTaskDeleteMessage } = tasksSlice.actions;
+export const { resetError,setTaskDeleteMessage,setTaskStatus } = tasksSlice.actions;
 export default tasksSlice.reducer;

@@ -18,7 +18,7 @@ import CustomTooltip from '../components/Tooltips/CustomTooltip';
 
 import { Link, useParams } from 'react-router-dom';
 import { useSelector, useDispatch } from "react-redux";
-import { fetchData, fetchTask, runTask, stopTask, addStream, deleteStream, deviceTemperature } from "../store/tasks";
+import { fetchData, fetchTask, runTask, stopTask, addStream, deleteStream, deviceTemperature,setTaskStatus } from "../store/tasks";
 import { resetUpdateStatus } from "../store/areas";
 
 import { WebSocket } from '../components/Panel/WebSocket';
@@ -74,7 +74,7 @@ function AiInference() {
     const setMessageOpen=(showType,showText)=>{
         setShowType(showType);
         setShowText(showText);
-        alertRef.current.setShowTrue();
+        alertRef.current.setShowTrue(3000);
        
     };
 
@@ -110,6 +110,19 @@ function AiInference() {
         setTemp(temp);
     }
 
+    const handleWebSocketError = (mySourceId,myType,myMsg) => {
+
+        setMessageOpen(1,myMsg);
+        
+        const myData={};
+        myData.source_uid=mySourceId;
+        myData.status=myType;
+        myData.message=myMsg;
+
+        dispatch(setTaskStatus(myData));
+        
+    }
+
     const handleEditClick=()=>{
 
         window.location.href=`/editTask/${params.uuid}/1`;
@@ -123,31 +136,22 @@ function AiInference() {
     }
 
     const handleVideoClick=()=>{
-
-        log('handle video click')
-        //setFullScreen(true);
+      
         if ((playing)&&(!handle.active)){
             handle.enter();
+        }else if (handle.active){
+            handle.exit();
         }
         
-        //videoPanelRef.current.webkitRequestFullscreen();
-
     }
 
     useEffect(() => {
        
-        log('full screen?')
-        log(handle.active)
-
         if (handle.active){
             setFullScreen(true);
         }else{
             setFullScreen(false);
         }
-        
-        
-
-
 
     }, [handle]);
 
@@ -359,7 +363,7 @@ function AiInference() {
                                                                     </div>
                                                                     <div className='my-area-b1-1  d-flex justify-content-between'>
                                                                         <div className='my-area-b1-1-1 roboto-b1'>
-                                                                            FPS
+                                                                            Inference FPS
                                                                         </div>
                                                                         <div className='my-area-b1-1-2 roboto-b1'>
                                                                             {((myItem.status==='run')&&(myItem.fps))?myItem.fps:"N/A"}
@@ -373,7 +377,7 @@ function AiInference() {
                                                         </div>
                                                         <div className="tab-pane fade" id="log" role="tabpanel" aria-labelledby="log-tab">
                                                             <div className='my-tab-container'>
-                                                                <WebSocket uuid={params.uuid} status={myItem.status} device={myItem.device} updateTemp={handleUpdateTemp}/>
+                                                                <WebSocket uuid={params.uuid} status={myItem.status} device={myItem.device} updateTemp={handleUpdateTemp} onError={handleWebSocketError} apiError={myItem.apiError}/>
                                                             </div>
                                                         </div>
                                                     </div>

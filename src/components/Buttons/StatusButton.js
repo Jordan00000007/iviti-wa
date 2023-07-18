@@ -111,6 +111,17 @@ const StatusButton = ({ name }) => {
             )
         }
 
+        if (name.toLowerCase().indexOf('err')>=0){
+            return (
+                <div className="my-tooltip-container" data-tooltip-id="my-tooltip-id" data-tooltip-content={name.replaceAll("_"," ")}>
+                    <button className="my-button-error">
+                        Error
+                    </button>
+                    <Tooltip id="my-tooltip-id" className="my-tooltip"/>
+                </div>
+            )
+        }
+
         if (name==="set_stream_stop_success"){
             return (
                 <div className="my-tooltip-container" data-tooltip-id="my-tooltip-id" data-tooltip-content={name.replaceAll("_"," ")}>

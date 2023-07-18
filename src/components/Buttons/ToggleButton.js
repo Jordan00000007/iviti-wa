@@ -30,7 +30,7 @@ const ToggleButton = forwardRef((props, ref) => {
 
         if (props.status==='run') setDisabled(false);
         if (props.status==='stop') setDisabled(false);
-        if (props.status.indexOf('error')>=0){
+        if (props.status.toLowerCase().indexOf('error')>=0){
             setDisabled(false);
             setIsChecked(false);
         } 

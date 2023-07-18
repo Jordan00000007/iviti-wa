@@ -141,6 +141,10 @@ const RemoteVideo = ({ uuid, status,onPlaying,fullScreen }) => {
             setVideoMessage('Stoping...');
             onPlaying(false);
         }
+        if (status.toLowerCase().indexOf('err') >=0) {
+            setVideoMessage('Something wrong with this AI task.');
+            onPlaying(false);
+        }
 
     }, [status]);
 
