@@ -66,8 +66,6 @@ export const getSourceFrame = createAsyncThunk('sources/getSourceFrame', async (
         if (response.status===200){
             const imageBlob = await response.blob();
             myData.blob=imageBlob;
-            log('myData')
-            log(myData)
             return myData;
         }else if (response.status===500){
             log('fetch source frame error...')
@@ -177,7 +175,7 @@ const sourcesSlice = createSlice({
                 if (action.payload.status_code === 200) {
 
                     log('--- upload source data fulfilled  ---')
-                    log(action.payload.data)
+                    //log(action.payload.data)
                    
                     state.data = action.payload.data;
                     state.uid = action.payload.data.uid;
@@ -307,23 +305,36 @@ const sourcesSlice = createSlice({
             getSourceWidthHeight.fulfilled,
             (state, action) => {
 
-                
                 const myData=action.payload.data;
 
-                log('get source info success')
+                if (action.payload.status_code === 200) {
+
+                    log('get source width height success')
+
+                    myData.forEach(function (item, idx) {
                 
-                myData.forEach(function (item, idx) {
-                
-                    if (item.uid===state.uid){
-                        log(item)
-                        state.originWidth=parseInt(item.width);
-                        state.originHeight=parseInt(item.height);
-                        state.type=item.type.toUpperCase();
-                        state.fileName=item.name;
-                        
-                    }
-                })
-                state.sizeStatus = 'success';
+                        if (item.uid===state.uid){
+                           
+                            state.originWidth=parseInt(item.width);
+                            state.originHeight=parseInt(item.height);
+                            state.type=item.type.toUpperCase();
+                            state.fileName=item.name;
+                            
+                        }
+                    })
+                    state.sizeStatus='success';
+
+                }else if(action.payload.status_code === 500){
+
+                    log(action.payload.message);
+                    state.sizeMessage = action.payload.message;
+                    state.sizeStatus='error';
+
+                } else {
+                    //return updateTaskStatus(state,action.meta.arg,'set_stream_delete_error');
+                   
+                    state.sizeStatus='error';
+                }
             }
         )
         builder.addCase(

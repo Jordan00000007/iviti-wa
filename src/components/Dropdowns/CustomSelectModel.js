@@ -191,6 +191,7 @@ const CustomSelectModel = forwardRef((props, ref) => {
                         border: "1px solid #979CB5",
                         backgroundColor: "var(--base_2)",
                     },
+                    '--Select-placeholderOpacity': 0.31,
 
                 }}
                 ref={ref}
@@ -251,7 +252,7 @@ const CustomSelectModel = forwardRef((props, ref) => {
                         {item[1]}
 
                         {
-                            ((item[1]!=='yolo-v3-tf')&&(item[1]!=='resnet-v1'))&&
+                            ((item[1]!=='yolo-v3-tf')&&(item[1]!=='resnet-v1')&&(item[1]!=='yolov4-tiny-416')&&(item[1]!=='resnet34')&&(item[1]!=='yolov4-416'))&&
                             <Chip
                                 size="sm"
                                 variant="outlined"

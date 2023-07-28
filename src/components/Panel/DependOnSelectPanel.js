@@ -6,8 +6,8 @@ import LabelButton from '../../components/Buttons/LabelButton';
 import CustomInput from '../../components/Inputs/CustomInput';
 import DependOnItem from '../../components/Panel/DependOnItem';
 import DependOnCheckSum from '../../components/Panel/DependOnCheckSum';
-
 import { toggleSelectAll,toggleDependOnItem } from "../../store/areas";
+
 
 const DependOnSelectPanel = forwardRef((props, ref) => {
 
@@ -25,6 +25,8 @@ const DependOnSelectPanel = forwardRef((props, ref) => {
 
     const areaDependOn = useSelector((state) => state.areas.areaDependOn);
     const areaEditingIndex = useSelector((state) => state.areas.areaEditingIndex);
+
+    const dependOnItemRef=useRef(null);
 
     const handleToggleSelectAll = () => {
      
@@ -69,6 +71,12 @@ const DependOnSelectPanel = forwardRef((props, ref) => {
        
     }
 
+    const handleScrolling=(event)=>{
+        dependOnItemRef.current.setClosePalette();
+    }
+
+  
+
     return (
         <>
             <div className="row ">
@@ -87,13 +95,15 @@ const DependOnSelectPanel = forwardRef((props, ref) => {
             <hr className="my-divider" style={{ marginTop: 13, marginBottom: 4 }} />
 
             <div className="row">
-                <div className="col-12" style={{maxHeight:props.basicType?(props.linePanel?264:400)+16:(props.linePanel?264:400),minHeight:props.basicType?(props.linePanel?264:400)+16:(props.linePanel?264:400),overflowY:'auto',overflowX:'hidden'}}>
-
+            
+                <div className="col-12" onScroll={handleScrolling} style={{maxHeight:props.basicType?(props.linePanel?264:400)+16:(props.linePanel?264:400),minHeight:props.basicType?(props.linePanel?264:400)+16:(props.linePanel?264:400),overflowY:'auto',overflowX:'hidden'}}>
+               
                     {areaDependOn[areaEditingIndex].map((item, idx) => (
-                        <DependOnItem data={item} key={idx} index={idx} onClick={handleToggleCheckBox} onColorChange={handleColorChange}/>
+                        <DependOnItem data={item} key={idx} index={idx} onClick={handleToggleCheckBox} onColorChange={handleColorChange} ref={dependOnItemRef}/>
                     ))}
 
                 </div>
+               
             </div>
 
         </>

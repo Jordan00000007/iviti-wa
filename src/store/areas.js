@@ -3,7 +3,7 @@ import update from 'react-addons-update';
 import log from "../utils/console";
 import moment from 'moment';
 import palette from '../utils/palette.json';
-import { cloneDeep } from 'lodash-es';
+import { cloneDeep,max } from 'lodash-es';
 
 
 
@@ -61,8 +61,8 @@ const areasSlice = createSlice({
         lineRelationArr:[['','']], 
         lineRelationArrPast:[['','']], 
 
-        areaDependOn: [[{ "name": "name", "checked": true, "key": 0, "color": "white" }]], 
-        areaDependOnPast: [[{ "name": "name", "checked": true, "key": 0, "color": "white" }]], 
+        areaDependOn: [[{ "name": "", "checked": false, "key": 0, "color": "white" }]], 
+        areaDependOnPast: [[{ "name": "", "checked": false, "key": 0, "color": "white" }]], 
 
 
         areaEditingIndex: 0, 
@@ -161,10 +161,22 @@ const areasSlice = createSlice({
         areaInsert(state, action) {
             log('area create')
             log(action.payload)
+
+            // find new number
+            let numArr=[];
+            state.areaNameArr.forEach((item, idx) => {
+                if (item[1].toLowerCase().indexOf('area ')>=0){
+                    numArr.push(parseInt(item[1].replace(/\D/g, '')));
+                }
+            })
+            // log('---  numArr ---')
+            // log(numArr)
+            // log(max(numArr))
+
             const currentLength = state.areaNameArr.length;
            
-            const newName=state.areaMaxNumber;
-            state.areaMaxNumber=state.areaMaxNumber+1;
+            const newName=(max(numArr)+1).toString();
+            state.areaMaxNumber=max(numArr)+1;
   
             const sampleDependOn = state.areaDependOn[0];
            
@@ -182,8 +194,8 @@ const areasSlice = createSlice({
             state.areaShapeArr.push(action.payload);
             state.linePointArr.push([[],[]]);
             state.lineRelationArr.push(['','']);
-            state.areaNameArr.push([currentLength, `Area ${newName + 1}`]);
-            state.lineNameArr.push([`Line ${newName + 1}A`,`Line ${newName + 1}B`]);
+            state.areaNameArr.push([currentLength, `Area ${newName}`]);
+            state.lineNameArr.push([`Line ${newName}A`,`Line ${newName}B`]);
 
             state.areaEditingIndex = currentLength;
         },
@@ -361,21 +373,10 @@ const areasSlice = createSlice({
             state.selectedApplication=action.payload.applicationName;
         },
         updateLabelColor(state,action){
-            log('update label color')
-           
-            const {name,color}=action.payload
-        
-            log(state.areaDependOn)
-
+            const {color,key}=action.payload;
             state.areaDependOn.forEach(function(item){
-                item.forEach(function(item2){
-                    log(item2)
-                    log('------')
-                    if (item2.name===name) item2.color=color;
-                });
+                item[key].color=color;
             });
-
-
         },
     },
     extraReducers: (builder) => {
@@ -386,13 +387,10 @@ const areasSlice = createSlice({
         (state, action) => {
           
             log('--- get app setting fulfilled ---')
-            log(action.payload)
-            log(action.payload.data[0].app_setting.application.palette)
+           
             const myPalette=action.payload.data[0].app_setting.application.palette;
           
 
-            log('----------------------------')
-           
             state.selectedApplication=action.payload.data[0].name;
 
             const modelType=action.payload.data[0].type

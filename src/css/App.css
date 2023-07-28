@@ -14,6 +14,7 @@
 
 div::-webkit-scrollbar {
     width: 6px;
+    height: 6px;
 }
 
 div::-webkit-scrollbar-track {
@@ -45,6 +46,21 @@ div::-webkit-scrollbar-thumb {
     background: rgb(224, 225, 230);
     border-radius: 10px;
 }
+
+.my-color-box{
+    width: 20px;
+    height: 20px; 
+    border-radius: 6px;
+    cursor: pointer;
+    position: relative;
+    /* background-image: url('../../src/assets/Icon_Edit.svg'); */
+}
+
+/* .my-color-box:hover{
+    width: 25px;
+    height: 25px; 
+    background-image: url('../../src/assets/Icon_Edit.svg');
+} */
 
 .App {
     text-align: center;
@@ -768,14 +784,14 @@ body{
  }
 
 .my-label-button-select {
-    background-color: var(--bg_gray);
+    background-color: #16272e12;
     border-radius: 100px;
     border: 0px;
     padding-top: 2px;
 }
 
 .my-label-button-select:hover {
-    background-color: #D1D2D4;;
+    background-color: #16272e24;
 }
 
 
@@ -789,15 +805,6 @@ body{
     border: 1px solid var(--on_color_2) !important;
 
 }
-
-
-
-/* 
-.css-19sovsq-JoySelect-button{
-    opacity: 0.2!important;
-    color:red;
-} */
-
 
 /* .my-source-input-text:focus + .my-source-input-tag {
    border-left: 0px !important;
@@ -959,13 +966,6 @@ body{
     color: #16272E50 !important; 
     
 }
-
-.css-63sa2y-JoySelect-button {
-    opacity: 0.31 !important; 
-    border-radius: 12px!important;   
-   
-}
-
 
 .MuiModal-backdrop{
     backdrop-filter: blur(0px)!important;   
@@ -1388,19 +1388,6 @@ input:checked+.my-toggle-slider:before {
 
 .my-video-player {
     background-color: var(--stream_empty);
-    width:841px;
-    height:604px;
-   
-}
-
-.my-video-player-full {
-    background-color: var(--stream_empty);
-    object-fit: cover;
-    position: 'absolute';
-    top: 0px;
-    left: 0px;
-    bottom:0px;
-    left:0px;
 }
 
 .my-video-message {

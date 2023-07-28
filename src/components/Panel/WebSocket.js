@@ -60,6 +60,14 @@ export const WebSocket = (props) => {
                         
                        
                     }
+                    if (myData.type.toLowerCase().indexOf('err')>=0){
+
+                        log('ws error')
+                        log(myData)
+                        log(myData.data.source_uid)
+                       
+                        props.onError(myData.data.source_uid,myData.type,myData.message);
+                    }
                 }
         }
     }, [lastMessage]);
@@ -116,7 +124,7 @@ export const WebSocket = (props) => {
 
     return (
         <div>
-            <LogPanel data={messageHistory} status={props.status} /> 
+            <LogPanel data={messageHistory} status={props.status} apiError={props.apiError}/> 
         </div>
     );
 };

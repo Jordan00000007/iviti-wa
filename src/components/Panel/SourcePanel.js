@@ -4,13 +4,14 @@ import CustomButton from '../../components/Buttons/CustomButton';
 import LabelButton from '../../components/Buttons/LabelButton';
 import CustomLoadingSmall from '../../components/Loading/CustomLoadingSmall';
 import RtspInput from '../../components/Inputs/RtspInput';
-import CustomSelect from '../../components/Dropdowns/CustomSelect';
+import CustomSelectDevice from '../../components/Dropdowns/CustomSelectDevice';
 import { uploadSourceData, getV4l2Devices, resetErrorMessage, resetFileName,resetV4l2Status } from "../../store/sources";
 
 import { useSelector, useDispatch } from "react-redux";
 import CustomAlertSmall from '../../components/Alerts/CustomAlertSmall';
 import CustomInput from '../Inputs/CustomInput';
 
+import { includes } from 'lodash-es';
 
 const SourcePanel = (props) => {
 
@@ -71,17 +72,41 @@ const SourcePanel = (props) => {
 
     const handleFileChange = (e) => {
         log('file change');
+        log(e.target.files)
 
         if (e.target.files) {
 
             dispatch(resetFileName());
 
-            const file = e.target.files[0];
-            const formData = new FormData();
-            formData.append('files', e.target.files[0]);
-            dispatch(uploadSourceData(formData))
+            const fileName = e.target.files[0].name;
 
-            setUploadLoading(true);
+            const fileExtension = fileName.toString().split('.').pop().toLowerCase();
+
+            const supportType=['jpg','jpeg','png','tiff','tif','bmp','mp4','avi','mov','wmv'];
+
+            log('fileName')
+            log(fileName)
+
+            log('fileExtension')
+            log(fileExtension)
+
+            log('support?')
+            log()
+
+            if (includes(supportType,fileExtension)){
+                const formData = new FormData();
+                formData.append('files', e.target.files[0]);
+                dispatch(uploadSourceData(formData))
+                setUploadLoading(true);
+            }else{
+                setShowType(1);
+                setShowText('Not support file type.');
+                setShowInterval(3000);
+                alertRef.current.setShowTrue();
+            }
+
+
+           
 
         }
 
@@ -260,7 +285,7 @@ const SourcePanel = (props) => {
                                             typeV4L2 &&
                                             <div className="row ">
                                                 <div className="col-12 d-flex justify-content-between">
-                                                    <CustomSelect areaArr={v4l2Options} width="395" height="32" fontSize="16" placeHolder={true} onChange={handleV4l2Selected} ref={v4l2SelectorRef} ></CustomSelect>
+                                                    <CustomSelectDevice areaArr={v4l2Options} width="395" height="32" fontSize="16" placeHolder={true} onChange={handleV4l2Selected} ref={v4l2SelectorRef} ></CustomSelectDevice>
                                                 </div>
                                             </div>
 
@@ -312,7 +337,7 @@ const SourcePanel = (props) => {
                                 <div className="row">
                                     <div className="col-12 d-flex justify-content-center align-items-center" style={{ height: '0px' }}>
 
-                                        <input type="file" name="files" onChange={handleFileChange} ref={fileRef} style={{ visibility: 'hidden' }} />
+                                        <input type="file" name="files" onChange={handleFileChange} ref={fileRef} style={{ visibility: 'hidden' }} accept=".jpg,.jpeg,.png,.tiff,.tif,.bmp,.mp4,.avi,.mov,.wmv"/>
 
                                     </div>
                                 </div>

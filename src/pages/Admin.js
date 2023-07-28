@@ -1,6 +1,8 @@
 import SimpleLayout from '../components/Layouts/SimpleLayout';
 import CustomButton from '../components/Buttons/CustomButton';
 import ColorPicker from '../components/ColorPicker/ColorPicker';
+
+
 import { Link } from 'react-router-dom';
 const TASK_SERVER = process.env.REACT_APP_TASK_SERVER;
 const STREAM_SERVER = process.env.REACT_APP_STREAM_SERVER;
@@ -33,26 +35,36 @@ function Admin() {
                                 <div className="row p-1 gy-0">
                                     <div className="col-4 roboto-h4 mb-2 ">
                                         Task Server
-                                    </div>  
+                                    </div>
                                     <div className="col-8 roboto-h4 mb-2 ">
-                                        <div class="input-group mb-3">
-                                            <input type="text" class="form-control" value={TASK_SERVER} disabled="true"/>
+                                        <div className="input-group mb-3">
+                                            <input type="text" className="form-control" value={TASK_SERVER} disabled={true} />
                                         </div>
-                                    </div>  
-                                </div>  
+                                    </div>
+                                </div>
                                 <div className="row p-1 gy-0">
                                     <div className="col-4 roboto-h4 mb-2 ">
                                         Stream Server
-                                    </div>  
+                                    </div>
                                     <div className="col-8 roboto-h4 mb-2 ">
-                                        <div class="input-group mb-3">
-                                            <input type="text" class="form-control" value={STREAM_SERVER} disabled="true"/>
+                                        <div className="input-group mb-3">
+                                            <input type="text" className="form-control" value={STREAM_SERVER} disabled={true} />
                                         </div>
-                                    </div>  
-                                </div>  
-                            </div>  
+                                    </div>
+                                </div>
+
+                            </div>
                         </div>
                     </div>
+
+                   
+
+                    <div className="row p-1 gy-0">
+                        <div className="col-8 roboto-h4 mb-2 ">
+                           
+                        </div>
+                    </div>
+
                 </div>
             </div>
         </SimpleLayout>

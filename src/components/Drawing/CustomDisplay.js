@@ -141,9 +141,14 @@ const CustomDisplay = (props) => {
     useEffect(() => {
         if (sizeStatus === 'success') {
 
-            dispatch(setDrawWidthHeight({ "maxWidth": 839, "maxHeight": 604 }));
+            if (props.fullScreen){
+                dispatch(setDrawWidthHeight({ "maxWidth": window.innerWidth, "maxHeight": window.innerHeight }));
+            }else{
+                dispatch(setDrawWidthHeight({ "maxWidth": 839, "maxHeight": 604 }));
+            }
+            
         }
-    }, [sizeStatus]);
+    }, [sizeStatus,props.fullScreen]);
 
 
     useEffect(() => {
@@ -156,8 +161,6 @@ const CustomDisplay = (props) => {
             let myLineNameArr = [];
             let myLinePointArr = [];
             applicationAreas.forEach(function (item, idx) {
-
-                log(item)
 
                 //-----------------------------------------
                 myAreaNameArr.push(item.name);

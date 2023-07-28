@@ -7,7 +7,10 @@ import UndoAlert from '../components/Alerts/UndoAlert';
 import ProgressAlert from '../components/Alerts/ProgressAlert';
 import DrawingTooltip from '../components/Tooltips/DrawingTooltip';
 
-import ColorPicker from '../components/ColorPicker/ColorPicker';
+
+import ColorfulPicker from '../components/ColorPicker/ColorfulPicker';
+
+import VsColorPicker from '../components/ColorPicker/VsColorPicker';
 
 import CustomInput from '../components/Inputs/CustomInput';
 import LinePanel from '../components/Panel/LinePanel';
@@ -451,7 +454,10 @@ function EditAiTask() {
 
                 if (value.toLowerCase().indexOf("basic") >= 0) {
                     setBasicType(true);
-                    dispatch(getSourceFrame({ "fileUid": fileUid, "basicType": true }));
+                    if (fileUid!==''){
+                        dispatch(getSourceFrame({ "fileUid": fileUid, "basicType": true }));
+                    }
+                    
                 } else {
                     setBasicType(false);
 
@@ -880,6 +886,10 @@ function EditAiTask() {
 
         e.preventDefault();
 
+
+        log('enter key?')
+        log(e.code)
+
         if (e.code === 'KeyS') {
 
             setMode('select');
@@ -931,6 +941,9 @@ function EditAiTask() {
         if (sourceMenu){
             sourceRef.current.setButtonClick();
         };
+
+        // log('body click')
+        // log(event.target)
     
     };
 
@@ -1075,11 +1088,6 @@ function EditAiTask() {
     }, [deviceStatus]);
 
     useEffect(() => {
-
-
-        log('delete ----')
-        log(areaDeleteStatus)
-        log(areaDeleteMessage)
 
         if (areaDeleteMessage !== '') {
            
@@ -1860,7 +1868,9 @@ function EditAiTask() {
                         <div className='row'>
                         <div className='col-12 d-flex justify-content-start' style={{padding:0}}>
                         
-                            <ColorPicker defaultValue={color} ref={colorRef}/>
+                           
+
+                            <ColorfulPicker defaultValue={color} ref={colorRef}/>
                         
                         </div>
                         </div>

@@ -104,6 +104,7 @@ const CustomSelect = forwardRef((props, ref) => {
                     paddingleft: 5,
                     minHeight: parseInt(props.height),
                     borderRadius: 6,
+                    
                     [`& .${selectClasses.indicator}`]: {
                         transition: '0.2s',
                         [`&.${selectClasses.expanded}`]: {
@@ -114,6 +115,7 @@ const CustomSelect = forwardRef((props, ref) => {
                         border: "1px solid #979CB5",
                         backgroundColor: "var(--base_2)",
                     },
+                    '--Select-placeholderOpacity': 0.31,
 
 
 
@@ -125,7 +127,11 @@ const CustomSelect = forwardRef((props, ref) => {
                 onListboxOpenChange={handleListBoxChange.bind(this)}
 
                 slotProps={{
-
+                    // root:{
+                    //     sx: {
+                    //         textOverflow: 'ellipsis',
+                    //     }
+                    // },
 
                     listbox: {
                         sx: {
@@ -134,7 +140,20 @@ const CustomSelect = forwardRef((props, ref) => {
                             backgroundColor: '#FAFAFD!important',
                             // '--List-padding': '0px',
                             maxHeight: parseInt(props.height) * 5,
-
+                            
+                            
+                        },
+                        placement: 'bottom-start',
+                    },
+                    button: {
+                        sx: {
+                            overflow:'hidden',
+                            textOverflow: 'ellipsis',
+                            maxWidth:188,
+                            display: 'inline-block',   
+                            whiteSpace: 'nowrap',
+                            textAlign:'left',
+                            
                         },
                     },
 

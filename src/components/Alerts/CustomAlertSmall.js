@@ -27,6 +27,7 @@ import { ReactComponent as IconLoading } from '../../assets/Feedback_Icon_Loadin
 const CustomAlertSmall = forwardRef((props, ref) => {
 
     const [show, setShow] = useState(false);
+    const [interval, setInterval] = useState(3000);
   
     const containerRef = React.useRef(null);
 
@@ -35,8 +36,19 @@ const CustomAlertSmall = forwardRef((props, ref) => {
 
 
     useImperativeHandle(ref, () => ({
-        setShowTrue: () => {
+        setShowTrue: (myInterval) => {
             setShow(true);
+            if (myInterval===undefined) myInterval=interval;
+            setTimeout(() => {
+                setShow(false);
+               
+            }, myInterval); 
+        },
+        setShowKeep: () => {
+            setShow(true);
+        },
+        setShowClose: () => {
+            setShow(false);
         }
     }));
 

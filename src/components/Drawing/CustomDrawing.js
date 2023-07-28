@@ -151,14 +151,6 @@ const CustomDrawing = forwardRef((props, ref) => {
 
     }, [props]);
 
-
-    useEffect(() => {
-        log('--- data change ---')
-        // log(areaNameArr)
-        // log(areaShapeArr)
-        // log(areaDependOn)
-    }, [areaNameArr,areaShapeArr,areaDependOn]);
-
   
     return (
         <div style={{width:(props.basicType)?854:800,height:558,background:'var(--stream_empty)'}}  className="d-flex align-items-center justify-content-center">

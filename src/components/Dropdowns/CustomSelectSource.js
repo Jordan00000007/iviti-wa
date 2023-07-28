@@ -1,4 +1,5 @@
-import React, { useState, useEffect,useRef,useImperativeHandle,forwardRef } from 'react'
+import React, { useState, useEffect,useRef,useImperativeHandle,forwardRef } from 'react';
+import { useSelector, useDispatch } from "react-redux";
 import { extendTheme, CssVarsProvider } from '@mui/joy/styles';
 import Select, { selectClasses } from '@mui/joy/Select';
 import Option from '@mui/joy/Option';
@@ -17,6 +18,8 @@ const CustomSelectSource = forwardRef((props, ref) => {
 
     const [placeHolder, setPlaceHolder] = useState(props.placeHolder);
     const [expandSourceMenu, setExpandSourceMenu] = useState(true);
+
+    const uploadStatus = useSelector((state) => state.sources.uploadStatus);
 
     const buttonRef = useRef(null);
    
@@ -42,10 +45,10 @@ const CustomSelectSource = forwardRef((props, ref) => {
     //handleSourceMenuClick
 
     const handleSourceMenuClick = (event, value) => {
-
-        expandSourceMenu?setExpandSourceMenu(false):setExpandSourceMenu(true);
-        props.onListboxOpenChange(expandSourceMenu);
-        log('set source menu click')
+        if (uploadStatus!=='loading'){
+            expandSourceMenu?setExpandSourceMenu(false):setExpandSourceMenu(true);
+            props.onListboxOpenChange(expandSourceMenu);
+        }
     };
 
     useEffect(() => {
