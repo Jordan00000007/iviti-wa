@@ -159,6 +159,28 @@ const SourcePanel = (props) => {
         event.stopPropagation();
     }
 
+    const handleV4l2Click= (event) => {
+
+        log('handle v4l2 click')
+        v4l2SelectorRef.current.setSelectedValue('');
+        dispatch(getV4l2Devices())
+    }
+
+
+ 
+    useEffect(() => {
+
+        log('cameraLoading')
+        log(cameraLoading)
+        log(uploadRef.current.disabled)
+
+        log('uploadLoading')
+        log(uploadLoading)
+
+
+    }, [cameraLoading,uploadLoading]);
+    
+
 
     useEffect(() => {
 
@@ -252,10 +274,10 @@ const SourcePanel = (props) => {
                 <div style={{ position: 'absolute', width: 499, top: 0 }}>
                     <ul className="nav nav-tabs flex-nowrap" id="myTab" role="tablist">
                         <li className="nav-item" role="presentation">
-                            <button className="my-nav-link-s active roboto-b1" id="info-tab" data-bs-toggle="tab" data-bs-target="#info" type="button" role="tab" aria-controls="info" aria-selected="true" ref={cameraRef}>Camera</button>
+                            <button className="my-nav-link-s active roboto-b1" id="info-tab" data-bs-toggle="tab" data-bs-target="#info" type="button" role="tab" aria-controls="info" aria-selected="true" ref={cameraRef} disabled={uploadLoading}>Camera</button>
                         </li>
                         <li className="nav-item" role="presentation">
-                            <button className="my-nav-link-s roboto-b1" id="log-tab" data-bs-toggle="tab" data-bs-target="#log" type="button" role="tab" aria-controls="log" aria-selected="false" ref={uploadRef}>Upload</button>
+                            <button className="my-nav-link-s roboto-b1" id="log-tab" data-bs-toggle="tab" data-bs-target="#log" type="button" role="tab" aria-controls="log" aria-selected="false" ref={uploadRef} disabled={cameraLoading}>Upload</button>
                         </li>
                     </ul>
                     <div className="tab-content" id="myTabContent">
@@ -285,7 +307,7 @@ const SourcePanel = (props) => {
                                             typeV4L2 &&
                                             <div className="row ">
                                                 <div className="col-12 d-flex justify-content-between">
-                                                    <CustomSelectDevice areaArr={v4l2Options} width="395" height="32" fontSize="16" placeHolder={true} onChange={handleV4l2Selected} ref={v4l2SelectorRef} ></CustomSelectDevice>
+                                                    <CustomSelectDevice areaArr={v4l2Options} width="395" height="32" fontSize="16" placeHolder={true} onChange={handleV4l2Selected} ref={v4l2SelectorRef} onClick={handleV4l2Click} ></CustomSelectDevice>
                                                 </div>
                                             </div>
 

@@ -6,6 +6,7 @@ import CustomAlert from '../components/Alerts/CustomAlert';
 import UndoAlert from '../components/Alerts/UndoAlert';
 import ProgressAlert from '../components/Alerts/ProgressAlert';
 import DrawingTooltip from '../components/Tooltips/DrawingTooltip';
+import CustomTooltip from '../components/Tooltips/CustomTooltip';
 
 
 import ColorfulPicker from '../components/ColorPicker/ColorfulPicker';
@@ -275,6 +276,7 @@ function EditAiTask() {
 
     const uploadStatus = useSelector((state) => state.sources.uploadStatus);
     const frameStatus = useSelector((state) => state.sources.frameStatus);
+    const frameMessage = useSelector((state) => state.sources.frameMessage);
     const sizeStatus = useSelector((state) => state.sources.sizeStatus);
     const taskSourceType = useSelector((state) => state.sources.type);
 
@@ -1338,7 +1340,9 @@ function EditAiTask() {
         if ((frameStatus === 'error')) {
             setShowAppSetting(false);
             setShowLoadingModal(false);
-            setMessageOpen(1, 'Fetch source frame error.');
+            setMessageOpen(1, frameMessage);
+            setSourceContent('');
+            setShowAppSetting(false);
         }
 
 
@@ -1438,8 +1442,13 @@ function EditAiTask() {
 
                             {
                                 (taskUid !== '') &&
-                                <div className="my-body-title roboto-h2">
-                                    Edit {taskName}
+                                <div className="my-body-title roboto-h2 d-flex flex-row gap-2">
+                                    Edit 
+                                    <div >
+                                        <CustomTooltip customClassName="my-task-name-title">
+                                        {taskName}
+                                        </CustomTooltip>    
+                                    </div>
                                 </div>
                             }
 
@@ -1692,7 +1701,7 @@ function EditAiTask() {
                     }
 
                     {
-                        ((!showAppSetting) && (taskUid === '')) &&
+                        (!showAppSetting) &&
                         <div className='roboto-b1' style={{ color: 'var(--on_color_2)', padding: '0px 8px' }}>
                             Please complete general section first.
                         </div>

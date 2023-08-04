@@ -11,7 +11,7 @@ const DrawingTooltip = ({ children, title }) => {
             title={
                 <Box sx={{ display: 'flex', gap: 1, width: '100%', mt: 0, backgroundColor: 'transparent', height: '28px' }}>
 
-                    <Chip color="var(--base_2)" sx={{ ml: 0, mt: 0, fontSize: '15px', padding: 0, height: '20px', lineHeight: '20px' }}>
+                    <Chip color="var(--base_2)" sx={{ ml: 0, mt: 0, fontSize: '15px', padding: 0, height: '20px', lineHeight: '20px',backgroundColor:'transparent',color:'white' }}>
                         {title}
                     </Chip>
 

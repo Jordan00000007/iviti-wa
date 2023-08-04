@@ -110,17 +110,23 @@ function AiInference() {
         setTemp(temp);
     }
 
-    const handleWebSocketError = (mySourceId,myType,myMsg) => {
 
-        setMessageOpen(1,myMsg);
-        
-        const myData={};
-        myData.source_uid=mySourceId;
-        myData.status=myType;
-        myData.message=myMsg;
+    const handleWebSocketError = (myType, myMsg) => {
+
+        log('------------------')
+        log(myType)
+        log(myMsg)
+
+
+        setMessageOpen(1, myMsg);
+
+        const myData = {};
+        myData.task_uid = params.uuid;
+        myData.status = myType;
+        myData.message = myMsg;
 
         dispatch(setTaskStatus(myData));
-        
+    
     }
 
     const handleEditClick=()=>{
@@ -229,9 +235,9 @@ function AiInference() {
                                         </Link>
                                     </div>
 
-                                    <div className="my-body-title roboto-h2">
+                                    <CustomTooltip customClassName="my-body-title roboto-h2">
                                         {(myItem.task_name) ? myItem.task_name : ""}
-                                    </div>
+                                    </CustomTooltip>
 
                                     <div className='d-flex justify-content-start align-items-center'>
                                         <ToggleButton onChange={handleToggleChange} status={myItem.status} />
@@ -239,9 +245,10 @@ function AiInference() {
                                 </div>
                                
                                 {
-                                    (myItem.status === 'stop')&&
-                                    <CustomButton name="edit" onClick={handleEditClick} width="100"/>
+                                    ((myItem.status === 'stop')||(myItem.status.toLowerCase().indexOf('error')>=0)) &&
+                                    <CustomButton name="edit" onClick={handleEditClick} width="100" />
                                 }
+
                                     
                             
                             </div>

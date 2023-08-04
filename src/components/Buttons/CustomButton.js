@@ -77,11 +77,20 @@ const CustomButton = (props) => {
         }
 
         if (props.name==="save"){
-            return (
-                <button onClick={props.onClick} className="my-button-submit">
-                    Save
-                </button>
-            )
+           
+            if (props.disabled){
+                return (
+                    <button className="my-button-disable">
+                        Save
+                    </button>
+                )
+            }else{
+                return (
+                    <button onClick={props.onClick} className="my-button-submit">
+                        Save
+                    </button>
+                )
+            }
         }
 
         if (props.name==="delete"){

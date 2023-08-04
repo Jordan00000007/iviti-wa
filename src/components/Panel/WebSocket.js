@@ -64,9 +64,9 @@ export const WebSocket = (props) => {
 
                         log('ws error')
                         log(myData)
-                        log(myData.data.source_uid)
+                     
                        
-                        props.onError(myData.data.source_uid,myData.type,myData.message);
+                        props.onError(myData.type,myData.message);
                     }
                 }
         }

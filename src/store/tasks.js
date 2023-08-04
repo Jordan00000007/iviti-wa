@@ -260,11 +260,11 @@ const tasksSlice = createSlice({
         },
         setTaskStatus(state,action){
             log('reducer update task status....');
-            log(action.payload.source_uid);
+            log(action.payload.task_uid);
             log(action.payload.status);
             log(action.payload.message);
 
-            const indexToUpdate = state.data.findIndex(item => item.source_uid === action.payload.source_uid);
+            const indexToUpdate = state.data.findIndex(item => item.task_uid === action.payload.task_uid);
             state.data[indexToUpdate].status=action.payload.status;
             state.data[indexToUpdate].apiError=action.payload.message;
             state.data[indexToUpdate].apiSuccess='';

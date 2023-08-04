@@ -124,6 +124,7 @@ const CustomSelectDevice = forwardRef((props, ref) => {
                 defaultValue={placeHolder ? "" : props.defaultValue}
                 value={selectedValue}
                 onChange={handleSelectChange}
+                onClick={props.onClick}
                 onListboxOpenChange={handleListBoxChange.bind(this)}
 
                 slotProps={{

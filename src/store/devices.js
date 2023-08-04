@@ -31,6 +31,7 @@ const devicesSlice = createSlice({
 
                 if (action.payload.status_code===200){
                     let myData=[];
+                    //let myData=[['aaaaaaaaaaaaaaaaaaaaaaaaaaaaa','aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa']];
                     Object.keys(action.payload.data).map((e, i) => {
                         myData.push([action.payload.data[e].uid,action.payload.data[e].uid])
                     })

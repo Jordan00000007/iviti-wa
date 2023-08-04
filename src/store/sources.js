@@ -4,6 +4,7 @@ import log from "../utils/console";
 import axios from "axios";
 import moment from 'moment';
 import { Buffer } from 'buffer';
+import { sort,orderBy } from 'lodash-es';
 
 
 const TASK_SERVER = process.env.REACT_APP_TASK_SERVER;
@@ -62,18 +63,23 @@ export const getSourceFrame = createAsyncThunk('sources/getSourceFrame', async (
             body: JSON.stringify(myData),
         });
         log('response...')
-        log(response.status)
+        log(response)
         if (response.status===200){
             const imageBlob = await response.blob();
+            myData.status_code=200;
             myData.blob=imageBlob;
             return myData;
         }else if (response.status===500){
             log('fetch source frame error...')
-            log(response)
-            return 'error';
+            const json = await response.json();
+            myData.status_code=500;
+            myData.message=json.message;
+            return myData;
         }else{
             log('fetch source frame unknow error...')
-            return 'error';
+            myData.status_code=500;
+            myData.message='Unknow error';
+            return myData;
         }
        
         
@@ -216,6 +222,7 @@ const sourcesSlice = createSlice({
             getV4l2Devices.fulfilled,
             (state, action) => {
 
+
                 if (action.payload.status_code === 200) {
 
                     log('--- get v4l2 fulfilled  ---')
@@ -223,11 +230,21 @@ const sourcesSlice = createSlice({
 
                     state.v4l2Data = action.payload.data;
                     state.status = 'success';
-                    let myData = [];
+                    //let myData = [];
+                    let myData=[['/dev/video999','/dev/video999'],['/dev/video10','/dev/video10'],['/dev/video4','/dev/video4']];
                     Object.keys(action.payload.data).map((e, i) => {
                         myData.push([action.payload.data[e], action.payload.data[e]])
                     })
-                    state.v4l2Options = myData;
+
+                    myData.forEach(element => {
+                        element.push(parseInt(element[0].match(/\d+$/)[0]));
+                    });
+                    myData=orderBy(myData,[2]);
+                    const mySortData = myData.map(function(item){
+                        return item.splice(0,2);
+                    });
+                    
+                    state.v4l2Options = mySortData;
                     state.v4l2Status='success';
                 }else if(action.payload.status_code === 500){
 
@@ -240,6 +257,7 @@ const sourcesSlice = createSlice({
                     log('--- v4l2 other ---')
                     state.v4l2Status='error';
                 }
+
 
             }
         )
@@ -265,20 +283,30 @@ const sourcesSlice = createSlice({
             getSourceFrame.fulfilled,
             (state, action) => {
              
-                log('--- get source frame fulfilled  ---')
+                log('----- get source frame fulfilled  -----')
                 log(action.payload)
-                if (action.payload!=='error'){
+                log('-----------------------------')
+
+                if (action.payload.status_code === 200) {
                     const {width,height,blob} = action.payload;
                     const myImage= URL.createObjectURL(blob);
                     state.fileUrl = myImage;
                     state.drawHeight=height;
                     state.drawWidth=width;
+                    state.frameMessage='';
                     state.frameStatus='success';
-                }else{
-                    state.frameMessage='Fetch source frame error';
+                }else if(action.payload.status_code === 500){
+
+
+
+                    state.frameMessage=action.payload.message;
+                    state.frameStatus = 'error';
+                } else {
+                    //return updateTaskStatus(state,action.meta.arg,'set_stream_delete_error');
+                   
+                    state.frameMessage='Unknow error';
                     state.frameStatus='error';
-                }
-               
+                } 
 
             }
         )
