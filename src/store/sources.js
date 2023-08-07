@@ -144,6 +144,10 @@ const sourcesSlice = createSlice({
         
             state.v4l2Status = 'idle';
         },
+        resetV4l2Options(state) {
+        
+            state.v4l2Options = [];
+        },
         setSourceId(state,action) {
            
             state.uid = action.payload;
@@ -230,8 +234,8 @@ const sourcesSlice = createSlice({
 
                     state.v4l2Data = action.payload.data;
                     state.status = 'success';
-                    //let myData = [];
-                    let myData=[['/dev/video999','/dev/video999'],['/dev/video10','/dev/video10'],['/dev/video4','/dev/video4']];
+                    let myData = [];
+                    //let myData=[['/dev/video999','/dev/video999'],['/dev/video10','/dev/video10'],['/dev/video4','/dev/video4']];
                     Object.keys(action.payload.data).map((e, i) => {
                         myData.push([action.payload.data[e], action.payload.data[e]])
                     })
@@ -432,5 +436,5 @@ const sourcesSlice = createSlice({
 
 });
 export const sourcesActions = sourcesSlice.actions;
-export const { resetErrorMessage,resetFileName,resetV4l2Status,setSourceId,resetFrameStatus,setDrawWidthHeight } = sourcesSlice.actions;
+export const { resetErrorMessage,resetFileName,resetV4l2Status,resetV4l2Options,setSourceId,resetFrameStatus,setDrawWidthHeight } = sourcesSlice.actions;
 export default sourcesSlice.reducer;

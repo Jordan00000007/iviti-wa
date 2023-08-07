@@ -493,7 +493,7 @@ const tasksSlice = createSlice({
                     state.updateMessage='Success';
                 }else if (action.payload.status_code===500){
                     state.updateStatus='error'
-                    state.updateMessage=action.payload.message;
+                    state.updateMessage=JSON.stringify(action.payload.data.data);
                 }else{
                     state.updateStatus='error'
                     state.updateMessage='Unknow error.';

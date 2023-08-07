@@ -29,7 +29,7 @@ const StatusButton = ({ name }) => {
                     <button className="my-button-loading">
                         Loading
                     </button>
-                    <Tooltip id="my-tooltip-id" className="my-tooltip"/>
+                    
                 </div>
             )
         }
@@ -40,7 +40,7 @@ const StatusButton = ({ name }) => {
                     <button className="my-button-error">
                         Error
                     </button>
-                    <Tooltip id="my-tooltip-id" className="my-tooltip"/>
+                    
                 </div>
             )
         }
@@ -51,7 +51,7 @@ const StatusButton = ({ name }) => {
                     <button className="my-button-loading">
                         Loading
                     </button>
-                    <Tooltip id="my-tooltip-id" className="my-tooltip"/>
+                   
                 </div>
             )
         }
@@ -62,7 +62,7 @@ const StatusButton = ({ name }) => {
                     <button className="my-button-loading">
                         Loading
                     </button>
-                    <Tooltip id="my-tooltip-id" className="my-tooltip"/>
+                    
                 </div>
             )
         }
@@ -73,7 +73,7 @@ const StatusButton = ({ name }) => {
                     <button className="my-button-loading">
                         Loading
                     </button>
-                    <Tooltip id="my-tooltip-id" className="my-tooltip"/>
+                   
                 </div>
             )
         }
@@ -84,7 +84,7 @@ const StatusButton = ({ name }) => {
                     <button className="my-button-error">
                         Error
                     </button>
-                    <Tooltip id="my-tooltip-id" className="my-tooltip"/>
+                    
                 </div>
             )
         }
@@ -95,7 +95,7 @@ const StatusButton = ({ name }) => {
                     <button className="my-button-loading">
                         Loading
                     </button>
-                    <Tooltip id="my-tooltip-id" className="my-tooltip"/>
+                    
                 </div>
             )
         }
@@ -106,7 +106,7 @@ const StatusButton = ({ name }) => {
                     <button className="my-button-error">
                         Error
                     </button>
-                    <Tooltip id="my-tooltip-id" className="my-tooltip"/>
+                   
                 </div>
             )
         }
@@ -117,7 +117,7 @@ const StatusButton = ({ name }) => {
                     <button className="my-button-error">
                         Error
                     </button>
-                    <Tooltip id="my-tooltip-id" className="my-tooltip"/>
+                   
                 </div>
             )
         }
@@ -128,7 +128,7 @@ const StatusButton = ({ name }) => {
                     <button className="my-button-loading">
                         Loading
                     </button>
-                    <Tooltip id="my-tooltip-id" className="my-tooltip"/>
+                    
                 </div>
             )
         }
@@ -139,7 +139,7 @@ const StatusButton = ({ name }) => {
                     <button className="my-button-loading">
                         Loading
                     </button>
-                    <Tooltip id="my-tooltip-id" className="my-tooltip"/>
+                    
                 </div>
             )
         }
@@ -150,7 +150,7 @@ const StatusButton = ({ name }) => {
                     <button className="my-button-error">
                         Error
                     </button>
-                    <Tooltip id="my-tooltip-id" className="my-tooltip"/>
+                    
                 </div>
             )
         }
@@ -161,7 +161,7 @@ const StatusButton = ({ name }) => {
                     <button className="my-button-error">
                         Error
                     </button>
-                    <Tooltip id="my-tooltip-id" className="my-tooltip"/>
+                    
                 </div>
             )
         }
@@ -172,7 +172,7 @@ const StatusButton = ({ name }) => {
                     <button className="my-button-loading">
                         Loading
                     </button>
-                    <Tooltip id="my-tooltip-id" className="my-tooltip"/>
+                    
                 </div>
             )
         }
@@ -183,7 +183,7 @@ const StatusButton = ({ name }) => {
                     <button className="my-button-loading">
                         Loading
                     </button>
-                    <Tooltip id="my-tooltip-id" className="my-tooltip"/>
+                   
                 </div>
             )
         }
@@ -194,7 +194,7 @@ const StatusButton = ({ name }) => {
                     <button className="my-button-loading">
                         Loading
                     </button>
-                    <Tooltip id="my-tooltip-id" className="my-tooltip"/>
+                   
                 </div>
             )
         }
@@ -205,7 +205,7 @@ const StatusButton = ({ name }) => {
                     <button className="my-button-error">
                         Error
                     </button>
-                    <Tooltip id="my-tooltip-id" className="my-tooltip"/>
+                   
                 </div>
             )
         }
@@ -216,7 +216,7 @@ const StatusButton = ({ name }) => {
                     <button className="my-button-error">
                         Error
                     </button>
-                    <Tooltip id="my-tooltip-id" className="my-tooltip"/>
+                   
                 </div>
             )
         }

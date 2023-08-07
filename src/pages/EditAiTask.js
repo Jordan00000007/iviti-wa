@@ -86,6 +86,8 @@ function EditAiTask() {
 
     const [showAppSetting, setShowAppSetting] = useState(false);
 
+    const [sourceWarnning,setSourceWarnning] = useState(false);
+
     const [mode, setMode] = useState('select');
     const [linePanel, setLinePanel] = useState(false);
 
@@ -284,6 +286,7 @@ function EditAiTask() {
     const infoStatus = useSelector((state) => state.sources.infoStatus);
 
     const taskNameRef = useRef(null);
+    const sourceTitleRef = useRef(null);
 
     const [modifyAreaName, setModifyAreaName] = useState('');
     const [modifyAreaIndex, setModifyAreaIndex] = useState(-1);
@@ -378,9 +381,20 @@ function EditAiTask() {
 
     useEffect(() => {
 
-        if (fileName !== '')
+        if (fileName !== ''){
             sourceRef.current.setButtonClick();
+        }
+            
     }, []);
+
+    useEffect(() => {
+
+        if (fileName === ''){
+        
+            setShowAppSetting(false);
+        }
+            
+    }, [fileName]);
 
     const modelArr = useSelector((state) => state.models.options);
     const modelData = useSelector((state) => state.models.data);
@@ -552,6 +566,22 @@ function EditAiTask() {
 
     const submitCheck = () => {
         let myPass = true;
+
+
+        log('(0) check select source')
+        if (fileName === '') {
+            myPass = false;
+           
+            sourceTitleRef.current.className = "my-input-title-warnning roboto-b2 py-1 d-flex flex-row justify-content-between align-items-center";
+            setSourceWarnning(true);
+        } else {
+            
+            sourceTitleRef.current.className = "my-input-title roboto-b2 py-1 d-flex flex-row justify-content-between align-items-center";
+            setSourceWarnning(false);
+        }
+
+        
+
         // (1) check task name
         log('(1) check task name')
         const myTaskName = taskNameRef.current.value.trim();
@@ -1487,7 +1517,7 @@ function EditAiTask() {
                                 </div>
                             </div>
                             <div>
-                                <div className='my-input-title roboto-b2 py-1 d-flex flex-row justify-content-between align-items-center'>
+                                <div className='my-input-title roboto-b2 py-1 d-flex flex-row justify-content-between align-items-center' ref={sourceTitleRef}>
                                     <div>
                                         Source *
                                     </div>
@@ -1503,7 +1533,7 @@ function EditAiTask() {
                                 <div>
 
                                     {/* <CustomSelectSource name={sourceContent} width="240" height="52" fontSize="16" ref={sourceRef} onListboxOpenChange={handleSourceMenuToggle} placeHolder={true} disabled={(taskUid === '') ? false : true} /> */}
-                                    <CustomSelectSource name={sourceContent} width="240" height="52" fontSize="16" ref={sourceRef} onListboxOpenChange={handleSourceMenuToggle} placeHolder={true} sourceMenu={sourceMenu} />
+                                    <CustomSelectSource name={sourceContent} width="240" height="52" fontSize="16" ref={sourceRef} onListboxOpenChange={handleSourceMenuToggle} placeHolder={true} sourceMenu={sourceMenu} warnning={sourceWarnning}/>
                                 </div>
                                 <div className='position-relative'>
                                     {

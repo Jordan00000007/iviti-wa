@@ -5,7 +5,7 @@ import LabelButton from '../../components/Buttons/LabelButton';
 import CustomLoadingSmall from '../../components/Loading/CustomLoadingSmall';
 import RtspInput from '../../components/Inputs/RtspInput';
 import CustomSelectDevice from '../../components/Dropdowns/CustomSelectDevice';
-import { uploadSourceData, getV4l2Devices, resetErrorMessage, resetFileName,resetV4l2Status } from "../../store/sources";
+import { uploadSourceData, getV4l2Devices, resetErrorMessage, resetFileName,resetV4l2Status,resetV4l2Options } from "../../store/sources";
 
 import { useSelector, useDispatch } from "react-redux";
 import CustomAlertSmall from '../../components/Alerts/CustomAlertSmall';
@@ -144,12 +144,22 @@ const SourcePanel = (props) => {
     const handleV4l2Selected = (event, value) => {
 
         log('handle V4l2 Selected');
-        if ((value !== null)&&(value!==fileName)) {
-            const formData = new FormData();
-            formData.append('input', value);
-            dispatch(uploadSourceData(formData));
-
-            setCameraLoading(true);
+        log(value)
+        log(fileName)
+        //if ((value !== null)&&(value!==fileName)) {
+        if (value !== null) {
+          
+            if (value===fileName){
+                
+            }else{
+                const formData = new FormData();
+                formData.append('input', value);
+                dispatch(uploadSourceData(formData));
+                setCameraLoading(true);
+    
+            }
+        }else{
+            v4l2SelectorRef.current.setSelectedValue(fileName)
         }
 
     }
@@ -162,7 +172,9 @@ const SourcePanel = (props) => {
     const handleV4l2Click= (event) => {
 
         log('handle v4l2 click')
-        v4l2SelectorRef.current.setSelectedValue('');
+        v4l2SelectorRef.current.setSelectedValue('-1');
+        dispatch(resetFileName());
+        dispatch(resetV4l2Options())
         dispatch(getV4l2Devices())
     }
 
@@ -229,10 +241,10 @@ const SourcePanel = (props) => {
         if ((typeV4L2)&&(fileName!=='')&&(v4l2Status==='success')&&(type==='CAM')){
             
            
-            if (v4l2SelectorRef.current){
-                v4l2SelectorRef.current.setSelectedValue(fileName);
-                dispatch(resetV4l2Status());
-            }
+            // if (v4l2SelectorRef.current){
+            //     v4l2SelectorRef.current.setSelectedValue(fileName);
+            //     dispatch(resetV4l2Status());
+            // }
         }
 
 

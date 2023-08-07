@@ -84,6 +84,12 @@ const CustomSelectSource = forwardRef((props, ref) => {
                    
                   
                 }
+                .my-source-input-warnning { 
+                    border: 1px solid #B00020;   
+                    height: 52px;
+                    background: #fff!important; 
+                    
+                }
                 .my-source-input:hover { 
                     border: 1px solid var(--on_color_2);   
                     
@@ -114,7 +120,7 @@ const CustomSelectSource = forwardRef((props, ref) => {
                 `}
             </style>
             <div className="my-input-group">
-                <input type="text" className={(props.disabled)?"form-control my-source-disable":"form-control my-source-input"} aria-label="Text input with dropdown button" placeholder='--- please select ---' disabled  value={props.name}/>
+                <input type="text" className={(props.disabled)?"form-control my-source-disable": (props.warnning)?"form-control my-source-input-warnning":"form-control my-source-input"} aria-label="Text input with dropdown button" placeholder='--- please select ---' disabled  value={props.name}/>
                 <button className="btn dropdown-toggle my-source-input-button" type="button" aria-expanded="false" 
                 disabled={props.disabled}
                 onClick={handleSourceMenuClick}

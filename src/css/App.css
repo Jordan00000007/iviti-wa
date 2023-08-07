@@ -1009,6 +1009,8 @@ body{
     border-color: #979CB5 !important;
 }
 
+
+
 .my-draw-tip{
     margin-top:10px;
     margin-left:5px;
@@ -1060,7 +1062,7 @@ body{
 
 
 .my-nav-link {
-    color: var(--on_color_1t);
+    color: var(--on_color_1_t1);
     width: 176px;
     height: 56px;
     background-color: var(--base_2);
@@ -1070,8 +1072,13 @@ body{
     border-right: 0px;
 }
 
+.my-nav-link.active {
+    color: var(--on_color_1);
+    border-bottom: 3px solid var(--on_color_1);
+}
+
 .my-nav-link-2 {
-    color: var(--on_color_1t);
+    color: var(--on_color_1_t1);
     width: 176px;
     height: 56px;
     background-color: var(--base_2);
