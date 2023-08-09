@@ -25,6 +25,8 @@ import { WebSocket } from '../components/Panel/WebSocket';
 
 import { FullScreen, useFullScreenHandle } from "react-full-screen";
 
+import WarnningPanel from '../components/Panel/WarnningPanel';
+
 
 
 
@@ -396,6 +398,13 @@ function AiInference() {
 
             </SimpleLayout>
         );
+
+    if (myStatus === 'rejected')
+        return (
+            <SimpleLayout>
+                <WarnningPanel message="Network or server problem occurs."></WarnningPanel>
+            </SimpleLayout>
+        )
 
     return (
         <SimpleLayout>

@@ -9,7 +9,8 @@ import { Link } from 'react-router-dom';
 import { useSelector, useDispatch } from "react-redux";
 import { fetchData } from "../store/tasks";
 import { resetFileName } from "../store/sources";
-import { resetDeleteStatus,resetAddStatus,resetUpdateStatus } from "../store/areas";
+import { resetDeleteStatus, resetAddStatus, resetUpdateStatus } from "../store/areas";
+import WarnningPanel from '../components/Panel/WarnningPanel';
 
 
 function AllAiTasks() {
@@ -48,34 +49,34 @@ function AllAiTasks() {
     };
 
     useEffect(() => {
-   
-        if ((taskDeleteMessage!=='')&&(taskDeleteStatus==='success')&&(myStatus==='success')){
-          
-            setMessageOpen((taskDeleteStatus==='success')?0:1, taskDeleteMessage);
+
+        if ((taskDeleteMessage !== '') && (taskDeleteStatus === 'success') && (myStatus === 'success')) {
+
+            setMessageOpen((taskDeleteStatus === 'success') ? 0 : 1, taskDeleteMessage);
             dispatch(resetDeleteStatus());
         }
 
-    }, [taskDeleteStatus,myStatus]);
+    }, [taskDeleteStatus, myStatus]);
 
     useEffect(() => {
 
-        if ((taskAddMessage!=='')&&(taskAddStatus==='success')&&(myStatus==='success')){
-          
-            setMessageOpen((taskAddStatus==='success')?0:1, taskAddMessage);
+        if ((taskAddMessage !== '') && (taskAddStatus === 'success') && (myStatus === 'success')) {
+
+            setMessageOpen((taskAddStatus === 'success') ? 0 : 1, taskAddMessage);
             dispatch(resetAddStatus());
         }
 
-    }, [taskAddStatus,myStatus]);
+    }, [taskAddStatus, myStatus]);
 
     useEffect(() => {
 
-        if ((taskUpdateMessage!=='')&&(taskUpdateStatus==='success')&&(myStatus==='success')){
-          
-            setMessageOpen((taskUpdateStatus==='success')?0:1, taskUpdateMessage);
+        if ((taskUpdateMessage !== '') && (taskUpdateStatus === 'success') && (myStatus === 'success')) {
+
+            setMessageOpen((taskUpdateStatus === 'success') ? 0 : 1, taskUpdateMessage);
             dispatch(resetUpdateStatus());
         }
 
-    }, [taskUpdateStatus,myStatus]);
+    }, [taskUpdateStatus, myStatus]);
 
 
     useEffect(() => {
@@ -84,8 +85,9 @@ function AllAiTasks() {
         dispatch(resetFileName());
     }, []);
 
+  
 
-    if (myStatus === 'success') 
+    if (myStatus === 'success')
         return (
             <SimpleLayout>
                 <CustomAlert message={showText} type={showType} ref={alertRef} />
@@ -104,8 +106,8 @@ function AllAiTasks() {
                             </div>
                         </div>
                         <div className="row p-0 g-3">
-                            {myData.map((item,idx) => (
-                                <div className="col-3" key={item.task_uid} style={{paddingBottom:5}} >
+                            {myData.map((item, idx) => (
+                                <div className="col-3" key={item.task_uid} style={{ paddingBottom: 5 }} >
                                     <TaskCard
                                         task_uid={item.task_uid}
                                         nameTask={item.task_name}
@@ -139,6 +141,14 @@ function AllAiTasks() {
 
             </SimpleLayout>
         );
+
+    if (myStatus === 'rejected')
+        return (
+            <SimpleLayout>
+                <WarnningPanel message="Network or server problem occurs."></WarnningPanel>
+            </SimpleLayout>
+        )
+
 
     return (
         <SimpleLayout>

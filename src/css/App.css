@@ -1094,7 +1094,7 @@ body{
 }
 
 .my-nav-link-3 {
-    color: var(--on_color_1t);
+    color: var(--on_color_1_t1);
     width: 119px;
     height: 55px;
     background-color: var(--base_2);
@@ -1110,7 +1110,7 @@ body{
 }
 
 .my-nav-link-s {
-    color: var(--on_color_1t);
+    color: var(--on_color_1_t1);
     width: 100px;
     height: 36px;
     background-color: var(--base_2);

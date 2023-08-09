@@ -36,20 +36,20 @@ const DependOnItem = forwardRef((props, ref) => {
 
     const handleColorChange= (event) => {
         
-        const myColor=props.data.color;
-        const myName=props.data.name;
-        const myKey=props.data.key;
-        const myColorData={};
-        myColorData.color=myColor;
-        myColorData.name=myName;
-        myColorData.key=myKey;
-        if (colorItem.open===true){
-            myColorData.open=false;
-        }else{
-            myColorData.open=true;
-        }
+        // const myColor=props.data.color;
+        // const myName=props.data.name;
+        // const myKey=props.data.key;
+        // const myColorData={};
+        // myColorData.color=myColor;
+        // myColorData.name=myName;
+        // myColorData.key=myKey;
+        // if (colorItem.open===true){
+        //     myColorData.open=false;
+        // }else{
+        //     myColorData.open=true;
+        // }
         
-        setColorItem(myColorData);
+        // setColorItem(myColorData);
         
     }
 
@@ -85,14 +85,14 @@ const DependOnItem = forwardRef((props, ref) => {
                             <ColorTooltip colorItem={colorItem} onOutSideClick={handleOutSideClick}>
                                 <div>
                                     <div className='my-color-box' style={{ background: areaDependOnItem.color}} onClick={handleColorChange} name={areaDependOnItem.name} key={areaDependOnItem.key} onMouseEnter={() => setShowEdit(true)} onMouseLeave={() => setShowEdit(false)}>
-                                        {
+                                        {/* {
                                             (showEdit||(colorItem.open)) &&
                                             <div style={{position:'absolute',top:0,left:0,width:20,height:20,borderRadius:6,background:'#0000001F'}}/>
                                         }
                                         {
                                             (showEdit||(colorItem.open)) &&
                                             <img src={Icon_Edit} style={{position:'absolute',top:0,left:0}}/>
-                                        }
+                                        } */}
                                        
                                     </div>
                                 </div>

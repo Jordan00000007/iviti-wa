@@ -8,6 +8,8 @@ import ProgressAlert from '../components/Alerts/ProgressAlert';
 import DrawingTooltip from '../components/Tooltips/DrawingTooltip';
 import CustomTooltip from '../components/Tooltips/CustomTooltip';
 
+import WarnningPanel from '../components/Panel/WarnningPanel';
+
 
 import ColorfulPicker from '../components/ColorPicker/ColorfulPicker';
 
@@ -76,6 +78,7 @@ import { Link, useParams } from 'react-router-dom';
 
 function EditAiTask() {
 
+    const [serverRejected, setServerRejected] = useState(false);
 
     const [sourceMenu, setSourceMenu] = useState(false);
     const [showConfirm, setShowConfirm] = useState(false);
@@ -388,12 +391,9 @@ function EditAiTask() {
     }, []);
 
     useEffect(() => {
-
         if (fileName === ''){
-        
             setShowAppSetting(false);
         }
-            
     }, [fileName]);
 
     const modelArr = useSelector((state) => state.models.options);
@@ -1107,6 +1107,9 @@ function EditAiTask() {
 
     useEffect(() => {
 
+        log('deviceStatus=')
+        log(deviceStatus)
+
         if ((deviceStatus === 'success') && (selectedDevice === '')) {
             setSelectedDevice(deviceArr[0][0]);
             deviceRef.current.setSelectedValue(deviceArr[0][0]);
@@ -1117,6 +1120,15 @@ function EditAiTask() {
             setShowLoadingModal(false);
         }
 
+        if (deviceStatus==='rejected'){
+            
+            setServerRejected(true);
+          
+        }
+
+
+
+        //rejected
     }, [deviceStatus]);
 
     useEffect(() => {
@@ -1448,490 +1460,504 @@ function EditAiTask() {
    
 
 
-    return (
-        <SimpleLayout>
-            <Hotkeys
-                keyName="s,e,a,l,d"
-                onKeyDown={handleKeyDown.bind(this)}
-            />
-            <UndoAlert message={showText} type={showType} ref={undoAlertRef} />
-            <CustomAlert message={showText} type={showType} ref={alertRef} />
-            <ProgressAlert message={showText} type={showType} ref={progressAlertRef} />
-            <div className="container p-0">
-                <div className="my-body" onClick={handleBodyClick}>
-                    <div className="row p-0 g-0 mb-0 mt-3">
-                        <div className="col-12 d-flex justify-content-between align-items-center my-flex-gap">
+ 
 
-                            {
-                                (taskUid === '') &&
-                                <div className="my-body-title roboto-h2">
-                                    Add AI task
-                                </div>
-                            }
-
-
-                            {
-                                (taskUid !== '') &&
-                                <div className="my-body-title roboto-h2 d-flex flex-row gap-2">
-                                    Edit 
-                                    <div >
-                                        <CustomTooltip customClassName="my-task-name-title">
-                                        {taskName}
-                                        </CustomTooltip>    
+        if (serverRejected){
+            return(
+                <SimpleLayout> 
+                    <WarnningPanel message="Network or server problem occurs."></WarnningPanel>
+                </SimpleLayout>
+            )
+        }else{
+            return(
+                <SimpleLayout>
+                <Hotkeys
+                    keyName="s,e,a,l,d"
+                    onKeyDown={handleKeyDown.bind(this)}
+                />
+                <UndoAlert message={showText} type={showType} ref={undoAlertRef} />
+                <CustomAlert message={showText} type={showType} ref={alertRef} />
+                <ProgressAlert message={showText} type={showType} ref={progressAlertRef} />
+                <div className="container p-0">
+                    <div className="my-body" onClick={handleBodyClick}>
+                        <div className="row p-0 g-0 mb-0 mt-3">
+                            <div className="col-12 d-flex justify-content-between align-items-center my-flex-gap">
+    
+                                {
+                                    (taskUid === '') &&
+                                    <div className="my-body-title roboto-h2">
+                                        Add AI task
                                     </div>
-                                </div>
-                            }
-
-
-                            <div className='d-flex justify-content-start align-items-center'>
+                                }
+    
+    
                                 {
                                     (taskUid !== '') &&
-                                    <CustomButton name='delete' onClick={handleShowDeleteModal}></CustomButton>
+                                    <div className="my-body-title roboto-h2 d-flex flex-row gap-2">
+                                        Edit 
+                                        <div >
+                                            <CustomTooltip customClassName="my-task-name-title">
+                                            {taskName}
+                                            </CustomTooltip>    
+                                        </div>
+                                    </div>
                                 }
-
+    
+    
+                                <div className='d-flex justify-content-start align-items-center'>
+                                    {
+                                        (taskUid !== '') &&
+                                        <CustomButton name='delete' onClick={handleShowDeleteModal}></CustomButton>
+                                    }
+    
+                                </div>
                             </div>
                         </div>
-                    </div>
-
-                    <div className="row py-0">
-                        <div className="col-12" style={{height:20}}>
-                            <hr className="my-divider" />
-                        </div>
-                    </div>
-
-
-                    <div className="row mb-2 p-2">
-                        <div className="col-12 d-flex justify-content-start align-items-center my-flex-gap py-2">
-                            <div className="my-sub-title">
-                                General
+    
+                        <div className="row py-0">
+                            <div className="col-12" style={{height:20}}>
+                                <hr className="my-divider" />
                             </div>
                         </div>
-
-                        <div className="col-12 d-flex justify-content-start align-items-center my-flex-gap gap-3 py-2 ">
-                            <div>
-                                <div className='my-input-title roboto-b2 py-1' ref={taskTitleRef}>
-                                    AI task name *
+    
+    
+                        <div className="row mb-2 p-2">
+                            <div className="col-12 d-flex justify-content-start align-items-center my-flex-gap py-2">
+                                <div className="my-sub-title">
+                                    General
+                                </div>
+                            </div>
+    
+                            <div className="col-12 d-flex justify-content-start align-items-center my-flex-gap gap-3 py-2 ">
+                                <div>
+                                    <div className='my-input-title roboto-b2 py-1' ref={taskTitleRef}>
+                                        AI task name *
+                                    </div>
+                                    <div>
+                                        <CustomInput defaultValue={taskName} width="240" height="52" ref={taskNameRef} onChange={() => { }}></CustomInput>
+                                    </div>
                                 </div>
                                 <div>
-                                    <CustomInput defaultValue={taskName} width="240" height="52" ref={taskNameRef} onChange={() => { }}></CustomInput>
-                                </div>
-                            </div>
-                            <div>
-                                <div className='my-input-title roboto-b2 py-1 d-flex flex-row justify-content-between align-items-center' ref={sourceTitleRef}>
+                                    <div className='my-input-title roboto-b2 py-1 d-flex flex-row justify-content-between align-items-center' ref={sourceTitleRef}>
+                                        <div>
+                                            Source *
+                                        </div>
+                                        <div>
+                                            {
+                                                showConfirm &&
+                                                <ToolIcon_Confirm className="my-source-confirm" />
+                                            }
+    
+                                        </div>
+    
+                                    </div>
                                     <div>
-                                        Source *
+    
+                                        {/* <CustomSelectSource name={sourceContent} width="240" height="52" fontSize="16" ref={sourceRef} onListboxOpenChange={handleSourceMenuToggle} placeHolder={true} disabled={(taskUid === '') ? false : true} /> */}
+                                        <CustomSelectSource name={sourceContent} width="240" height="52" fontSize="16" ref={sourceRef} onListboxOpenChange={handleSourceMenuToggle} placeHolder={true} sourceMenu={sourceMenu} warnning={sourceWarnning}/>
+                                    </div>
+                                    <div className='position-relative'>
+                                        {
+                                            sourceMenu &&
+    
+                                            <SourcePanel onClose={handleSourcePanelClose} />
+    
+                                        }
+                                    </div>
+                                </div>
+                                <div>
+                                    <div className='my-input-title roboto-b2 py-1'>
+                                        Model *
+                                    </div>
+                                    <div>
+    
+                                        {
+                                            (taskUid !== '') &&
+                                            <CustomSelect areaArr={modelArr} width="240" height="52" fontSize="16" className="my-dropdown-select" onChange={handleModelChange} placeHolder={false} ref={modelRef} defaultValue={selectedModel} disabled={true} name="model"></CustomSelect>
+                                        }
+                                        {
+                                            (taskUid === '') &&
+                                            <CustomSelectModel areaArr={modelArr} width="240" height="52" fontSize="16" className="my-dropdown-select" onChange={handleModelChange} placeHolder={true} ref={modelRef} disabled={false} name="model" importModel={handleImportModel} modelDelete={handleModelDelete}></CustomSelectModel>
+                                        }
+                                    </div>
+                                </div>
+                                <div>
+                                    <div className='my-input-title roboto-b2 py-1'>
+                                        Application *
                                     </div>
                                     <div>
                                         {
-                                            showConfirm &&
-                                            <ToolIcon_Confirm className="my-source-confirm" />
+                                            (taskUid !== '') &&
+                                            <CustomSelect areaArr={applicationOptions} width="240" height="52" fontSize="16" className="my-dropdown-select" onChange={handleApplicationChange} placeHolder={false} ref={applicationRef} name="application"></CustomSelect>
                                         }
-
+                                        {
+                                            (taskUid === '') &&
+                                            <CustomSelect areaArr={applicationOptions} width="240" height="52" fontSize="16" className="my-dropdown-select" onChange={handleApplicationChange} placeHolder={true} ref={applicationRef} name="application"></CustomSelect>
+                                        }
+    
                                     </div>
-
-                                </div>
-                                <div>
-
-                                    {/* <CustomSelectSource name={sourceContent} width="240" height="52" fontSize="16" ref={sourceRef} onListboxOpenChange={handleSourceMenuToggle} placeHolder={true} disabled={(taskUid === '') ? false : true} /> */}
-                                    <CustomSelectSource name={sourceContent} width="240" height="52" fontSize="16" ref={sourceRef} onListboxOpenChange={handleSourceMenuToggle} placeHolder={true} sourceMenu={sourceMenu} warnning={sourceWarnning}/>
-                                </div>
-                                <div className='position-relative'>
-                                    {
-                                        sourceMenu &&
-
-                                        <SourcePanel onClose={handleSourcePanelClose} />
-
-                                    }
                                 </div>
                             </div>
-                            <div>
-                                <div className='my-input-title roboto-b2 py-1'>
-                                    Model *
+    
+                            <div className="col-12 d-flex justify-content-start align-items-center my-flex-gap gap-3 mt-3">
+                                <div>
+                                    <div className='my-input-title roboto-b2 py-1' ref={confidenceTitleRef}>
+                                        Confidence * (0.01~0.99)
+                                    </div>
+                                    <div>
+                                        <CustomInput defaultValue={confidence} width="240" height="52" ref={confidenceRef} onChange={() => { }}></CustomInput>
+                                    </div>
                                 </div>
                                 <div>
-
-                                    {
-                                        (taskUid !== '') &&
-                                        <CustomSelect areaArr={modelArr} width="240" height="52" fontSize="16" className="my-dropdown-select" onChange={handleModelChange} placeHolder={false} ref={modelRef} defaultValue={selectedModel} disabled={true} name="model"></CustomSelect>
-                                    }
-                                    {
-                                        (taskUid === '') &&
-                                        <CustomSelectModel areaArr={modelArr} width="240" height="52" fontSize="16" className="my-dropdown-select" onChange={handleModelChange} placeHolder={true} ref={modelRef} disabled={false} name="model" importModel={handleImportModel} modelDelete={handleModelDelete}></CustomSelectModel>
-                                    }
+                                    <div className='my-input-title roboto-b2 py-1'>
+                                        Accelerators *
+                                    </div>
+                                    <div>
+                                        {
+                                            (taskUid !== '') &&
+                                            <CustomSelect areaArr={deviceArr} width="240" height="52" fontSize="16" className="my-dropdown-select" onChange={handleAcceleratorsChange} placeHolder={false} ref={deviceRef} defaultValue={selectedDevice} disabled={true} name="device"></CustomSelect>
+                                        }
+                                        {
+                                            (taskUid === '') &&
+                                            <CustomSelect areaArr={deviceArr} width="240" height="52" fontSize="16" className="my-dropdown-select" onChange={handleAcceleratorsChange} placeHolder={true} ref={deviceRef} defaultValue={selectedDevice} disabled={false} name="device"></CustomSelect>
+                                        }
+    
+                                    </div>
                                 </div>
+    
                             </div>
-                            <div>
-                                <div className='my-input-title roboto-b2 py-1'>
-                                    Application *
-                                </div>
-                                <div>
-                                    {
-                                        (taskUid !== '') &&
-                                        <CustomSelect areaArr={applicationOptions} width="240" height="52" fontSize="16" className="my-dropdown-select" onChange={handleApplicationChange} placeHolder={false} ref={applicationRef} name="application"></CustomSelect>
-                                    }
-                                    {
-                                        (taskUid === '') &&
-                                        <CustomSelect areaArr={applicationOptions} width="240" height="52" fontSize="16" className="my-dropdown-select" onChange={handleApplicationChange} placeHolder={true} ref={applicationRef} name="application"></CustomSelect>
-                                    }
-
+                        </div>
+    
+    
+    
+                        <div className="row py-3 mt-0">
+                            <div className="col-12" style={{height:20}}>
+                                <hr className="my-divider" />
+                            </div>
+                        </div>
+    
+    
+                        <div className="row p-2">
+                            <div className="col-12 d-flex justify-content-start align-items-center">
+                                <div className="my-sub-title">
+                                    Application
                                 </div>
                             </div>
                         </div>
-
-                        <div className="col-12 d-flex justify-content-start align-items-center my-flex-gap gap-3 mt-3">
-                            <div>
-                                <div className='my-input-title roboto-b2 py-1' ref={confidenceTitleRef}>
-                                    Confidence * (0.01~0.99)
-                                </div>
-                                <div>
-                                    <CustomInput defaultValue={confidence} width="240" height="52" ref={confidenceRef} onChange={() => { }}></CustomInput>
-                                </div>
-                            </div>
-                            <div>
-                                <div className='my-input-title roboto-b2 py-1'>
-                                    Accelerators *
-                                </div>
-                                <div>
-                                    {
-                                        (taskUid !== '') &&
-                                        <CustomSelect areaArr={deviceArr} width="240" height="52" fontSize="16" className="my-dropdown-select" onChange={handleAcceleratorsChange} placeHolder={false} ref={deviceRef} defaultValue={selectedDevice} disabled={true} name="device"></CustomSelect>
-                                    }
-                                    {
-                                        (taskUid === '') &&
-                                        <CustomSelect areaArr={deviceArr} width="240" height="52" fontSize="16" className="my-dropdown-select" onChange={handleAcceleratorsChange} placeHolder={true} ref={deviceRef} defaultValue={selectedDevice} disabled={false} name="device"></CustomSelect>
-                                    }
-
-                                </div>
-                            </div>
-
-                        </div>
-                    </div>
-
-
-
-                    <div className="row py-3 mt-0">
-                        <div className="col-12" style={{height:20}}>
-                            <hr className="my-divider" />
-                        </div>
-                    </div>
-
-
-                    <div className="row p-2">
-                        <div className="col-12 d-flex justify-content-start align-items-center">
-                            <div className="my-sub-title">
-                                Application
-                            </div>
-                        </div>
-                    </div>
-
-                    {
-                        showAppSetting &&
-
-                        <div className="row p-2 g-0 my-2 mb-4 mt-0">
-                            <div className="col-12 d-flex justify-content-between my-area-container bdr">
-
-                                <table className='w-100' style={{ border: '1px' }}>
-                                    <tbody>
-                                        <tr>
-                                            {
-                                                (!basicType) &&
-
-                                                <td className='my-area-p3-a'>
-                                                    <div className='w-100 h-100 d-flex flex-column p-0 align-items-center'>
-                                                        <DrawingTooltip title="Select area">
-                                                            <ToolIcon_Point className={mode === 'select' ? "my-tool-icon-selected p-0 mt-3 mb-1" : "my-tool-icon p-0 mt-3 mb-1"} onClick={handleSelectMode} ref={KeySRef} />
-                                                        </DrawingTooltip>
-
-                                                        <DrawingTooltip title="Edit area">
-                                                            <ToolIcon_Pen className={mode === 'edit' ? "my-tool-icon-selected p-0 mt-3 mb-1" : "my-tool-icon p-0 mt-3 mb-1"} onClick={handleEditMode} ref={KeyERef} />
-                                                        </DrawingTooltip>
-
-                                                        <DrawingTooltip title="Add new area">
-                                                            <ToolIcon_Pen_Add className={mode === 'add' ? "my-tool-icon-selected p-0 mt-3 mb-1" : "my-tool-icon p-0 mt-3 mb-1"} onClick={handleAddMode} ref={KeyARef} />
-                                                        </DrawingTooltip>
-
-                                                        {
-                                                            linePanel &&
-                                                            <DrawingTooltip title="Set line">
-                                                                <ToolIcon_Line className={mode === 'line' ? "my-tool-icon-selected p-0 mt-3 mb-1" : "my-tool-icon p-0 mt-3 mb-1"} onClick={handleLineMode} ref={KeyLRef} />
+    
+                        {
+                            showAppSetting &&
+    
+                            <div className="row p-2 g-0 my-2 mb-4 mt-0">
+                                <div className="col-12 d-flex justify-content-between my-area-container bdr">
+    
+                                    <table className='w-100' style={{ border: '1px' }}>
+                                        <tbody>
+                                            <tr>
+                                                {
+                                                    (!basicType) &&
+    
+                                                    <td className='my-area-p3-a'>
+                                                        <div className='w-100 h-100 d-flex flex-column p-0 align-items-center'>
+                                                            <DrawingTooltip title="Select area">
+                                                                <ToolIcon_Point className={mode === 'select' ? "my-tool-icon-selected p-0 mt-3 mb-1" : "my-tool-icon p-0 mt-3 mb-1"} onClick={handleSelectMode} ref={KeySRef} />
                                                             </DrawingTooltip>
+    
+                                                            <DrawingTooltip title="Edit area">
+                                                                <ToolIcon_Pen className={mode === 'edit' ? "my-tool-icon-selected p-0 mt-3 mb-1" : "my-tool-icon p-0 mt-3 mb-1"} onClick={handleEditMode} ref={KeyERef} />
+                                                            </DrawingTooltip>
+    
+                                                            <DrawingTooltip title="Add new area">
+                                                                <ToolIcon_Pen_Add className={mode === 'add' ? "my-tool-icon-selected p-0 mt-3 mb-1" : "my-tool-icon p-0 mt-3 mb-1"} onClick={handleAddMode} ref={KeyARef} />
+                                                            </DrawingTooltip>
+    
+                                                            {
+                                                                linePanel &&
+                                                                <DrawingTooltip title="Set line">
+                                                                    <ToolIcon_Line className={mode === 'line' ? "my-tool-icon-selected p-0 mt-3 mb-1" : "my-tool-icon p-0 mt-3 mb-1"} onClick={handleLineMode} ref={KeyLRef} />
+                                                                </DrawingTooltip>
+                                                            }
+    
+                                                            <DrawingTooltip title="Delete">
+                                                                <ToolIcon_Delete className={mode === 'select' ? "my-tool-icon p-0 mt-3 mb-1" : "my-tool-icon-disable p-0 mt-3 mb-1"} onClick={handleDeleteMode} ref={KeyDRef} />
+                                                            </DrawingTooltip>
+                                                        </div>
+                                                    </td>
+                                                }
+                                                <td className='my-area-p3-b' style={{ background: (basicType) ? 'black' : 'white' }}>
+                                                    <div className='w-100 d-flex flex-column align-items-center justify-content-center'>
+                                                        {
+                                                            (fileUrl === '') &&
+                                                            <Image_Default style={{ width: (basicType) ? 854 : 800, height: 560, background: 'white', border: '0px solid white' }} />
                                                         }
-
-                                                        <DrawingTooltip title="Delete">
-                                                            <ToolIcon_Delete className={mode === 'select' ? "my-tool-icon p-0 mt-3 mb-1" : "my-tool-icon-disable p-0 mt-3 mb-1"} onClick={handleDeleteMode} ref={KeyDRef} />
-                                                        </DrawingTooltip>
+    
+                                                        {/* {
+                                                            ((fileUrl !== '') && (basicType)) &&
+    
+                                                            // 
+                                                            <img src={fileUrl}></img>
+                                                        } */}
+    
+                                                        {
+                                                            // ((fileUrl !== '') && (!basicType)) &&
+                                                            (fileUrl !== '') &&
+                                                            <CustomDrawing
+                                                                src={fileUrl}
+                                                                width={(basicType) ? (drawWidth + 50) : drawWidth}
+                                                                height={drawHeight}
+                                                                mode={mode}
+                                                                setMode={handleChangeMode}
+                                                                areaArr={areaArr}
+                                                                showAppSetting={showAppSetting}
+                                                                onDrawLineComplete={handleDrawLineComplete}
+                                                                basicType={basicType}
+                                                                ref={customDrawingRef}
+                                                            >
+                                                            </CustomDrawing>
+                                                        }
+    
+    
                                                     </div>
                                                 </td>
-                                            }
-                                            <td className='my-area-p3-b' style={{ background: (basicType) ? 'black' : 'white' }}>
-                                                <div className='w-100 d-flex flex-column align-items-center justify-content-center'>
-                                                    {
-                                                        (fileUrl === '') &&
-                                                        <Image_Default style={{ width: (basicType) ? 854 : 800, height: 560, background: 'white', border: '0px solid white' }} />
-                                                    }
-
-                                                    {/* {
-                                                        ((fileUrl !== '') && (basicType)) &&
-
-                                                        // 
-                                                        <img src={fileUrl}></img>
-                                                    } */}
-
-                                                    {
-                                                        // ((fileUrl !== '') && (!basicType)) &&
-                                                        (fileUrl !== '') &&
-                                                        <CustomDrawing
-                                                            src={fileUrl}
-                                                            width={(basicType) ? (drawWidth + 50) : drawWidth}
-                                                            height={drawHeight}
-                                                            mode={mode}
-                                                            setMode={handleChangeMode}
-                                                            areaArr={areaArr}
-                                                            showAppSetting={showAppSetting}
-                                                            onDrawLineComplete={handleDrawLineComplete}
-                                                            basicType={basicType}
-                                                            ref={customDrawingRef}
-                                                        >
-                                                        </CustomDrawing>
-                                                    }
-
-
-                                                </div>
-                                            </td>
-                                            <td className='my-area-p3-c'>
-                                                <div className='w-100 h-100 d-flex flex-column p-0 align-items-start'>
-                                                    <div className='my-area-p3-c1' style={{ height: (basicType) ? 62 : 80 }}>
+                                                <td className='my-area-p3-c'>
+                                                    <div className='w-100 h-100 d-flex flex-column p-0 align-items-start'>
+                                                        <div className='my-area-p3-c1' style={{ height: (basicType) ? 62 : 80 }}>
+                                                            {
+                                                                (!basicType) &&
+                                                                <CustomSelectArea areaArr={areaNameArr} width="280" height="48" fontSize="20" className="my-dropdown-select" onChange={handleAreaChange} defaultValue={areaEditingIndex} areaRename={handleAreaRename}></CustomSelectArea>
+                                                            }
+                                                            {
+                                                                (basicType) &&
+                                                                <div className='roboto-h4'>Full Screen</div>
+                                                            }
+                                                        </div>
+                                                        <div className='my-area-p3-c2'>
+                                                            <DependOnSelectPanel linePanel={linePanel} basicType={basicType} ref={dependOnTitle} areaDependOn={areaDependOn} onColorChange={handleColorChange}/>
+                                                            {/* <DependOnSelectPanel dependOn={[]} linePanel={linePanel}/> */}
+                                                        </div>
+    
                                                         {
-                                                            (!basicType) &&
-                                                            <CustomSelectArea areaArr={areaNameArr} width="280" height="48" fontSize="20" className="my-dropdown-select" onChange={handleAreaChange} defaultValue={areaEditingIndex} areaRename={handleAreaRename}></CustomSelectArea>
+                                                            linePanel &&
+                                                            <LinePanel ref={linePanelRef} setLineMode={handleLineMode} />
                                                         }
-                                                        {
-                                                            (basicType) &&
-                                                            <div className='roboto-h4'>Full Screen</div>
-                                                        }
+    
                                                     </div>
-                                                    <div className='my-area-p3-c2'>
-                                                        <DependOnSelectPanel linePanel={linePanel} basicType={basicType} ref={dependOnTitle} areaDependOn={areaDependOn} onColorChange={handleColorChange}/>
-                                                        {/* <DependOnSelectPanel dependOn={[]} linePanel={linePanel}/> */}
-                                                    </div>
-
-                                                    {
-                                                        linePanel &&
-                                                        <LinePanel ref={linePanelRef} setLineMode={handleLineMode} />
-                                                    }
-
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+    
+                        }
+    
+                        {
+                            (!showAppSetting) &&
+                            <div className='roboto-b1' style={{ color: 'var(--on_color_2)', padding: '0px 8px' }}>
+                                Please complete general section first.
+                            </div>
+                        }
+    
+    
+    
+                        <div className="row py-3 mt-4">
+                            <div className="col-12">
+                                <hr className="my-divider" />
                             </div>
                         </div>
-
-                    }
-
-                    {
-                        (!showAppSetting) &&
-                        <div className='roboto-b1' style={{ color: 'var(--on_color_2)', padding: '0px 8px' }}>
-                            Please complete general section first.
+    
+                        <div className="row p-0 g-0 mb-3">
+                            <div className="col-12 d-flex justify-content-end align-items-center my-flex-gap gap-3">
+    
+                                <CustomButton name='cancel' onClick={handleCancelClick}></CustomButton>
+    
+                                <CustomButton name={(taskUid === '') ? 'submit' : 'save'} onClick={handleSubmit} disabled={!showAppSetting}></CustomButton>
+                            </div>
                         </div>
-                    }
-
-
-
-                    <div className="row py-3 mt-4">
-                        <div className="col-12">
-                            <hr className="my-divider" />
-                        </div>
+    
+    
                     </div>
-
-                    <div className="row p-0 g-0 mb-3">
-                        <div className="col-12 d-flex justify-content-end align-items-center my-flex-gap gap-3">
-
-                            <CustomButton name='cancel' onClick={handleCancelClick}></CustomButton>
-
-                            <CustomButton name={(taskUid === '') ? 'submit' : 'save'} onClick={handleSubmit} disabled={!showAppSetting}></CustomButton>
-                        </div>
-                    </div>
-
-
                 </div>
-            </div>
-
-
-            <Modal
-                open={showAreaRenameModal}
-            >
-                <ModalDialog
-                    sx={{ minWidth: 500, maxWidth: 500, minHeight: 400 }}
+    
+    
+                <Modal
+                    open={showAreaRenameModal}
                 >
-                    <div className='container-fluid'>
-                        <div className='row'>
-                            <div className='col-12 roboto-h2 p-0'>
-                                <div>
-                                    Rename
-                                </div>
-
-                            </div>
-                        </div>
-                        <div className='row'>
-                            <div className='col-12 roboto-b1 p-0' style={{ color: 'var(--on_color_2)' }}>
-                                <div style={{ paddingTop: 24}}>
-                                    Area name
-                                </div>
-
-                            </div>
-                        </div>
-                        <div className='row'>
-                            <div className='col-12 roboto-h2 p-0'>
-                                <div style={{ paddingTop: 5}}>
-                                    <CustomInput width="418" height="52" defaultValue={modifyAreaName} ref={areaRenameRef} onChange={() => { }} />
-                                </div>
-                            </div>
-                        </div>
-                        <div className='row'>
-                        <div className='col-12 d-flex justify-content-end' style={{padding:0}}>
-                                <div style={{ paddingTop: 145 }} className='d-flex gap-3'>
-                                    <CustomButton name="cancel" onClick={() => {
-                                        setShowAreaRenameModal(false);
-                                    }} />
-                                    <CustomButton name="save" onClick={handleAreaRenameComplete} />
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </ModalDialog>
-            </Modal>
-
-
-            <Modal
-                open={showTaskDeleteModal}
-            >
-                <ModalDialog
-                    sx={{ minWidth: 500, maxWidth: 500, minHeight: 400 }}
-                >
-                    <div className='container-fluid'>
-                        <div className='row'>
-                            <div className='col-12 roboto-h2 p-0' style={{ paddingTop: 20}}>
-                                <div>
-                                    Delete {taskName}
-                                </div>
-
-                            </div>
-                        </div>
-                        <div className='row'>
-                            <div className='col-12 roboto-b1 p-0' style={{ color: 'var(--on_color_1)' }}>
-                                <div style={{ paddingTop: 24}}>
-                                    {taskName} will be deleted.
-                                </div>
-
-                            </div>
-                        </div>
-
-                        <div className='row'>
-                            <div className='col-12 d-flex justify-content-end' style={{padding:0}}>
-                                <div style={{ paddingTop: 205}} className='d-flex gap-3'>
-                                    <CustomButton name="cancel" onClick={() => {
-                                        setShowTaskDeleteModal(false);
-                                    }} />
-                                    <CustomButton name="delete" onClick={handleDelete} />
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </ModalDialog>
-            </Modal>
-
-            <Modal
-                open={showModelDeleteModal}
-            >
-                <ModalDialog
-                    sx={{ minWidth: 500, maxWidth: 500, minHeight: 400 }}
-                >
-                    <div className='container-fluid'>
-                        <div className='row'>
-                            <div className='col-12 roboto-h2 p-0'>
-                                <div>
-                                    Delete {deleteModelName}
-                                </div>
-
-                            </div>
-                        </div>
-                        <div className='row'>
-                            <div className='col-12 roboto-b1 p-0' style={{ color: 'var(--on_color_1)' }}>
-                                <div style={{ paddingTop: 24}}>
-                                    {deleteModelName} will be deleted.
-                                </div>
-
-                            </div>
-                        </div>
-
-                        <div className='row'>
-                            <div className='col-12 d-flex justify-content-end' style={{padding:0}}>
-                                <div style={{ paddingTop: 205 }} className='d-flex gap-3'>
-                                    <CustomButton name="cancel" onClick={() => {
-                                        setShowModelDeleteModal(false);
-                                    }} />
-                                    <CustomButton name="delete" onClick={handleModelDeleteExecute} />
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </ModalDialog>
-            </Modal>
-
-
-
-            <Modal
-                open={showLoadingModal}
-            >
-                <ModalDialog
-                    sx={{ minWidth: 200, maxWidth: 200, minHeight: 200,layout:'center' }}
-                >
-                    
-                        <div style={{width:0, height:0,background: 'white'}}>
-                            <CustomLoading />
-                        </div>
-                    
-                    
-                </ModalDialog>
-            </Modal>
-
-            <Modal
-                open={showColorModal}
-            >
-                <ModalDialog
-                    sx={{ minWidth: 500, maxWidth: 500, minHeight: 400 }}
-                >
+                    <ModalDialog
+                        sx={{ minWidth: 500, maxWidth: 500, minHeight: 400 }}
+                    >
                         <div className='container-fluid'>
-                        <div className='row'>
-                        <div className='col-12 d-flex justify-content-start' style={{padding:0}}>
-                        
-                           
-
-                            <ColorfulPicker defaultValue={color} ref={colorRef}/>
-                        
-                        </div>
-                        </div>
-
-                        <div className='row'>
-                        <div className='col-12 d-flex justify-content-end' style={{padding:0}}>
-                                <div style={{ paddingTop: 20 }} className='d-flex gap-3'>
-                                    <CustomButton name="cancel" onClick={() => {
-                                        setShowColorModal(false);
-                                    }} />
-                                    <CustomButton name="save" onClick={handlePickColorComplete} />
+                            <div className='row'>
+                                <div className='col-12 roboto-h2 p-0'>
+                                    <div>
+                                        Rename
+                                    </div>
+    
+                                </div>
+                            </div>
+                            <div className='row'>
+                                <div className='col-12 roboto-b1 p-0' style={{ color: 'var(--on_color_2)' }}>
+                                    <div style={{ paddingTop: 24}}>
+                                        Area name
+                                    </div>
+    
+                                </div>
+                            </div>
+                            <div className='row'>
+                                <div className='col-12 roboto-h2 p-0'>
+                                    <div style={{ paddingTop: 5}}>
+                                        <CustomInput width="418" height="52" defaultValue={modifyAreaName} ref={areaRenameRef} onChange={() => { }} />
+                                    </div>
+                                </div>
+                            </div>
+                            <div className='row'>
+                            <div className='col-12 d-flex justify-content-end' style={{padding:0}}>
+                                    <div style={{ paddingTop: 145 }} className='d-flex gap-3'>
+                                        <CustomButton name="cancel" onClick={() => {
+                                            setShowAreaRenameModal(false);
+                                        }} />
+                                        <CustomButton name="save" onClick={handleAreaRenameComplete} />
+                                    </div>
                                 </div>
                             </div>
                         </div>
+                    </ModalDialog>
+                </Modal>
+    
+    
+                <Modal
+                    open={showTaskDeleteModal}
+                >
+                    <ModalDialog
+                        sx={{ minWidth: 500, maxWidth: 500, minHeight: 400 }}
+                    >
+                        <div className='container-fluid'>
+                            <div className='row'>
+                                <div className='col-12 roboto-h2 p-0' style={{ paddingTop: 20}}>
+                                    <div>
+                                        Delete {taskName}
+                                    </div>
+    
+                                </div>
+                            </div>
+                            <div className='row'>
+                                <div className='col-12 roboto-b1 p-0' style={{ color: 'var(--on_color_1)' }}>
+                                    <div style={{ paddingTop: 24}}>
+                                        {taskName} will be deleted.
+                                    </div>
+    
+                                </div>
+                            </div>
+    
+                            <div className='row'>
+                                <div className='col-12 d-flex justify-content-end' style={{padding:0}}>
+                                    <div style={{ paddingTop: 205}} className='d-flex gap-3'>
+                                        <CustomButton name="cancel" onClick={() => {
+                                            setShowTaskDeleteModal(false);
+                                        }} />
+                                        <CustomButton name="delete" onClick={handleDelete} />
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                </ModalDialog>
-            </Modal>
+                    </ModalDialog>
+                </Modal>
+    
+                <Modal
+                    open={showModelDeleteModal}
+                >
+                    <ModalDialog
+                        sx={{ minWidth: 500, maxWidth: 500, minHeight: 400 }}
+                    >
+                        <div className='container-fluid'>
+                            <div className='row'>
+                                <div className='col-12 roboto-h2 p-0'>
+                                    <div>
+                                        Delete {deleteModelName}
+                                    </div>
+    
+                                </div>
+                            </div>
+                            <div className='row'>
+                                <div className='col-12 roboto-b1 p-0' style={{ color: 'var(--on_color_1)' }}>
+                                    <div style={{ paddingTop: 24}}>
+                                        {deleteModelName} will be deleted.
+                                    </div>
+    
+                                </div>
+                            </div>
+    
+                            <div className='row'>
+                                <div className='col-12 d-flex justify-content-end' style={{padding:0}}>
+                                    <div style={{ paddingTop: 205 }} className='d-flex gap-3'>
+                                        <CustomButton name="cancel" onClick={() => {
+                                            setShowModelDeleteModal(false);
+                                        }} />
+                                        <CustomButton name="delete" onClick={handleModelDeleteExecute} />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </ModalDialog>
+                </Modal>
+    
+    
+    
+                <Modal
+                    open={showLoadingModal}
+                >
+                    <ModalDialog
+                        sx={{ minWidth: 200, maxWidth: 200, minHeight: 200,layout:'center' }}
+                    >
+                        
+                            <div style={{width:0, height:0,background: 'white'}}>
+                                <CustomLoading />
+                            </div>
+                        
+                        
+                    </ModalDialog>
+                </Modal>
+    
+                <Modal
+                    open={showColorModal}
+                >
+                    <ModalDialog
+                        sx={{ minWidth: 500, maxWidth: 500, minHeight: 400 }}
+                    >
+                            <div className='container-fluid'>
+                            <div className='row'>
+                            <div className='col-12 d-flex justify-content-start' style={{padding:0}}>
+                            
+                               
+    
+                                <ColorfulPicker defaultValue={color} ref={colorRef}/>
+                            
+                            </div>
+                            </div>
+    
+                            <div className='row'>
+                            <div className='col-12 d-flex justify-content-end' style={{padding:0}}>
+                                    <div style={{ paddingTop: 20 }} className='d-flex gap-3'>
+                                        <CustomButton name="cancel" onClick={() => {
+                                            setShowColorModal(false);
+                                        }} />
+                                        <CustomButton name="save" onClick={handlePickColorComplete} />
+                                    </div>
+                                </div>
+                            </div>
+                            </div>
+                    </ModalDialog>
+                </Modal>
+    
+    
+                <input type="file" name="files" onChange={handleFileChange} ref={fileRef} style={{ visibility: 'hidden', width: '0px', height: '0px' }} />
+            </SimpleLayout>
+            )
+        }
 
 
-            <input type="file" name="files" onChange={handleFileChange} ref={fileRef} style={{ visibility: 'hidden', width: '0px', height: '0px' }} />
-        </SimpleLayout>
-    );
+
+    
 }
 
 export default EditAiTask;

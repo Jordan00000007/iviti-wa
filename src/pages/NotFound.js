@@ -1,6 +1,8 @@
 import SimpleLayout from '../components/Layouts/SimpleLayout';
 import CustomButton from '../components/Buttons/CustomButton';
+import WarnningPanel from '../components/Panel/WarnningPanel';
 import { Link } from 'react-router-dom';
+
 
 function NotFound() {
 
@@ -8,25 +10,13 @@ function NotFound() {
         console.log('Add Button clicked!');
     };
 
+    
     return (
         <SimpleLayout>
             <div className="container p-0">
                 <div className="my-body">
-                    <div className="row p-0 g-0 mb-3 mt-3">
-                        <div className="col-12 d-flex justify-content-between">
-                            <div className="my-body-title">
-                                N/A
-                            </div>
-                            
-                            <Link to="/">
-                                <CustomButton onClick={handleClickAdd} disabled={false} name="back" />
-                            </Link>
-                            
-                        </div>
-                    </div>
-                    <div className="row p-0 g-2">
-                        <h1>Page Not Found</h1>
-                    </div>
+                    
+                    <WarnningPanel message="Page not found."/>
                 </div>
             </div>
         </SimpleLayout>

@@ -316,7 +316,7 @@ const tasksSlice = createSlice({
             fetchData.rejected,
             (state, { payload }) => {
                 //log('--- fetch data reject ---');
-                state.status = 'error';
+                state.status = 'rejected';
             }
         )
 
