@@ -13,8 +13,6 @@ const DependOnSelectPanel = forwardRef((props, ref) => {
 
     const dispatch = useDispatch();
 
-    
-
     const [checkedNum, setCheckedNum] = useState(0);
    
     const [colorList, setColorList] = useState([]);
@@ -96,7 +94,7 @@ const DependOnSelectPanel = forwardRef((props, ref) => {
 
             <div className="row">
             
-                <div className="col-12" onScroll={handleScrolling} style={{maxHeight:props.basicType?(props.linePanel?264:400)+16:(props.linePanel?264:400),minHeight:props.basicType?(props.linePanel?264:400)+16:(props.linePanel?264:400),overflowY:'auto',overflowX:'hidden'}}>
+                <div className="col-12" onScroll={handleScrolling} style={{maxHeight:props.basicType?(props.linePanel?219:355)+56:(props.linePanel?219:355),minHeight:props.basicType?(props.linePanel?219:355)+56:(props.linePanel?219:355),overflowY:'auto',overflowX:'hidden'}}>
                
                     {areaDependOn[areaEditingIndex].map((item, idx) => (
                         <DependOnItem data={item} key={idx} index={idx} onClick={handleToggleCheckBox} onColorChange={handleColorChange} ref={dependOnItemRef}/>

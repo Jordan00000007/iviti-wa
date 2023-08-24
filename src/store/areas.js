@@ -3,13 +3,12 @@ import update from 'react-addons-update';
 import log from "../utils/console";
 import moment from 'moment';
 import palette from '../utils/palette.json';
-import { cloneDeep,max } from 'lodash-es';
-
-
-
+import { cloneDeep,max,isNumber,isInteger } from 'lodash-es';
 
 
 const TASK_SERVER = process.env.REACT_APP_TASK_SERVER;
+const REQUEST_TIMEOUT = process.env.REACT_APP_REQUEST_TIMEOUT;
+
 const APP_URL = `${TASK_SERVER}/apps`;
 
 const componentToHex = (c) => {
@@ -64,6 +63,8 @@ const areasSlice = createSlice({
         areaDependOn: [[{ "name": "", "checked": false, "key": 0, "color": "white" }]], 
         areaDependOnPast: [[{ "name": "", "checked": false, "key": 0, "color": "white" }]], 
 
+        eventConfigArr: [{ "enable": false, "uid": "", "title": "", "logic_operator": "","logic_value":"" }], 
+        eventConfigArrPast: [{ "enable": false, "uid": "", "title": "", "logic_operator": "","logic_value":"" }], 
 
         areaEditingIndex: 0, 
         areaEditingIndexPast: 0,
@@ -108,6 +109,7 @@ const areasSlice = createSlice({
             state.areaEditingIndex = 0;
             state.areaMaxNumber= 1;
             state.paletteArr = setPaletteArr();
+            state.eventConfigArr = [{ "enable": true, "uid": "", "title": "", "logic_operator": "","logic_value":"" }];
             //state.areaDependOn = [[{ "name": "name", "checked": true, "key": 0, "color": "white" }]];
         },
         setDependOn(state, action) {
@@ -165,13 +167,20 @@ const areasSlice = createSlice({
             // find new number
             let numArr=[];
             state.areaNameArr.forEach((item, idx) => {
-                if (item[1].toLowerCase().indexOf('area ')>=0){
-                    numArr.push(parseInt(item[1].replace(/\D/g, '')));
+                if (item[1].toLowerCase().indexOf('area')>=0){
+                    if (isNaN(parseInt(item[1].replace(/\D/g, '')))){
+                        numArr.push(state.areaNameArr.length);
+                    }else{
+                        numArr.push(parseInt(item[1].replace(/\D/g, '')));
+                    }
+                    
+                }else{
+                    numArr.push(state.areaNameArr.length)
                 }
             })
-            // log('---  numArr ---')
-            // log(numArr)
-            // log(max(numArr))
+            log('---  numArr ---')
+            log(numArr)
+            log(max(numArr))
 
             const currentLength = state.areaNameArr.length;
            
@@ -196,6 +205,8 @@ const areasSlice = createSlice({
             state.lineRelationArr.push(['','']);
             state.areaNameArr.push([currentLength, `Area ${newName}`]);
             state.lineNameArr.push([`Line ${newName}A`,`Line ${newName}B`]);
+
+            state.eventConfigArr.push({ "enable": true, "uid": "", "title": "", "logic_operator": "","logic_value":"" });
 
             state.areaEditingIndex = currentLength;
         },
@@ -222,6 +233,7 @@ const areasSlice = createSlice({
             state.lineNameArrPast=cloneDeep(state.lineNameArr);
             state.linePointArrPast=cloneDeep(state.linePointArr);
             state.lineRelationArrPast=cloneDeep(state.lineRelationArr);
+            state.eventConfigArrPast=cloneDeep(state.eventConfigArr);
 
 
             if (state.areaNameArr.length>1){
@@ -234,6 +246,8 @@ const areasSlice = createSlice({
                 state.lineNameArr.splice(idx, 1);
                 state.linePointArr.splice(idx, 1);
                 state.lineRelationArr.splice(idx, 1);
+
+                state.eventConfigArr.splice(idx, 1);
 
                 state.areaNameArr.forEach((item, idx) => {
                     state.areaNameArr[idx][0]=idx;
@@ -258,6 +272,7 @@ const areasSlice = createSlice({
             state.linePointArr=cloneDeep(state.linePointArrPast);
             state.lineRelationArr=cloneDeep(state.lineRelationArrPast);
             state.areaEditingIndex=cloneDeep(state.areaEditingIndexPast);
+            state.eventConfigArr=cloneDeep(state.eventConfigArrPast);
 
         },
         lineADelete(state, action) {
@@ -269,6 +284,8 @@ const areasSlice = createSlice({
             state.lineNameArrPast=cloneDeep(state.lineNameArr);
             state.linePointArrPast=cloneDeep(state.linePointArr);
             state.lineRelationArrPast=cloneDeep(state.lineRelationArr);
+            state.eventConfigArrPast=cloneDeep(state.eventConfigArr);
+
 
             state.lineADeleteMessage=`${state.lineNameArr[state.areaEditingIndex][0]} has been deleted`;
             state.lineADeleteStatus='success'
@@ -288,6 +305,8 @@ const areasSlice = createSlice({
             state.lineNameArrPast=cloneDeep(state.lineNameArr);
             state.linePointArrPast=cloneDeep(state.linePointArr);
             state.lineRelationArrPast=cloneDeep(state.lineRelationArr);
+            state.eventConfigArrPast=cloneDeep(state.eventConfigArr);
+
 
             state.lineBDeleteMessage=`${state.lineNameArr[state.areaEditingIndex][1]} has been deleted`;
             state.lineBDeleteStatus='success'
@@ -318,6 +337,22 @@ const areasSlice = createSlice({
             log('whole line update')
             log(action.payload)
             state.linePointArr[state.areaEditingIndex]=action.payload;
+        },
+        eventToggleUpdate(state,action){
+            log('event toggle update')
+            state.eventConfigArr[state.areaEditingIndex].enable=action.payload;
+        },
+        eventTitleUpdate(state,action){
+            log('event title update')
+            state.eventConfigArr[state.areaEditingIndex].title=action.payload;
+        },
+        eventLogicUpdate(state,action){
+            log('event logic update');
+            state.eventConfigArr[state.areaEditingIndex].logic_operator=action.payload;
+        },
+        eventValueUpdate(state,action){
+            log('event value update')
+            state.eventConfigArr[state.areaEditingIndex].logic_value=action.payload;
         },
         setFileWidthHeight(state,action){
             state.drawWidth=action.payload.drawWidth;
@@ -390,7 +425,6 @@ const areasSlice = createSlice({
            
             const myPalette=action.payload.data[0].app_setting.application.palette;
           
-
             state.selectedApplication=action.payload.data[0].name;
 
             const modelType=action.payload.data[0].type
@@ -406,6 +440,7 @@ const areasSlice = createSlice({
             let myLineNameArr=[];
             let myLinePointArr=[];
             let myLineRelationArr=[];
+            let myEventConfigArr=[];
            // const sampleAreaDependOn=state.areaDependOn[0];
 
             myData.forEach((item1, idx) => {
@@ -491,7 +526,22 @@ const areasSlice = createSlice({
                 }
                 myLineRelationArr.push(lineRelationArr);
 
-
+                // (6) Event Config Array 
+                const eventConfig=item1.events;
+                log('--- event config ---')
+                log(eventConfig)
+                if (eventConfig){
+                    myEventConfigArr.push(eventConfig);
+                }else{
+                    const initEventConfig={};
+                    initEventConfig.enable=false;
+                    initEventConfig.uid='';
+                    initEventConfig.title='';
+                    initEventConfig.logic_operator='';
+                    initEventConfig.logic_value='';
+                    myEventConfigArr.push(initEventConfig);
+                }
+               
             });
       
             state.areaShapeArr=myAreaShapeArr;
@@ -499,7 +549,7 @@ const areasSlice = createSlice({
             state.lineNameArr=myLineNameArr;
             state.lineRelationArr=myLineRelationArr;
             state.areaDependOn=myAreaDependOn;
-
+            state.eventConfigArr=myEventConfigArr;
             state.areaNameArr=myAreaNameArr;
             state.areaEditingIndex=0;
 
@@ -526,5 +576,5 @@ const areasSlice = createSlice({
     }
 });
 export const areasActions = areasSlice.actions;
-export const { initData, setDependOn, toggleSelectAll, toggleDependOnItem, areaInsert, areaSelected, areaRename, areaUpdate, areaDelete, areaUndo, lineAUpdate, lineBUpdate,lineARelationUpdate,lineBRelationUpdate,setFileWidthHeight,lineUpdate,setLinePanel,lineDataReset,setModelData,resetStatus,resetDeleteStatus,resetAddStatus,resetUpdateStatus,setSelectedApplication,setSelectedModel,lineADelete,lineBDelete,resetLineADeleteStatus,resetLineBDeleteStatus,updateLabelColor } = areasSlice.actions;
+export const { initData, setDependOn, toggleSelectAll, toggleDependOnItem, areaInsert, areaSelected, areaRename, areaUpdate, areaDelete, areaUndo, lineAUpdate, lineBUpdate,lineARelationUpdate,lineBRelationUpdate,setFileWidthHeight,lineUpdate,setLinePanel,lineDataReset,setModelData,resetStatus,resetDeleteStatus,resetAddStatus,resetUpdateStatus,setSelectedApplication,setSelectedModel,lineADelete,lineBDelete,resetLineADeleteStatus,resetLineBDeleteStatus,updateLabelColor,eventToggleUpdate,eventTitleUpdate,eventLogicUpdate,eventValueUpdate } = areasSlice.actions;
 export default areasSlice.reducer;

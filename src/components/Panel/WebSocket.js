@@ -60,13 +60,18 @@ export const WebSocket = (props) => {
                         
                        
                     }
+                    if (myData.type==="EVENT"){
+                        
+                        props.onEvent(myData.data);
+                       
+                    }
                     if (myData.type.toLowerCase().indexOf('err')>=0){
 
                         log('ws error')
                         log(myData)
-                        log(myData.data.source_uid)
+                        // log(myData.data.source_uid)
                        
-                        props.onError(myData.data.source_uid,myData.type,myData.message);
+                        props.onError(myData.type,myData.message);
                     }
                 }
         }
@@ -92,10 +97,16 @@ export const WebSocket = (props) => {
 
                 myData.type="TEMP";
                 myData.data=[props.device];
+
+                //log('send ws request temp')
+                //log(myData)
                 sendMessage(JSON.stringify(myData));
 
                 myData.type="UID";
                 myData.data=props.uuid;
+
+                //log('send ws request uid')
+                //log(myData)
                 sendMessage(JSON.stringify(myData));
 
             }, 3000);

@@ -4,18 +4,18 @@ import Box from '@mui/joy/Box';
 import Typography from '@mui/joy/Typography';
 import Chip from '@mui/joy/Chip';
 
-const DrawingTooltip = ({ children, title }) => {
+const DrawingTooltip = ({ children, title, keyword }) => {
 
     return (
         <Tooltip
             title={
                 <Box sx={{ display: 'flex', gap: 1, width: '100%', mt: 0, backgroundColor: 'transparent', height: '28px' }}>
 
-                    <Chip color="var(--base_2)" sx={{ ml: 0, mt: 0, fontSize: '15px', padding: 0, height: '20px', lineHeight: '20px' }}>
+                    <Chip color="var(--base_2)" sx={{ ml: 0, mt: 0, fontSize: '15px', padding: 0, height: '20px', lineHeight: '20px' ,backgroundColor:'transparent',color:'white'}}>
                         {title}
                     </Chip>
 
-                    <Box sx={{ backgroundColor: '#979CB5', width: '20px', height: '20px', paddingTop: '3px', paddingLeft: '6px', borderRadius: '4px', mt: '5px', fontSize: '13px' }}>{title.substring(0, 1)}</Box>
+                    <Box sx={{ backgroundColor: '#979CB5', width: keyword==='delete'?'48px':'20px', height: '20px', paddingTop: '3px', paddingLeft: '6px', borderRadius: '4px', mt: '5px', fontSize: '13px' }}>{keyword}</Box>
                 </Box>
 
             }

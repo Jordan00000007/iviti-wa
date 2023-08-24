@@ -91,6 +91,10 @@ http {
       proxy_pass http://127.0.0.1:${BACKEND_PORT}/ivit/v1/v4l2;
     } 
 
+    location /events {
+      proxy_pass http://127.0.0.1:${BACKEND_PORT}/ivit/v1/events;
+    } 
+
     location /stream {
       proxy_pass http://127.0.0.1:${STREAM_PORT}/stream;
     }  

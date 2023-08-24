@@ -70,7 +70,8 @@ function PolygonOriginAnchor(props) {
 
 const areaCreate = forwardRef((props, ref) => {
     const [points, setPoints] = useState([])
-    const [nextPoint, setNextPoint] = useState({ x: 0, y: 0 })
+    //const [nextPoint, setNextPoint] = useState({ x: 0, y: 0 })
+    const [nextPoint, setNextPoint] = useState({ x: null, y: null})
     const [isComplete, setIsComplete] = useState(false);
 
     const dispatch = useDispatch();
@@ -82,7 +83,7 @@ const areaCreate = forwardRef((props, ref) => {
     useImperativeHandle(ref, () => ({
         setReset: () => {
             setPoints([]);
-            setNextPoint({ x: 0, y: 0 });
+            setNextPoint({ x: null, y: null });
             setIsComplete(false);
         }
     }));
@@ -166,7 +167,7 @@ const areaCreate = forwardRef((props, ref) => {
                         // setIsComplete(true)
                         // back to init status
                         setPoints([]);
-                        setNextPoint({ x: 0, y: 0 });
+                        setNextPoint({ x: null, y: null });
                         setIsComplete(false);
                         props.setMode('select');
 

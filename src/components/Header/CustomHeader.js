@@ -13,34 +13,34 @@ function CustomHeader() {
     const [homePage, setHomePage] = useState(true);
 
     const handleLogoClick = (event) => {
-        
-        if ((pathname.indexOf('addTask') >= 0)|| (pathname.indexOf('editTask') >= 0)) {
+
+        if ((pathname.indexOf('addTask') >= 0) || (pathname.indexOf('editTask') >= 0)) {
             log('show message')
             setShowComfirmBackModal(true);
-           
+
         }
-        else{
-            window.location.href="/";
-            
+        else {
+            window.location.href = "/";
+
         }
-        
+
     };
 
     const handleGoMainPage = (event) => {
-        window.location.href="/";
+        window.location.href = "/";
     }
 
     useEffect(() => {
 
-        if ((pathname.indexOf('addTask') >= 0)|| (pathname.indexOf('editTask') >= 0)|| (pathname.indexOf('inference') >= 0)) {
-          
+        if ((pathname.indexOf('addTask') >= 0) || (pathname.indexOf('editTask') >= 0) || (pathname.indexOf('inference') >= 0)) {
+
             setHomePage(false);
         }
-        else{
-           
+        else {
+
             setHomePage(true);
         }
-     
+
     }, [pathname]);
 
     return (
@@ -50,16 +50,27 @@ function CustomHeader() {
 
                 <div className="row p-0 g-0">
                     <div className="col-12 p-0">
-                          
+
                         {
-                            (homePage)&&
-                            <a href="./"><Logo style={{ cursor: 'pointer' }} /></a>
+                            (homePage) &&
+                            <a href="./">
+
+                                <div style={{ position: 'relative', height: 56 }}>
+                                    <Logo style={{ cursor: 'pointer', height: 48, position: 'absolute', top: 4, left: -12 }} />
+                                </div>
+
+
+
+                            </a>
                         }
                         {
-                            (!homePage)&&
-                            <Logo onClick={handleLogoClick} style={{ cursor: 'pointer' }} />
+                            (!homePage) &&
+                           
+                            <div style={{position:'relative',height:56}}>
+                                        <Logo onClick={handleLogoClick} style={{ cursor: 'pointer',height:48,position:'absolute',top:4,left:-12 }} />
+                            </div>
                         }
-                        
+
                     </div>
                 </div>
 
@@ -85,16 +96,16 @@ function CustomHeader() {
                         </div>
                         <div className='row'>
                             <div className='col-12 roboto-b1 p-0' style={{ color: 'var(--on_color_1)' }}>
-                                <div style={{ paddingTop: 24}}>
-                                Everything not saved will be lost.
+                                <div style={{ paddingTop: 24 }}>
+                                    Everything not saved will be lost.
                                 </div>
 
                             </div>
                         </div>
 
                         <div className='row'>
-                            <div className='col-12 d-flex justify-content-end' style={{padding:0}}>
-                                <div style={{ paddingTop: 225}} className='d-flex gap-3'>
+                            <div className='col-12 d-flex justify-content-end' style={{ padding: 0 }}>
+                                <div style={{ paddingTop: 225 }} className='d-flex gap-3'>
                                     <CustomButton name="cancel" onClick={() => {
                                         setShowComfirmBackModal(false);
                                     }} />

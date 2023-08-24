@@ -10,6 +10,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { fetchData } from "../store/tasks";
 import { resetFileName } from "../store/sources";
 import { resetDeleteStatus,resetAddStatus,resetUpdateStatus } from "../store/areas";
+import WarnningPanel from '../components/Panel/WarnningPanel';
 
 
 function AllAiTasks() {
@@ -140,6 +141,13 @@ function AllAiTasks() {
             </SimpleLayout>
         );
 
+    if (myStatus === 'rejected')
+        return (
+            <SimpleLayout>
+                <WarnningPanel message="Network or server problem occurs."></WarnningPanel>
+            </SimpleLayout>
+        )                     
+    
     return (
         <SimpleLayout>
         </SimpleLayout>

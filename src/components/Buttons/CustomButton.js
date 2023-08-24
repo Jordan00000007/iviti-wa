@@ -58,6 +58,14 @@ const CustomButton = (props) => {
             )
         }
 
+        if (props.name==="close"){
+            return (
+                <button onClick={props.onClick} className="my-button-cancel">
+                    Close
+                </button>
+            )
+        }
+
         if (props.name==="submit"){
 
             if (props.disabled){
@@ -77,11 +85,19 @@ const CustomButton = (props) => {
         }
 
         if (props.name==="save"){
-            return (
-                <button onClick={props.onClick} className="my-button-submit">
-                    Save
-                </button>
-            )
+            if (props.disabled){
+                return (
+                    <button className="my-button-disable">
+                        save
+                    </button>
+                )
+            }else{
+                return (
+                    <button onClick={props.onClick} className="my-button-submit">
+                        save
+                    </button>
+                )
+            }
         }
 
         if (props.name==="delete"){

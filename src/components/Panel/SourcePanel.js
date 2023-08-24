@@ -5,7 +5,7 @@ import LabelButton from '../../components/Buttons/LabelButton';
 import CustomLoadingSmall from '../../components/Loading/CustomLoadingSmall';
 import RtspInput from '../../components/Inputs/RtspInput';
 import CustomSelectDevice from '../../components/Dropdowns/CustomSelectDevice';
-import { uploadSourceData, getV4l2Devices, resetErrorMessage, resetFileName,resetV4l2Status } from "../../store/sources";
+import { uploadSourceData, getV4l2Devices, resetErrorMessage, resetFileName, resetV4l2Status, resetV4l2Options } from "../../store/sources";
 
 import { useSelector, useDispatch } from "react-redux";
 import CustomAlertSmall from '../../components/Alerts/CustomAlertSmall';
@@ -82,7 +82,7 @@ const SourcePanel = (props) => {
 
             const fileExtension = fileName.toString().split('.').pop().toLowerCase();
 
-            const supportType=['jpg','jpeg','png','tiff','tif','bmp','mp4','avi','mov','wmv'];
+            const supportType = ['jpg', 'jpeg', 'png', 'tiff', 'tif', 'bmp', 'mp4', 'avi', 'mov', 'wmv'];
 
             log('fileName')
             log(fileName)
@@ -93,12 +93,12 @@ const SourcePanel = (props) => {
             log('support?')
             log()
 
-            if (includes(supportType,fileExtension)){
+            if (includes(supportType, fileExtension)) {
                 const formData = new FormData();
                 formData.append('files', e.target.files[0]);
                 dispatch(uploadSourceData(formData))
                 setUploadLoading(true);
-            }else{
+            } else {
                 setShowType(1);
                 setShowText('Not support file type.');
                 setShowInterval(3000);
@@ -106,7 +106,7 @@ const SourcePanel = (props) => {
             }
 
 
-           
+
 
         }
 
@@ -118,22 +118,22 @@ const SourcePanel = (props) => {
         log('rtsp submit');
         log(`rtsp://${rtspUrl}`)
         log(event.target.innerText)
-      
-            if (event.target.innerText==='Clear'){
-                dispatch(resetFileName());
-                props.onClose();
-            }else{
-                if (rtspSubmit) {
-                    const formData = new FormData();
-                    formData.append('input', `rtsp://${rtspUrl}`);
-                    dispatch(uploadSourceData(formData));
-                    setCameraLoading(true);
-                }
+
+        if (event.target.innerText === 'Clear') {
+            dispatch(resetFileName());
+            props.onClose();
+        } else {
+            if (rtspSubmit) {
+                const formData = new FormData();
+                formData.append('input', `rtsp://${rtspUrl}`);
+                dispatch(uploadSourceData(formData));
+                setCameraLoading(true);
             }
         }
+    }
 
 
-    
+
 
     const handleInputChange = (event) => {
 
@@ -144,7 +144,7 @@ const SourcePanel = (props) => {
     const handleV4l2Selected = (event, value) => {
 
         log('handle V4l2 Selected');
-        if ((value !== null)&&(value!==fileName)) {
+        if ((value !== null) && (value !== fileName)) {
             const formData = new FormData();
             formData.append('input', value);
             dispatch(uploadSourceData(formData));
@@ -157,6 +157,15 @@ const SourcePanel = (props) => {
     const handleSourcePanelClick = (event, value) => {
 
         event.stopPropagation();
+    }
+
+    const handleV4l2Click = (event) => {
+
+        log('handle v4l2 click')
+        v4l2SelectorRef.current.setSelectedValue('-1');
+        dispatch(resetFileName());
+        dispatch(resetV4l2Options())
+        dispatch(getV4l2Devices())
     }
 
 
@@ -204,34 +213,34 @@ const SourcePanel = (props) => {
 
     useEffect(() => {
 
-        if ((typeV4L2)&&(fileName!=='')&&(v4l2Status==='success')&&(type==='CAM')){
-            
-           
-            if (v4l2SelectorRef.current){
+        if ((typeV4L2) && (fileName !== '') && (v4l2Status === 'success') && (type === 'CAM')) {
+
+
+            if (v4l2SelectorRef.current) {
                 v4l2SelectorRef.current.setSelectedValue(fileName);
                 dispatch(resetV4l2Status());
             }
         }
 
 
-    }, [typeV4L2, fileName, v4l2Status,type]);
+    }, [typeV4L2, fileName, v4l2Status, type]);
 
     useEffect(() => {
 
         log('fileName----------')
         log(fileName)
 
-        if ((typeRTSP)&&(fileName!=='')&&(type==='RTSP')&&(fileName!==null)){
-            
+        if ((typeRTSP) && (fileName !== '') && (type === 'RTSP') && (fileName !== null)) {
+
             //rtspInputRef.current.setInputValue(fileName.replace("rtsp://",""));
-            if (rtspInputRef.current){
-                rtspInputRef.current.setInputValue(fileName.replace("rtsp://",""));
+            if (rtspInputRef.current) {
+                rtspInputRef.current.setInputValue(fileName.replace("rtsp://", ""));
             }
-           
+
         }
 
 
-    }, [typeRTSP, fileName ,type]);
+    }, [typeRTSP, fileName, type]);
 
 
 
@@ -244,9 +253,9 @@ const SourcePanel = (props) => {
 
     return (
         <div className='my-source-panel position-absolute top-100 start-0' onClick={handleSourcePanelClick}>
-           
+
             <div style={{ position: 'relative' }}>
-                <div style={{ position: 'absolute', width: 496,height: 250, top: 3, left: 3 }} className='d-flex align-items-end justify-content-center p-2'>
+                <div style={{ position: 'absolute', width: 496, height: 250, top: 3, left: 3 }} className='d-flex align-items-end justify-content-center p-2'>
                     <CustomAlertSmall message={showText} type={showType} ref={alertRef} interval={showInterval} width="375" height="18" />
                 </div>
                 <div style={{ position: 'absolute', width: 499, top: 0 }}>
@@ -276,8 +285,8 @@ const SourcePanel = (props) => {
                                             typeRTSP &&
                                             <div className="row ">
                                                 <div className="col-12 d-flex justify-content-between gap-2">
-                                                    <RtspInput defaultValue="" onChange={handleInputChange} ref={rtspInputRef}/>
-                                                    <LabelButton name={(fileName==='')?"Submit":"Clear"} className={(fileName==='')?(rtspSubmit ? "my-source-panel-submit-enable" : "my-source-panel-submit-disable"):"my-source-panel-clear-enable"} width="85" height="32" onClick={handleRtspSubmit} />
+                                                    <RtspInput defaultValue="" onChange={handleInputChange} ref={rtspInputRef} />
+                                                    <LabelButton name={(fileName === '') ? "Submit" : "Clear"} className={(fileName === '') ? (rtspSubmit ? "my-source-panel-submit-enable" : "my-source-panel-submit-disable") : "my-source-panel-clear-enable"} width="85" height="32" onClick={handleRtspSubmit} />
                                                 </div>
                                             </div>
                                         }
@@ -285,7 +294,7 @@ const SourcePanel = (props) => {
                                             typeV4L2 &&
                                             <div className="row ">
                                                 <div className="col-12 d-flex justify-content-between">
-                                                    <CustomSelectDevice areaArr={v4l2Options} width="395" height="32" fontSize="16" placeHolder={true} onChange={handleV4l2Selected} ref={v4l2SelectorRef} ></CustomSelectDevice>
+                                                    <CustomSelectDevice areaArr={v4l2Options} width="395" height="32" fontSize="16" placeHolder={true} onChange={handleV4l2Selected} ref={v4l2SelectorRef} onClick={handleV4l2Click} ></CustomSelectDevice>
                                                 </div>
                                             </div>
 
@@ -312,11 +321,21 @@ const SourcePanel = (props) => {
                                             (!uploadLoading) &&
                                             <>
                                                 {
-                                                    ((fileName === '')||(type==='CAM')||(type==='RTSP')) &&
-                                                    <LabelButton name="Upload" width="85" height="32" className="my-source-panel-upload" onClick={handleUploadClick} />
+                                                    ((fileName === '') || (type === 'CAM') || (type === 'RTSP')) &&
+                                                    <div className="d-flex flex-column" width="200px">
+                                                        <div className="d-flex justify-content-center mt-4">
+                                                            <LabelButton name="Upload" width="85" height="32" className="my-source-panel-upload" onClick={handleUploadClick} />
+
+                                                        </div>
+                                                        <div className="d-flex justify-content-center mt-3">
+                                                            <div className='roboto-b2' style={{color:'var(--on_color_2)'}}>Supported formats: 'jpg', 'jpeg', 'png', 'tiff', 'tif', 'bmp', 'mp4', 'avi', 'mov', 'wmv'.</div>
+                                                        </div>
+
+                                                    </div>
+
                                                 }
                                                 {
-                                                    (fileName !== '')&&((type==='VIDEO')||(type==='IMAGE')) &&
+                                                    (fileName !== '') && ((type === 'VIDEO') || (type === 'IMAGE')) &&
                                                     <div className='d-flex justify-content-between' style={{ width: 396 }}>
                                                         <CustomInput width="300" height="32" disabled={true} defaultValue={fileName}></CustomInput>
                                                         <LabelButton name="Clear" width="85" height="32" className="my-source-panel-clear roboto-b1" onClick={handleClearClick} />
@@ -337,7 +356,7 @@ const SourcePanel = (props) => {
                                 <div className="row">
                                     <div className="col-12 d-flex justify-content-center align-items-center" style={{ height: '0px' }}>
 
-                                        <input type="file" name="files" onChange={handleFileChange} ref={fileRef} style={{ visibility: 'hidden' }} accept=".jpg,.jpeg,.png,.tiff,.tif,.bmp,.mp4,.avi,.mov,.wmv"/>
+                                        <input type="file" name="files" onChange={handleFileChange} ref={fileRef} style={{ visibility: 'hidden' }} accept=".jpg,.jpeg,.png,.tiff,.tif,.bmp,.mp4,.avi,.mov,.wmv" />
 
                                     </div>
                                 </div>
