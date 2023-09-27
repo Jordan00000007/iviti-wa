@@ -1449,7 +1449,7 @@ function EditAiTask() {
             //------------
 
             dispatch(initData({ "w": fileSetWidth, "h": fileSetHeight }));
-            dispatch(getSourceFrame({ "fileUid": fileUid, "basicType": basicType }));
+            //dispatch(getSourceFrame({ "fileUid": fileUid, "basicType": basicType }));
            
         }
 
