@@ -5,6 +5,7 @@ import Modal from '@mui/joy/Modal';
 import ModalDialog from '@mui/joy/ModalDialog';
 import moment from "moment";
 
+
 import SimpleLayout from '../components/Layouts/SimpleLayout';
 import CustomButton from '../components/Buttons/CustomButton';
 import StatusButton from '../components/Buttons/StatusButton';
@@ -48,6 +49,9 @@ import WarnningPanel from '../components/Panel/WarnningPanel';
 
 function AiInference() {
 
+
+    const TASK_SERVER = process.env.REACT_APP_TASK_SERVER;
+
     const handle = useFullScreenHandle();
 
     const [fps, setFps] = useState('N/A');
@@ -69,16 +73,16 @@ function AiInference() {
 
     const [basicType, setBasicType] = useState(false);
 
-    const eventInitData={};
-    eventInitData.uid="";
-    eventInitData.title="";
-    eventInitData.app_uid="";
-    eventInitData.start_time="";
-    eventInitData.end_time="";
-    eventInitData.annotation={"area":{"name":"","area_point":[]}};
-    
+    const eventInitData = {};
+    eventInitData.uid = "";
+    eventInitData.title = "";
+    eventInitData.app_uid = "";
+    eventInitData.start_time = "";
+    eventInitData.end_time = "";
+    eventInitData.annotation = { "area": { "name": "", "area_point": [] } };
 
-    const [eventModalData,setEventModalData] = useState(eventInitData);
+
+    const [eventModalData, setEventModalData] = useState(eventInitData);
 
     const [disabled, setDisabled] = useState(false);
 
@@ -113,10 +117,10 @@ function AiInference() {
     const setMessageOpen = (showType, showText) => {
         setShowType(showType);
         setShowText(showText);
-        if (alertRef.current){
+        if (alertRef.current) {
             alertRef.current.setShowTrue(3000);
         }
-        
+
 
     };
 
@@ -125,7 +129,7 @@ function AiInference() {
     };
 
     const handleEventCardClick = (myData) => {
-        
+
         setEventModalData(myData);
         setShowEventModal(true);
     }
@@ -159,26 +163,64 @@ function AiInference() {
 
     const handleAddEvent = (myData) => {
 
-        if (myData.app_uid===params.uuid){
-            let tmpEvent=[myData].concat(eventArr);
-            if (tmpEvent.length>11){
-                tmpEvent=tmpEvent.slice(0,11);
-            }
-            setEventArr(tmpEvent);
+        if (myData.app_uid === params.uuid) {
 
-            // let tmpEvent=eventArr;
-            // tmpEvent.push(myData);
-            // if (tmpEvent.length>3){
-            //     tmpEvent=tmpEvent.slice(-3);
-            // }
-            // setEventArr(tmpEvent);
-          
+            const myBody = {};
+            myBody.timestamp = myData.start_time;
+            myBody.draw_results = true;
+
+            const requestOptions = {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(myBody)
+            };
+            const image1 = fetch(`${TASK_SERVER}/events/screenshot`, requestOptions)
+            .then(response => response.blob())
+            .then(blob => {
+
+                var reader = new FileReader();
+                reader.readAsDataURL(blob);
+                reader.onloadend = function () {
+                    var base64String = reader.result;
+                    myData.imgBase64_1 = base64String;
+
+                   
+                }
+
+                myBody.draw_results=false;
+                requestOptions.body=JSON.stringify(myBody)
+                return fetch(`${TASK_SERVER}/events/screenshot`, requestOptions)
+            })
+            .then(response => response.blob())
+            .then(blob => {
+
+                var reader = new FileReader();
+                reader.readAsDataURL(blob);
+                reader.onloadend = function () {
+                    var base64String = reader.result;
+                    myData.imgBase64_2 = base64String;
+                }
+
+
+                let tmpEvent = [myData].concat(eventArr);
+                if (tmpEvent.length > 11) {
+                    tmpEvent = tmpEvent.slice(0, 11);
+                }
+                setEventArr(tmpEvent);
+                
+            }).catch(function(error) {
+                log(error);
+                let tmpEvent = [myData].concat(eventArr);
+                if (tmpEvent.length > 11) {
+                    tmpEvent = tmpEvent.slice(0, 11);
+                }
+                setEventArr(tmpEvent);
+            })
+
         }
     }
 
     const handleWebSocketError = (myType, myMsg) => {
-
-       
 
         setMessageOpen(1, myMsg);
 
@@ -188,12 +230,12 @@ function AiInference() {
         // myData.message = myMsg;
 
         // dispatch(setTaskStatus(myData));
-    
+
     }
 
     const formatEventTime = (myStartTime) => {
-    
-        return moment(parseInt(myStartTime.toString().slice(0,13))).format("YYYY-MM-DD HH:mm:ss") 
+
+        return moment(parseInt(myStartTime.toString().slice(0, 13))).format("YYYY-MM-DD HH:mm:ss")
     }
 
     const handleEditClick = () => {
@@ -208,11 +250,17 @@ function AiInference() {
 
     }
 
+    const handleVideoError = (myErrorMessage) => {
+
+        setMessageOpen(1, myErrorMessage);
+
+    }
+
     const handlePredictionChange = (event) => {
-     
-        if (predictionToggleRef.current.getIsChecked()){
+
+        if (predictionToggleRef.current.getIsChecked()) {
             setShowPredictPic(false);
-        }else{
+        } else {
             setShowPredictPic(true);
         };
 
@@ -261,7 +309,7 @@ function AiInference() {
 
             }
 
-           
+
             if ((myItem.status) && (myStatus === 'success')) {
                 if (myItem.status === 'set_task_run_success') {
 
@@ -315,11 +363,11 @@ function AiInference() {
                                         </Link>
                                     </div>
 
-                                    
+
                                     <CustomTooltip customClassName="my-body-title roboto-h2">
                                         {(myItem.task_name) ? myItem.task_name : ""}
                                     </CustomTooltip>
-                                    
+
 
                                     <div className='d-flex justify-content-start align-items-center'>
                                         <ToggleButton onChange={handleToggleChange} status={myItem.status} />
@@ -327,7 +375,7 @@ function AiInference() {
                                 </div>
 
                                 {
-                                    ((myItem.status === 'stop')||(myItem.status.toLowerCase().indexOf('error')>=0)) &&
+                                    ((myItem.status === 'stop') || (myItem.status.toLowerCase().indexOf('error') >= 0)) &&
                                     <CustomButton name="edit" onClick={handleEditClick} width="100" />
                                 }
 
@@ -355,7 +403,7 @@ function AiInference() {
                                                     </div>
                                                     <FullScreen handle={handle}>
                                                         <div className={fullScreen ? 'my-area-a2' : 'my-area-a2 position-relative'} onChange={handleVideoClick} ref={videoPanelRef}>
-                                                            <RemoteVideo uuid={params.uuid} status={myItem.status} onPlaying={handlePlaying} fullScreen={fullScreen} />
+                                                            <RemoteVideo uuid={params.uuid} status={myItem.status} onPlaying={handlePlaying} onError={handleVideoError} fullScreen={fullScreen} />
                                                             <CustomDisplay uuid={myItem.source_uid} playing={playing} onClick={handleVideoClick} fullScreen={fullScreen}></CustomDisplay>
                                                         </div>
                                                     </FullScreen>
@@ -470,15 +518,15 @@ function AiInference() {
                                                             </div>
                                                         </div>
                                                         <div className="tab-pane fade" id="event" role="tabpanel" aria-labelledby="event-tab">
-                                                            <div className='my-tab-container' style={{overflowY:'scroll'}}>
+                                                            <div className='my-tab-container' style={{ overflowY: 'scroll' }}>
 
 
-                                                            {
-                                                                eventArr.map((item,idx) => (
-                                                                   
-                                                                    <EventCard key={idx} data={item} uuid={item.start_time} onClick={handleEventCardClick}></EventCard>
-                                                                ))
-                                                            }
+                                                                {
+                                                                    eventArr.map((item, idx) => (
+
+                                                                        <EventCard key={idx} data={item} uuid={item.start_time} onClick={handleEventCardClick}></EventCard>
+                                                                    ))
+                                                                }
 
                                                                 {/* <EventCard onClick={handleEventCardClick}></EventCard>
                                                                 <CustomDivider />
@@ -504,7 +552,7 @@ function AiInference() {
                     open={showEventModal}
                     onClose={(_event, reason) => {
                         setShowEventModal(false);
-                      }}
+                    }}
                 >
                     <ModalDialog
                         sx={{ minWidth: 730, maxWidth: 730, minHeight: 602 }}
@@ -512,7 +560,7 @@ function AiInference() {
                         <div className='container-fluid'>
                             <div className='row'>
                                 <div className='col-12 roboto-h2 p-0'>
-                                    <div style={{height:29}}>
+                                    <div style={{ height: 29 }}>
                                         {eventModalData.title}
                                     </div>
 
@@ -520,26 +568,26 @@ function AiInference() {
                             </div>
                             <div className='row'>
                                 <div className='col-12 roboto-b1 p-0 d-flex justify-content-between align-items-center' style={{ color: 'var(--on_color_2)' }}>
-                                    
-                                        <div style={{ height:20 }}>
-                                            {eventModalData.annotation.area.name}, {formatEventTime(eventModalData.start_time)} 
-                                        </div>
 
-                                        <div style={{width:144,height:36,background:'#FAFAFD',padding:'8px 10px',border:'1px solid #E0E1E6',borderRadius: 10}} className='d-flex justify-content-between'>
-                                            <div style={{position:'relative'}}>
-                                                <span style={{position:'absolute',top:-2}}>Prediction</span>
-                                            </div>
-                                            <div>
-                                                <PredictionToggleButton onChange={handlePredictionChange} status={(showPredictPic)?'run':'stop'} ref={predictionToggleRef}></PredictionToggleButton>
-                                            </div>
-                                        </div>                                   
+                                    <div style={{ height: 20 }}>
+                                        {eventModalData.annotation.area.name}, {formatEventTime(eventModalData.start_time)}
+                                    </div>
+
+                                    <div style={{ width: 144, height: 36, background: '#FAFAFD', padding: '8px 10px', border: '1px solid #E0E1E6', borderRadius: 10 }} className='d-flex justify-content-between'>
+                                        <div style={{ position: 'relative' }}>
+                                            <span style={{ position: 'absolute', top: -2 }}>Prediction</span>
+                                        </div>
+                                        <div>
+                                            <PredictionToggleButton onChange={handlePredictionChange} status={(showPredictPic) ? 'run' : 'stop'} ref={predictionToggleRef}></PredictionToggleButton>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                             <div className='row mt-1'>
                                 <div className='col-12 roboto-h2 p-0'>
                                     <div style={{ paddingTop: 5 }}>
-                                        <BigShot uuid={eventModalData.start_time} area={eventModalData.annotation.area} toggle={showPredictPic}/>  
-                                       
+                                        <BigShot uuid={eventModalData.start_time} area={eventModalData.annotation.area} image1={eventModalData.imgBase64_1} image2={eventModalData.imgBase64_2} toggle={showPredictPic} />
+
                                     </div>
                                 </div>
                             </div>

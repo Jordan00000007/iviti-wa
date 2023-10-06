@@ -38,6 +38,10 @@ function App() {
             element: <Admin />
         },
         {
+            path: "label",
+            element: <Admin />
+        },
+        {
             path: "*",
             element: <NotFound />
         },

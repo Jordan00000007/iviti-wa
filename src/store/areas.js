@@ -430,6 +430,11 @@ const areasSlice = createSlice({
             const modelType=action.payload.data[0].type
 
             const myIndex_1 = state.modelData.findIndex(item => item.uid === state.selectedModel);
+
+            if (myIndex_1>=0){
+
+          
+
             const myDependOn = JSON.parse(state.modelData[myIndex_1].classes.replace(/'/g, '"'));
 
             const myData=action.payload.data[0].app_setting.application.areas;
@@ -554,6 +559,9 @@ const areasSlice = createSlice({
             state.areaEditingIndex=0;
 
             state.status = 'complete';
+        }else{
+            state.status = 'complete';
+        }
         
         }
     )

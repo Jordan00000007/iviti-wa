@@ -19,6 +19,7 @@
     "@testing-library/user-event": "^13.5.0",
     "@tybys/vscode-color-picker": "^1.0.1",
     "axios": "^1.4.0",
+    "blob-to-buffer": "^1.2.9",
     "bootstrap": "^5.2.3",
     "buffer": "^6.0.3",
     "env-cmd": "^10.1.0",

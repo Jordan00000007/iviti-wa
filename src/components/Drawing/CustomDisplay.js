@@ -235,7 +235,7 @@ const CustomDisplay = (props) => {
                                     stroke="red"
                                     opacity={0.16}
                                     lineJoin="round"
-                                    fill="#FBB03B"
+                                    fill="#E61F23"
                                     points={item}
                                     onClick={event => {
                                         //

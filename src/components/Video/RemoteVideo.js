@@ -3,7 +3,7 @@ import log from "../../utils/console";
 import { Buffer } from "buffer";
 import { PropaneSharp } from '@mui/icons-material';
 
-const RemoteVideo = ({ uuid, status, onPlaying, fullScreen }) => {
+const RemoteVideo = ({ uuid, status, onPlaying, fullScreen,onError }) => {
     const STREAM_SERVER = process.env.REACT_APP_STREAM_SERVER;
     const [remoteStream, setRemoteStream] = useState(null);
     const remoteVideoRef = useRef(null);
@@ -43,12 +43,6 @@ const RemoteVideo = ({ uuid, status, onPlaying, fullScreen }) => {
 
             const trg_url = `${STREAM_SERVER}/stream/${uuid}/channel/0/webrtc`;
 
-            // log(` --> trg_url=${trg_url}`);
-            // log('--- offer begin ---')
-            // log(btoa(offer.sdp))
-            // log('--- offer end ---')
-
-
             fetch(trg_url, {
                 method: "POST",
                 headers: {
@@ -57,98 +51,69 @@ const RemoteVideo = ({ uuid, status, onPlaying, fullScreen }) => {
                 // body: 'data=' + btoa(offer.sdp)
                 body: 'data='+Buffer.from(offer.sdp).toString('base64')
             })
-                .then((response) => response.text())
-                .then((body) => {
+            .then((response) => {
+                return response.text()        
+            })
+            .then((body) => {
 
-                    log('--- body begin ---')
-                    log(body.slice(0,200))
-                    log('--- body end ---')
+                
+                if (body.slice(0,1)==='{'){
+                    const myBody=JSON.parse(body);
+                    setVideoMessage('Something wrong with this AI task.');
+                    onPlaying(false);
+                    onError(myBody.payload);
+                    log(myBody.payload);
 
+                }else{
                     peerConnection.setRemoteDescription(
                         new RTCSessionDescription({
                             type: 'answer',
                             //sdp: atob(decodeURIComponent(body))
                             sdp: Buffer.from(decodeURIComponent(body),'base64')
                             //decodeURIComponent
-                        }))
+                        })
+                    )
+                }
 
-
-                })
-                .catch(function (err) {
-                    log('--- err ---')
-                    log(err)
-                    //setTimeout( setPeerConnectionError(true), 30000);
-                });
+            })
+            .catch(function (err) {
+                log('--- err ---')
+                log(err)
+                //setTimeout( setPeerConnectionError(true), 30000);
+            });
         }
 
         log("(4) Define Track Event");
         peerConnection.ontrack = function (event) {
 
-            //log('--- track info ---')
-            //log(event.streams[0])
-
             setRemoteStream(event.streams[0]);
-            //setPeerConnectionError(false);
-
-            // if (status === 'running') {
-            //     setRemoteStream(event.streams[0]);
-            // } else {
-            //     setRemoteStream(null);
-            // }
-
-
+        
         }
 
 
         peerConnection.oniceconnectionstatechange = (e) => { 
-            log('===============================================')
-            log('on ice connection state change')
+          
+            log('peerConnection')
             log(e.currentTarget)
 
             if (e.currentTarget.iceConnectionState==='disconnected'){
-
                 setPeerConnectionError(true);
-                 
+                log('peerConnection')
             }
 
             if (e.currentTarget.iceConnectionState==='connected'){
-
                 setPeerConnectionError(false);
-                
             }
             
            
         };
 
-        // let id = setInterval(connCheck, 5000);
-        // function connCheck() {
-           
-        //     log('status='+status)
-        //     log('videoMessage='+videoMessage)
-
-        //     // if (onPlaying) {
-        //     //     log('conn check')
-        //     // }
-        // }
-
-
+        
     }
 
     useEffect(() => {
 
-        //log('status='+status)
-        //log('videoMessage='+videoMessage)
-
-        // let id = setInterval(connCheck, 5000);
-        // function connCheck() {
-           
-        //     log('status='+status)
-        //     log('videoMessage='+videoMessage)
-
-        //     if (onPlaying) {
-        //         log('conn check')
-        //     }
-        // }
+      
 
     }, []);
 

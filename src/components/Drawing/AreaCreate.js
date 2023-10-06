@@ -96,9 +96,15 @@ const areaCreate = forwardRef((props, ref) => {
                 opacity={1}
                 lineJoin="round"
                 closed={isComplete}
-                points={points
+                points={
+                    (nextPoint.x===null)?
+                    points
                     .flatMap(point => [point.x, point.y])
-                    .concat([nextPoint.x, nextPoint.y])}
+                    :
+                    points
+                    .flatMap(point => [point.x, point.y])
+                    .concat([nextPoint.x, nextPoint.y])
+                }
             />
 
             <Line
@@ -107,9 +113,15 @@ const areaCreate = forwardRef((props, ref) => {
                 fill="#E61F23"
                 lineJoin="round"
                 closed={true}
-                points={points
+                points={
+                    (nextPoint.x===null)?
+                    points
                     .flatMap(point => [point.x, point.y])
-                    .concat([nextPoint.x, nextPoint.y])}
+                    :
+                    points
+                    .flatMap(point => [point.x, point.y])
+                    .concat([nextPoint.x, nextPoint.y])
+                }
             />
 
             {    

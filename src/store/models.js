@@ -68,7 +68,7 @@ const modelsSlice = createSlice({
                     let myData=[];
                   
                     Object.keys(action.payload.data).map((e, i) => {
-                        myData.push([action.payload.data[e].uid,action.payload.data[e].name]);
+                        myData.push([action.payload.data[e].uid,action.payload.data[e].name,action.payload.data[e].default_model]);
                         
                     })
                     

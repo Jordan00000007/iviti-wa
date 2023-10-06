@@ -1161,9 +1161,14 @@ function EditAiTask() {
             //setSelectedApplication(app_name[0]);
 
             let myAppOptions = [];
-            myAppArr.forEach(item => {
-                myAppOptions.push([item, item.replace(/_/g, " ")])
-            });
+            log('myAppArr')
+            log(myAppArr)
+            if (myAppArr!==undefined){
+                myAppArr.forEach(item => {
+                    myAppOptions.push([item, item.replace(/_/g, " ")])
+                });
+            }
+          
             setApplicationOptions(myAppOptions);
             log('---(3) set application selected data')
             log(app_name)
@@ -1180,11 +1185,22 @@ function EditAiTask() {
         if (modelType !== '') {
 
             const myIndex_1 = modelData.findIndex(item => item.type === modelType);
-            const myDependOn = modelData[myIndex_1].classes;
+            log('myIndex_1')
+            log(myIndex_1)
 
-            if (taskUid === '') {
-                dispatch(setDependOn(JSON.parse(myDependOn.replace(/'/g, '"'))))
+            if (myIndex_1>=0){
+                const myDependOn = modelData[myIndex_1].classes;
+
+                if (taskUid === '') {
+                    dispatch(setDependOn(JSON.parse(myDependOn.replace(/'/g, '"'))))
+                }
+            }else{
+                setShowAppSetting(false);
+                setSelectedModel('');
+                //dispatch(setSelectedModel({ selectedModel: '' }));
+                dispatch(areasActions.setSelectedModel({ "selectedModel": '' }));
             }
+          
 
         }
 
@@ -1278,7 +1294,15 @@ function EditAiTask() {
     // [02] handle all options data and fetch task data
     useEffect(() => {
 
-        if ((modelStatus === 'success') && (applicationStatus === 'success') && (deviceStatus === 'success')) {
+        log('---------------------------')
+        log(modelStatus)
+        log(applicationStatus)
+        log(deviceStatus)
+        log('---------------------------')
+        log(selectedModel)
+        log('---------------------------')
+
+        if ((modelStatus === 'success') && (applicationStatus === 'success') && (deviceStatus === 'success') ) {
 
             if (params.uuid !== undefined) {
                 dispatch(fetchData());
@@ -1286,6 +1310,8 @@ function EditAiTask() {
                 setShowLoadingModal(false);
 
             }
+            
+
         }
 
     }, [modelStatus, applicationStatus, deviceStatus]);
@@ -1477,9 +1503,15 @@ function EditAiTask() {
             if (taskUid !== '') {
 
                 log('areaStatus=' + areaStatus);
-                setShowAppSetting(true);
+                
                 setShowLoadingModal(false);
                 // dispatch(resetStatus());
+                if (selectedModel===''){
+                    setShowAppSetting(false);
+                }else{
+                    setShowAppSetting(true);
+                }
+
             }
         }
 
@@ -1526,7 +1558,7 @@ function EditAiTask() {
             //------------
 
             dispatch(initData({ "w": fileSetWidth, "h": fileSetHeight }));
-            dispatch(getSourceFrame({ "fileUid": fileUid, "basicType": basicType }));
+            //dispatch(getSourceFrame({ "fileUid": fileUid, "basicType": basicType }));
 
         }
 

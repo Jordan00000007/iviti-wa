@@ -54,6 +54,8 @@ export const getSourceFrame = createAsyncThunk('sources/getSourceFrame', async (
 
         // log('url=')
         // log(`${TASK_URL}/sources/${fileUid}/frame`)
+        log('myData')
+        log(myData)
 
         const response = await fetch(`${TASK_URL}/sources/${fileUid}/frame`, {
             method: 'POST',

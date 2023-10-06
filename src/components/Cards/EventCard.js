@@ -59,30 +59,7 @@ const EventCard = (props) => {
         
     }
 
-    useEffect(() => {
 
-        if (props.uuid!==undefined){
-            const myData={};
-            myData.timestamp=props.uuid.toString();
-            myData.draw_results=false;
-           
-            const requestOptions = {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(myData)
-            };
-            fetch(`${TASK_SERVER}/events/screenshot`, requestOptions)
-                .then(response => response.blob())
-                .then(blob => {
-                    setData(URL.createObjectURL(blob))
-                })
-        }
-
-       
-           
-    
-    
-    }, [props.uuid]);
 
  
     return (
@@ -97,7 +74,7 @@ const EventCard = (props) => {
                                 <div>
                                 
                                     <div style={{ width: 66, height:66, background: 'black', border: '0px' }} className='d-flex align-items-center'>
-                                        <img src={data} style={{ maxWidth: 66, maxHeight: 66 }}/>
+                                        <img src={props.data.imgBase64_1} style={{ maxWidth: 66, maxHeight: 66 }}/>
                                     </div> 
                                     
                                 </div>
