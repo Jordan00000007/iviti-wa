@@ -44,6 +44,8 @@ import { FullScreen, useFullScreenHandle } from "react-full-screen";
 
 import WarnningPanel from '../components/Panel/WarnningPanel';
 
+import localStorage from "localStorage";
+
 
 
 
@@ -124,8 +126,15 @@ function AiInference() {
 
     };
 
-    const handleClickBack = () => {
-        log('Add Button clicked!');
+    const handleBackClick = () => {
+        log('Handle Button clicked!');
+        if (myItem.status==='run'){
+            localStorage.setItem(params.uuid, JSON.stringify(eventArr))
+        }else{
+            localStorage.setItem(params.uuid, '[]')
+        }
+
+        window.location.href = `/`;
     };
 
     const handleEventCardClick = (myData) => {
@@ -140,6 +149,8 @@ function AiInference() {
             dispatch(runTask(params.uuid));
         } else {
             dispatch(stopTask(params.uuid));
+            setEventArr([]);
+            localStorage.setItem(params.uuid, '[]');
         }
     };
 
@@ -163,59 +174,15 @@ function AiInference() {
 
     const handleAddEvent = (myData) => {
 
+        //log('myData--------------->',myData)
         if (myData.app_uid === params.uuid) {
 
-            const myBody = {};
-            myBody.timestamp = myData.start_time;
-            myBody.draw_results = true;
 
-            const requestOptions = {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(myBody)
-            };
-            const image1 = fetch(`${TASK_SERVER}/events/screenshot`, requestOptions)
-            .then(response => response.blob())
-            .then(blob => {
-
-                var reader = new FileReader();
-                reader.readAsDataURL(blob);
-                reader.onloadend = function () {
-                    var base64String = reader.result;
-                    myData.imgBase64_1 = base64String;
-
-                   
-                }
-
-                myBody.draw_results=false;
-                requestOptions.body=JSON.stringify(myBody)
-                return fetch(`${TASK_SERVER}/events/screenshot`, requestOptions)
-            })
-            .then(response => response.blob())
-            .then(blob => {
-
-                var reader = new FileReader();
-                reader.readAsDataURL(blob);
-                reader.onloadend = function () {
-                    var base64String = reader.result;
-                    myData.imgBase64_2 = base64String;
-                }
-
-
-                let tmpEvent = [myData].concat(eventArr);
-                if (tmpEvent.length > 11) {
-                    tmpEvent = tmpEvent.slice(0, 11);
-                }
-                setEventArr(tmpEvent);
-                
-            }).catch(function(error) {
-                log(error);
-                let tmpEvent = [myData].concat(eventArr);
-                if (tmpEvent.length > 11) {
-                    tmpEvent = tmpEvent.slice(0, 11);
-                }
-                setEventArr(tmpEvent);
-            })
+            let tmpEvent = [myData].concat(eventArr);
+            if (tmpEvent.length > 11) {
+                tmpEvent = tmpEvent.slice(0, 11);
+            }
+            setEventArr(tmpEvent);
 
         }
     }
@@ -276,6 +243,14 @@ function AiInference() {
 
     }
 
+    const handleContextMenu=(evt)=>{
+
+        log('handle Context Menu')
+        evt.preventDefault();
+        return false;
+
+    }
+
     useEffect(() => {
 
         if (handle.active) {
@@ -291,6 +266,26 @@ function AiInference() {
         dispatch(fetchData());
         //dispatch(getAllModels());
     }, []);
+
+    useEffect(() => {
+
+        log('myItem.status',myItem.status)
+        
+        log('check eventArr -------------------->',localStorage.getItem(params.uuid))
+
+        if (myItem.status==='run'){
+            if (localStorage.getItem(params.uuid)!==null){
+                setEventArr(JSON.parse(localStorage.getItem(params.uuid)))
+            }
+        }
+        if (myItem.status==='stop'){
+          
+            localStorage.setItem(params.uuid,'[]');
+            
+        }
+    
+    
+    }, [myItem.status]);
 
 
     useEffect(() => {
@@ -358,9 +353,9 @@ function AiInference() {
                             <div className="col-12 d-flex justify-content-between align-items-center my-flex-gap">
                                 <div className='d-flex flex-row my-flex-gap'>
                                     <div>
-                                        <Link to="/">
-                                            <CustomButton name="back" />
-                                        </Link>
+                                        {/* <Link to="/"> */}
+                                            <CustomButton name="back" onClick={handleBackClick}/>
+                                        {/* </Link> */}
                                     </div>
 
 
@@ -402,7 +397,7 @@ function AiInference() {
                                                         }
                                                     </div>
                                                     <FullScreen handle={handle}>
-                                                        <div className={fullScreen ? 'my-area-a2' : 'my-area-a2 position-relative'} onChange={handleVideoClick} ref={videoPanelRef}>
+                                                        <div className={fullScreen ? 'my-area-a2' : 'my-area-a2 position-relative'} onChange={handleVideoClick} ref={videoPanelRef} onContextMenu={handleContextMenu}>
                                                             <RemoteVideo uuid={params.uuid} status={myItem.status} onPlaying={handlePlaying} onError={handleVideoError} fullScreen={fullScreen} />
                                                             <CustomDisplay uuid={myItem.source_uid} playing={playing} onClick={handleVideoClick} fullScreen={fullScreen}></CustomDisplay>
                                                         </div>

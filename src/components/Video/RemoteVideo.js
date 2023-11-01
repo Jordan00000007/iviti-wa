@@ -63,6 +63,7 @@ const RemoteVideo = ({ uuid, status, onPlaying, fullScreen,onError }) => {
                     onPlaying(false);
                     onError(myBody.payload);
                     log(myBody.payload);
+                    setPeerConnectionError(true);
 
                 }else{
                     peerConnection.setRemoteDescription(
@@ -218,14 +219,7 @@ const RemoteVideo = ({ uuid, status, onPlaying, fullScreen,onError }) => {
         onPlaying(true);
     }
 
-    useEffect(() => {
-
-        if (fullScreen) {
-            //remoteVideoRef.current.webkitRequestFullscreen();
-        } else {
-            //remoteVideoRef.exitFullscreen();
-        }
-    }, [fullScreen]);
+    
 
     return (
         <div style={{ position: 'relative' }}>
