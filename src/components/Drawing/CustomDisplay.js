@@ -220,6 +220,7 @@ const CustomDisplay = (props) => {
                     setShowAreas(false);
                 }}
                 onClick={props.onClick}
+               
 
             >
                 {

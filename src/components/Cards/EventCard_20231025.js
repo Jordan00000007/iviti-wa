@@ -27,7 +27,7 @@ const EventCard = (props) => {
 
     // const [name, setName] = useState("");
 
-
+    
     const TASK_SERVER = process.env.REACT_APP_TASK_SERVER;
 
     const dispatch = useDispatch();
@@ -35,9 +35,6 @@ const EventCard = (props) => {
     const navigate = useNavigate();
 
     const [data, setData] = useState(null);
-
-    const [image1, setImage1] = useState(null);
-    const [image2, setImage2] = useState(null);
 
 
     const init = [];
@@ -47,55 +44,24 @@ const EventCard = (props) => {
 
 
     const handleCardClick = (event) => {
-
+        
         props.onClick(props.data);
     }
 
     const formatEventTime = (myStartTime) => {
 
-        if (myStartTime !== undefined) {
-            return moment(parseInt(myStartTime.toString().slice(0, 13))).format("YYYY-MM-DD HH:mm:ss");
-        } else {
+        if (myStartTime!==undefined){
+            return moment(parseInt(myStartTime.toString().slice(0,13))).format("YYYY-MM-DD HH:mm:ss");
+        }else{
             return "N/A";
         }
-
-
+    
+        
     }
 
-    useEffect(() => {
-
-        const myBody = {};
-        myBody.timestamp = props.uuid;
-        myBody.draw_results = true;
-
-        const requestOptions = {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(myBody)
-        };
-
-        const image1 = fetch(`${TASK_SERVER}/events/screenshot`, requestOptions)
-        .then(response => response.blob())
-        .then(blob => {
-
-            var reader = new FileReader();
-            reader.readAsDataURL(blob);
-            reader.onloadend = function () {
-                var base64String = reader.result;
-                //myData.imgBase64_1 = base64String;
-                setImage1(base64String);
-            }
-        }).catch(function (error) {
-            log(error);
-        })
-
-    }, [props.uuid]);
-
-   
 
 
-
-
+ 
     return (
         <div className="card border-0" style={{ marginTop: 16, marginLeft: 14 }}>
             <div className="card-body my-event-card" style={{ cursor: 'pointer' }} >
@@ -106,11 +72,11 @@ const EventCard = (props) => {
                         <div className="row">
                             <div className="col-12 d-flex flex-row gap-2">
                                 <div>
-
-                                    <div style={{ width: 66, height: 66, background: 'black', border: '0px' }} className='d-flex align-items-center'>
-                                        <img src={image1} style={{ maxWidth: 66, maxHeight: 66 }} />
-                                    </div>
-
+                                
+                                    <div style={{ width: 66, height:66, background: 'black', border: '0px' }} className='d-flex align-items-center'>
+                                        <img src={props.data.imgBase64_1} style={{ maxWidth: 66, maxHeight: 66 }}/>
+                                    </div> 
+                                    
                                 </div>
                                 <div className="d-flex flex-column" style={{ position: 'relative' }}>
 
@@ -128,20 +94,20 @@ const EventCard = (props) => {
                                     </div>
 
                                     <div className='roboto-b2' style={{ position: 'absolute', top: 48, width: 218, height: 18, color: '#16272E66' }}>
-
+                                        
                                         {formatEventTime(props.data.start_time)}
                                     </div>
 
                                     <div style={{ position: 'absolute', top: 48, left: 160 }}>
-                                        <div className='roboto-b2 my-event-card-button' style={{ position: 'relatvie' }}>
-                                            <span style={{ position: 'absolute', top: 1, left: 9 }}>
+                                        <div className='roboto-b2 my-event-card-button' style={{position:'relatvie'}}>
+                                            <span style={{position:'absolute',top:1,left:9}}>
                                                 view&nbsp;
                                             </span>
-                                            <span style={{ position: 'absolute', top: 1, left: 42 }}>
-                                                <Arrow />
+                                            <span style={{position:'absolute',top:1,left:42}}>
+                                                <Arrow/>
                                             </span>
                                         </div>
-
+                                        
                                     </div>
 
 

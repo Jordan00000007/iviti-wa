@@ -65,7 +65,7 @@ import { ReactComponent as Image_Default } from '../assets/Image_Default.svg';
 import SourcePanel from '../components/Panel/SourcePanel';
 import DependOnSelectPanel from '../components/Panel/DependOnSelectPanel';
 
-import { getSourceFrame, getSourceInfo, setSourceId, getSourceWidthHeight, sourcesActions, resetFrameStatus, setDrawWidthHeight } from "../store/sources";
+import { getSourceFrame, getSourceInfo, setSourceId, getSourceWidthHeight, sourcesActions, resetFrameStatus, setDrawWidthHeight,resetFileName } from "../store/sources";
 import { areaSelected, areaRename, areaDelete, getAppSetting, setFileWidthHeight, areasActions, lineDataReset, setModelData, resetStatus, setSelectedApplication, setSelectedModel, lineADelete, resetDeleteStatus, resetLineADeleteStatus, resetLineBDeleteStatus, updateLabelColor } from "../store/areas";
 import { fetchData, deleteTask, resetError, setTaskDeleteMessage } from "../store/tasks";
 
@@ -1488,6 +1488,7 @@ function EditAiTask() {
             setShowAppSetting(false);
             setShowLoadingModal(false);
             setMessageOpen(1, 'Fetch source frame error.');
+            dispatch(resetFileName());
             setSourceContent('');
             setShowAppSetting(false);
 
@@ -1968,7 +1969,7 @@ function EditAiTask() {
 
                                                         {
                                                             (toggleType === 'Event') &&
-                                                            <EventPanel ref={eventPanelObjRef}/>
+                                                            <EventPanel ref={eventPanelObjRef} selectedApplication={selectedApplication}/>
                                                         }
 
                                                     </div>

@@ -51,6 +51,10 @@ const CustomSelectSource = forwardRef((props, ref) => {
         }
     };
 
+    const handleInputClick=()=>{
+        buttonRef.current.click();
+    }
+
     useEffect(() => {
       
     }, [expandSourceMenu]);
@@ -120,7 +124,7 @@ const CustomSelectSource = forwardRef((props, ref) => {
                 `}
             </style>
             <div className="my-input-group" onClick={handleSourceMenuClick} >
-                <input type="text" className={(props.disabled)?"form-control my-source-disable": (props.warnning)?"form-control my-source-input-warnning":"form-control my-source-input"} aria-label="Text input with dropdown button" placeholder='--- please select ---' disabled  value={props.name} style={{cursor:'pointer'}}/>
+                <input type="text" className={(props.disabled)?"form-control my-source-disable": (props.warnning)?"form-control my-source-input-warnning":"form-control my-source-input"} aria-label="Text input with dropdown button" placeholder='--- please select ---' readOnly="readonly"  value={props.name} style={{cursor:'pointer'}} onClick={handleInputClick}/>
                 <button className="btn dropdown-toggle my-source-input-button" type="button" aria-expanded="false" 
                 disabled={props.disabled}
                 onClick={handleSourceMenuClick}

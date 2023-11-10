@@ -17,6 +17,8 @@ export const WebSocket = (props) => {
     
     //window.location.protocol
 
+    log('wsUrl',wsUrl)
+
     const [socketUrl, setSocketUrl] = useState(wsUrl);
     const [messageHistory, setMessageHistory] = useState([]);
     const {lastMessage, readyState, sendMessage } = useWebSocket(socketUrl);
@@ -61,6 +63,9 @@ export const WebSocket = (props) => {
                        
                     }
                     if (myData.type==="EVENT"){
+
+
+                        //log('raw data------------------?',myData.data)
                         
                         props.onEvent(myData.data);
                        

@@ -12,38 +12,38 @@ const BigShot = (props) => {
 
     const TASK_SERVER = process.env.REACT_APP_TASK_SERVER;
 
-    // useEffect(() => {
-
-    //     //log(props.toggle)
-
-    //     const myData={};
-    //     myData.timestamp=props.uuid.toString();
-    //     myData.draw_results=props.toggle;
-
-    //     const requestOptions = {
-    //         method: 'POST',
-    //         headers: { 'Content-Type': 'application/json' },
-    //         body: JSON.stringify(myData)
-    //     };
-    //     fetch(`${TASK_SERVER}/events/screenshot`, requestOptions)
-    //         .then(response => response.blob())
-    //         .then(blob => {
-    //             setData(URL.createObjectURL(blob))
-    //         })
-
-
-    // // empty dependency array means this effect will only run once (like componentDidMount in classes)
-    // }, [props.toggle]);
-
     useEffect(() => {
 
-        if (props.toggle) {
-            setData(props.image1);
-        }else{
-            setData(props.image2);
-        }
+        //log(props.toggle)
 
+        const myData={};
+        myData.timestamp=props.uuid.toString();
+        myData.draw_results=props.toggle;
+
+        const requestOptions = {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(myData)
+        };
+        fetch(`${TASK_SERVER}/events/screenshot`, requestOptions)
+            .then(response => response.blob())
+            .then(blob => {
+                setData(URL.createObjectURL(blob))
+            })
+
+
+    // empty dependency array means this effect will only run once (like componentDidMount in classes)
     }, [props.toggle]);
+
+    // useEffect(() => {
+
+    //     if (props.toggle) {
+    //         setData(props.image1);
+    //     }else{
+    //         setData(props.image2);
+    //     }
+
+    // }, [props.toggle]);
 
     return (
         <div style={{ width: 648, height: 400, background: 'black', border: '0px' }} className='position-relative d-flex justify-content-center align-items-center'>

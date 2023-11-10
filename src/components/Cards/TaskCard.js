@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import log from "../../utils/console";
 import AppIcon from '../Icons/AppIcon'
 import CustomButton from '../Buttons/CustomButton';
+import ExtendButton from '../Buttons/ExtendButton';
 import StatusButton from '../Buttons/StatusButton';
 import ToggleButton from '../Buttons/ToggleButton';
 import CustomTooltip from '../Tooltips/CustomTooltip';
@@ -120,10 +121,12 @@ const TaskCard = (props) => {
         <div className="card border-0">
             <div className="card-body my-card-l p-3" style={{cursor:(disabled)?'arrow':'pointer'}} >
                 <div className="row p-1 gy-0">
-                    <div className="col-12 roboto-h4 mb-2 " onClick={handleCardClick}>
+                    <div className="col-12 roboto-h4 mb-2 d-flex flex-row justify-content-between" onClick={handleCardClick}>
                         <CustomTooltip customClassName='roboto-h4'>
                             {props.nameTask}
                         </CustomTooltip>
+
+                        <ExtendButton type={2} uuid={props.task_uid} taskName={props.nameTask}></ExtendButton>
                     </div>
                     <div className="col-12 mb-2" onClick={handleCardClick}>
                         <div className="card border-0">

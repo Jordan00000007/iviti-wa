@@ -3,13 +3,15 @@ import React, { useEffect, useState, useRef } from 'react';
 import log from "../utils/console";
 import SimpleLayout from '../components/Layouts/SimpleLayout';
 import CustomButton from '../components/Buttons/CustomButton';
+import ExtendButton from '../components/Buttons/ExtendButton';
 import TaskCard from '../components/Cards/TaskCard';
 import CustomAlert from '../components/Alerts/CustomAlert';
 import { Link } from 'react-router-dom';
 import { useSelector, useDispatch } from "react-redux";
 import { fetchData } from "../store/tasks";
 import { resetFileName } from "../store/sources";
-import { resetDeleteStatus,resetAddStatus,resetUpdateStatus } from "../store/areas";
+import { resetDeleteStatus,resetAddStatus,resetUpdateStatus} from "../store/areas";
+import { resetExportStatus} from "../store/tasks";
 import WarnningPanel from '../components/Panel/WarnningPanel';
 
 
@@ -33,6 +35,9 @@ function AllAiTasks() {
 
     const taskUpdateMessage = useSelector((state) => state.tasks.updateMessage);
     const taskUpdateStatus = useSelector((state) => state.tasks.updateStatus);
+
+    const taskExportMessage = useSelector((state) => state.tasks.exportMessage);
+    const taskExportStatus = useSelector((state) => state.tasks.exportStatus);
 
     const setMessageOpen = (showType, showText) => {
 
@@ -78,6 +83,19 @@ function AllAiTasks() {
 
     }, [taskUpdateStatus,myStatus]);
 
+    useEffect(() => {
+
+        log('taskExportStatus',taskExportStatus)
+        log('taskExportMessage',taskExportMessage)
+
+        if ((taskExportMessage!=='')&&(taskExportStatus==='success')&&(myStatus==='success')){
+          
+            setMessageOpen((taskExportStatus==='success')?2:1, taskExportMessage);
+            dispatch(resetExportStatus());
+        }
+
+    }, [taskExportStatus,myStatus]);
+
 
     useEffect(() => {
         dispatch(fetchData());
@@ -100,7 +118,10 @@ function AllAiTasks() {
                                     All AI Tasks
                                 </div>
 
-                                <CustomButton onClick={handleClickAdd} disabled={false} name="add" />
+                                <div className='d-flex justify-content-between' style={{width:76,paddingBottom:4,paddingRight:4}}>
+                                    <ExtendButton type={1}></ExtendButton>
+                                    <CustomButton onClick={handleClickAdd} disabled={false} name="add" />
+                                </div>
 
                             </div>
                         </div>

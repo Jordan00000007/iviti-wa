@@ -62,8 +62,8 @@ const ProgressAlert = forwardRef((props, ref) => {
                     return startsWith(key, processUid);
                 });
 
-                log('------- ws message ------')
-                log(myResult)
+                //log('------- ws message ------')
+                //log(myResult)
                
                 const myStatus =myResult[processUid].status.toString().toLowerCase();
                 const myMessage =myResult[processUid].message;
@@ -99,8 +99,8 @@ const ProgressAlert = forwardRef((props, ref) => {
                 
             }
             
-            log('------- ws data ------')
-            log(myData)
+            //log('------- ws data ------')
+            //log(myData)
                 
         }
     }, [lastMessage,processUid]);

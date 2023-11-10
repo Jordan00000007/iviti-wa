@@ -2,6 +2,7 @@ import { createSlice, createAsyncThunk, current } from "@reduxjs/toolkit";
 import update from 'react-addons-update';
 import log from "../utils/console";
 import moment from 'moment';
+import { orderBy,cloneDeep,find }  from 'lodash-es';
 
 const TASK_SERVER = process.env.REACT_APP_TASK_SERVER;
 const STREAM_SERVER = process.env.REACT_APP_STREAM_SERVER;
@@ -145,6 +146,23 @@ export const updateTask = createAsyncThunk('tasks/updateTask', async (myData) =>
     return response.json();;
 });
 
+export const exportTask = createAsyncThunk('tasks/exportTask', async (myData) => {
+    log(`--- export task start ---`);
+    log(`${TASK_URL}`)
+
+    log(myData)
+
+    const response = await fetch(`${TASK_URL}/export`, {
+        method: 'POST',
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify(myData),
+    });
+
+    return response.json();
+});
+
 export const deleteTask = createAsyncThunk('tasks/deleteTask', async (uuid) => {
     log(`--- delete task start ---`);
     log(`${TASK_URL}`)
@@ -230,24 +248,25 @@ const updateTemperatureInfo = (state, uuid, message) => {
     log(message)
 
 
-    // const indexToUpdate = current(state).data.findIndex(item => item.uuid === uuid);
-    // const updatedArray = update(current(state).data, {
-    //     [indexToUpdate]: {
-    //         cpuTemperature: { $apply: cpuTemperature => Math.round(message.CPU.temperature) },
-    //         gpuTemperature: { $apply: gpuTemperature => Math.round(message.GPU.temperature) },
-
-    //     }
-    // });
-    // return {
-    //     ...state,
-    //     data: updatedArray
-    // }
 
 }
 
 const tasksSlice = createSlice({
     name: "tasks",
-    initialState: { status: 'idle', data: [], error: null, temperature: 'N/A', deleteStatus: 'idle', deleteMessage: '', addStatus: 'idle', addMessage: '', updateStatus: 'idle', updateMessage: '' },
+    initialState: { 
+        status: 'idle', 
+        data: [], 
+        error: null,
+        temperature: 'N/A',
+        deleteStatus: 'idle',
+        deleteMessage: '',
+        addStatus: 'idle',
+        addMessage: '',
+        updateStatus: 'idle',
+        updateMessage: '',
+        exportStatus: 'idle',
+        exportMessage: '',
+    },
     reducers: {
         toggleOn(state, action) {
 
@@ -295,7 +314,11 @@ const tasksSlice = createSlice({
             state.data[indexToUpdate].apiSuccess = '';
 
 
-        }
+        },
+        resetExportStatus(state,action){
+            state.exportStatus='idle';
+            state.exportMessage='';
+        },
     },
     extraReducers: (builder) => {
 
@@ -312,8 +335,10 @@ const tasksSlice = createSlice({
                         //log('empty')
                         state.data = [];
                     } else {
-                        //log('have data')
-                        state.data = action.payload.data;
+                        //console.log('have data ---------------->',action.payload.data)
+                        const myOrderArr=orderBy(action.payload.data, ['created_time'],['desc'])
+                        //console.log('have data order ---------------->',myOrderArr)
+                        state.data = myOrderArr;
                     }
 
                     state.status = 'success';
@@ -605,11 +630,56 @@ const tasksSlice = createSlice({
             }
         )
 
+          // ---- export task conditions ---
+          builder.addCase(
+            exportTask.fulfilled,
+            (state, action) => {
+                log(`--- export task fulfilled ---`);
+                log(action.payload)
+                if (action.payload.status_code === 200) {
+                    state.exportStatus = 'success';
+                    const taskId=action.payload.data.uid;
+                    const taskObj=find(state.data, function(o) { return o.task_uid === taskId; });
+                    state.exportMessage = taskObj.task_name+ ' ' +action.payload.data.status;
+                } else if (action.payload.status_code === 500) {
+                    state.exportStatus = 'error';
+                    if (action.payload.data.data){
+                        state.exportMessage = JSON.stringify(action.payload.data.data);
+                    }else{
+                        state.exportMessage = action.payload.message;
+                    }
+                } else {
+                    //return updateTaskStatus(state,action.meta.arg,'set_stream_delete_error');
+                    log('--- fetch data unknow error ---')
+                    state.exportMessage = "Unknow error.";
+                    state.exportStatus = 'error';
+                }
+
+
+            }
+        )
+        builder.addCase(
+            exportTask.pending,
+            (state, action) => {
+                log(`--- delete task pending ---`);
+                state.exportStatus = 'pending';
+
+            }
+        )
+        builder.addCase(
+            exportTask.rejected,
+            (state, action) => {
+                log(`--- delete task rejected ---`);
+                state.exportMessage = 'Export task rejected.';
+                state.exportStatus = 'error';
+            }
+        )
+
     },
 
 
 
 });
 export const tasksActions = tasksSlice.actions;
-export const { resetError, setTaskDeleteMessage, setTaskStatus } = tasksSlice.actions;
+export const { resetError, setTaskDeleteMessage, setTaskStatus,resetExportStatus } = tasksSlice.actions;
 export default tasksSlice.reducer;

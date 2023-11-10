@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { ReactComponent as Logo } from '../../assets/logo.svg';
+import ivitLogo from'../../assets/iVIT-I_W.png';
 import log from "../../utils/console";
 import CustomButton from '../../components/Buttons/CustomButton';
 import Modal from '@mui/joy/Modal';
@@ -56,7 +57,8 @@ function CustomHeader() {
                             <a href="./">
 
                                 <div style={{ position: 'relative', height: 56 }}>
-                                    <Logo style={{ cursor: 'pointer', height: 48, position: 'absolute', top: 4, left: -12 }} />
+                                    {/* <Logo style={{ cursor: 'pointer', height: 48, position: 'absolute', top: 4, left: -12 }} /> */}
+                                    <img  src={ivitLogo} style={{ cursor: 'pointer', height: 35, position: 'absolute', top: 10, left: -12 }}/>
                                 </div>
 
 
