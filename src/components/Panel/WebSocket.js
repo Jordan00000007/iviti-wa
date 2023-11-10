@@ -17,7 +17,7 @@ export const WebSocket = (props) => {
     
     //window.location.protocol
 
-    log('wsUrl',wsUrl)
+    //log('wsUrl',wsUrl)
 
     const [socketUrl, setSocketUrl] = useState(wsUrl);
     const [messageHistory, setMessageHistory] = useState([]);
