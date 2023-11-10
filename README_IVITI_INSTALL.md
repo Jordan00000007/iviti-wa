@@ -1,5 +1,17 @@
 # 網站安裝說明:
 
+
+
+### Step 0-1 : 準備工作,要確認一下npm與nodejs的版本號
+
+npm : version 9.5.0
+nodejs : version 10.19.0
+
+### Step 0-2 : 準備工作,由於build command會用到匯入參數的command env-cmd,要先安裝一下
+```
+    npm install env-cmd -g
+```
+
 ### Step 1 : 將專案打包到build資料夾
 ```
     npm run build
@@ -7,7 +19,7 @@
 
 ### Step 2 : 使用docker-compose將專案設成docker container
 ```
-    sudo docker-compose -f docker-compose-pro.yml
+    sudo docker-compose -f docker-compose-pro.yml up -d
 ```
 
 ### 問題記錄
