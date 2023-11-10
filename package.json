@@ -1,6 +1,6 @@
 {
   "name": "website",
-  "version": "1.2.0",
+  "version": "1.2.2",
   "private": true,
   "dependencies": {
     "@emotion/react": "^11.10.6",
@@ -24,7 +24,9 @@
     "buffer": "^6.0.3",
     "env-cmd": "^10.1.0",
     "geometric": "^2.5.4",
+    "hls.js": "^1.5.0-alpha.1.0.canary.9685",
     "jquery": "^3.6.4",
+    "localStorage": "^1.0.4",
     "lodash-es": "^4.17.21",
     "moment": "^2.29.4",
     "react": "^18.2.0",

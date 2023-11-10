@@ -2,6 +2,7 @@ import { createSlice, createAsyncThunk, current } from "@reduxjs/toolkit";
 import update from 'react-addons-update';
 import log from "../utils/console";
 import moment from 'moment';
+import { orderBy }  from 'lodash-es';
 
 const TASK_SERVER = process.env.REACT_APP_TASK_SERVER;
 const STREAM_SERVER = process.env.REACT_APP_STREAM_SERVER;
@@ -312,8 +313,10 @@ const tasksSlice = createSlice({
                         //log('empty')
                         state.data = [];
                     } else {
-                        //log('have data')
-                        state.data = action.payload.data;
+                        //console.log('have data ---------------->',action.payload.data)
+                        const myOrderArr=orderBy(action.payload.data, ['task_name'],['asc'])
+                        //console.log('have data order ---------------->',myOrderArr)
+                        state.data = myOrderArr;
                     }
 
                     state.status = 'success';

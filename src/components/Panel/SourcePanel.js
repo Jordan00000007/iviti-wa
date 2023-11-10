@@ -218,6 +218,7 @@ const SourcePanel = (props) => {
 
             if (v4l2SelectorRef.current) {
                 v4l2SelectorRef.current.setSelectedValue(fileName);
+                //handleV4l2Selected(null,fileName);
                 dispatch(resetV4l2Status());
             }
         }

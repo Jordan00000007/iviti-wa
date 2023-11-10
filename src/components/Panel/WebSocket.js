@@ -61,6 +61,9 @@ export const WebSocket = (props) => {
                        
                     }
                     if (myData.type==="EVENT"){
+
+
+                        //log('raw data------------------?',myData.data)
                         
                         props.onEvent(myData.data);
                        

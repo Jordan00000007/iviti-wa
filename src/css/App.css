@@ -1047,12 +1047,11 @@ body{
 }
 
 .MuiModal-backdrop{
-    backdrop-filter: blur(0px)!important;   
+    backdrop-filter: blur(0px)!important;    
+    background-color:#0000001f!important; 
 }
 
-.MuiModal-root{
-    background-color:#0000001f!important;
-}
+
 
 .MuiModalDialog-root{
     border: 1px solid #E0E1E6!important;
@@ -1096,6 +1095,16 @@ body{
 .my-nav-link-2.active {
     color: var(--on_color_1);
     border-bottom: 3px solid var(--on_color_1);
+}
+
+.my-nav-link-2:hover {
+    color: var(--on_color_1);
+    
+}
+
+.my-nav-link-3:hover {
+    color: var(--on_color_1);
+    
 }
 
 .my-nav-link-3 {
@@ -1496,7 +1505,7 @@ input:checked+.my-toggle-slider:before {
 }
  
 .MuiAlert-root{
-    padding: 3px !important;;
+    padding: 3px !important;
    
 } 
 /* .MuiSelect-button{
@@ -1583,4 +1592,8 @@ input:checked+.my-toggle-slider:before {
 
 .rotating-svg {
     animation: rotate 5s linear infinite;
+}
+
+.nav-item:hover{
+    color:red;
 }
