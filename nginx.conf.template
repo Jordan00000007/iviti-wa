@@ -87,6 +87,10 @@ http {
       proxy_pass http://127.0.0.1:${BACKEND_PORT}/ivit/v1/devices;
     } 
 
+    location /files {
+      proxy_pass http://172.0.0.1:${BACKEND_PORT}/ivit/v1/files;
+    } 
+
     location /v4l2 {
       proxy_pass http://127.0.0.1:${BACKEND_PORT}/ivit/v1/v4l2;
     } 

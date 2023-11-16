@@ -67,7 +67,7 @@ import DependOnSelectPanel from '../components/Panel/DependOnSelectPanel';
 
 import { getSourceFrame, getSourceInfo, setSourceId, getSourceWidthHeight, sourcesActions, resetFrameStatus, setDrawWidthHeight,resetFileName } from "../store/sources";
 import { areaSelected, areaRename, areaDelete, getAppSetting, setFileWidthHeight, areasActions, lineDataReset, setModelData, resetStatus, setSelectedApplication, setSelectedModel, lineADelete, resetDeleteStatus, resetLineADeleteStatus, resetLineBDeleteStatus, updateLabelColor } from "../store/areas";
-import { fetchData, deleteTask, resetError, setTaskDeleteMessage } from "../store/tasks";
+import { fetchData, deleteTask, resetError, setTaskDeleteMessage, resetDeleteTaskStatus } from "../store/tasks";
 
 
 import { Link, useParams } from 'react-router-dom';
@@ -1088,7 +1088,8 @@ function EditAiTask() {
             setShowTaskDeleteModal(false);
             setMessageClose();
             dispatch(setTaskDeleteMessage(`${taskName} had been deleted.`));
-            dispatch(resetError());
+            dispatch(resetDeleteTaskStatus());
+
             navigate('/');
 
         }
@@ -1096,12 +1097,17 @@ function EditAiTask() {
             setShowTaskDeleteModal(false);
             setMessageClose();
             setMessageOpen(1, taskDeleteMessage);
+            dispatch(resetDeleteTaskStatus());
+
 
         }
         if (taskDeleteStatus === 'pending') {
             setMessageKeep(2, 'Delete task loading...');
+            dispatch(resetDeleteTaskStatus());
+
         }
 
+       
 
     }, [taskDeleteStatus]);
 

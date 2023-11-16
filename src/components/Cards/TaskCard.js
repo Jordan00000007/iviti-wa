@@ -126,7 +126,7 @@ const TaskCard = (props) => {
                             {props.nameTask}
                         </CustomTooltip>
 
-                        <ExtendButton type={2} uuid={props.task_uid} taskName={props.nameTask}></ExtendButton>
+                        <ExtendButton type={1} uuid={props.task_uid} taskName={props.nameTask}></ExtendButton>
                     </div>
                     <div className="col-12 mb-2" onClick={handleCardClick}>
                         <div className="card border-0">

@@ -58,7 +58,7 @@ function CustomHeader() {
 
                                 <div style={{ position: 'relative', height: 56 }}>
                                     {/* <Logo style={{ cursor: 'pointer', height: 48, position: 'absolute', top: 4, left: -12 }} /> */}
-                                    <img  src={ivitLogo} style={{ cursor: 'pointer', height: 35, position: 'absolute', top: 10, left: -12 }}/>
+                                    <img  src={ivitLogo} style={{ cursor: 'pointer', height: 42, position: 'absolute', top: 7, left: -16 }}/>
                                 </div>
 
 

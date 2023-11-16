@@ -37,12 +37,18 @@ const RemoteVideo = forwardRef(({ uuid, status, onPlaying, fullScreen, onError }
 
         log('(1) Create RTCPeerConnection')
         const peerConnection = new RTCPeerConnection({
-            iceServers: [{
-                urls: ['stun:stun.l.google.com:19302']
-               
-            }],
+            iceServers: [
+                {
+                    urls: ['stun:stun.l.google.com:19302']
+                },
+                {
+                    urls: ['turn:192.168.8.134:3478'],
+                    username:'turnguest',
+                    credential:'turnguestpass',
+                },
+            ],
 
-            iceServers: [],
+           
             sdpSemantics: 'unified-plan'
         })
 
@@ -83,8 +89,8 @@ const RemoteVideo = forwardRef(({ uuid, status, onPlaying, fullScreen, onError }
                         const myBody = JSON.parse(body);
                         setVideoMessage('Something wrong with this AI task.');
                         onPlaying(false);
-                        //onError(myBody.payload);
-                        onError('WebRTC connection failed, transfer to MSE streaming');
+                        onError(myBody.payload);
+                        //onError('WebRTC connection failed, transfer to MSE streaming');
                         log(myBody.payload);
                         setPeerConnectionError(true);
 
@@ -121,20 +127,85 @@ const RemoteVideo = forwardRef(({ uuid, status, onPlaying, fullScreen, onError }
             log('peerConnection')
             log(e.currentTarget)
 
-            if (e.currentTarget.iceConnectionState === 'disconnected') {
-                setPeerConnectionError(true);
-                log('peerConnection')
-            }
+            // if (e.currentTarget.iceConnectionState === 'disconnected') {
+            //     setPeerConnectionError(true);
+            //     log('peerConnection')
+            // }
 
-            if (e.currentTarget.iceConnectionState === 'connected') {
-                setPeerConnectionError(false);
-            }
+            // if (e.currentTarget.iceConnectionState === 'connected') {
+            //     setPeerConnectionError(false);
+            // }
 
 
         };
 
 
     }
+
+    const getStreaming2 = () => {
+
+        const videoEl=remoteVideoRef1.current;
+
+        const url = `${STREAM_SERVER}/stream/${uuid}/channel/0/webrtc`;
+
+        const webrtc = new RTCPeerConnection({
+          iceServers: [{
+            urls: ['stun:stun.l.google.com:19302']
+          },
+          {
+            urls: ['turn:192.168.8.134:3478?transport=udp'],
+            username: 'turnguest',
+            credential: 'turnguestpass',
+        }
+        ],
+        //iceServers:[],
+          sdpSemantics: 'unified-plan'
+        })
+        webrtc.ontrack = function (event) {
+          console.log(event.streams.length + ' track is delivered')
+          videoEl.srcObject = event.streams[0]
+          videoEl.play()
+        }
+        webrtc.addTransceiver('video', { direction: 'sendrecv' })
+        webrtc.onnegotiationneeded = async function handleNegotiationNeeded () {
+
+            const offer = await webrtc.createOffer()
+
+            await webrtc.setLocalDescription(offer)
+
+            // log('--- sdp ---')
+            // log(btoa(webrtc.localDescription.sdp))
+      
+            fetch(url, {
+              method: 'POST',
+              body: new URLSearchParams({ data: btoa(webrtc.localDescription.sdp) })
+            })
+              .then(response => response.text())
+              .then(data => {
+                try {
+                  webrtc.setRemoteDescription(
+                    new RTCSessionDescription({ type: 'answer', sdp: atob(data) })
+                  )
+                } catch (e) {
+                  console.warn(e)
+                  //getStreaming2();
+                  setPeerConnectionError(true);
+                }
+              })
+
+        }
+    
+        // const webrtcSendChannel = webrtc.createDataChannel('rtsptowebSendChannel')
+        // webrtcSendChannel.onopen = (event) => {
+        //   console.log(`${webrtcSendChannel.label} has opened`)
+        //   webrtcSendChannel.send('ping')
+        // }
+        // webrtcSendChannel.onclose = (_event) => {
+        //   console.log(`${webrtcSendChannel.label} has closed`)
+        //   getStreaming2(videoEl, url)
+        // }
+        // webrtcSendChannel.onmessage = event => console.log(event.data)
+      }
 
     const mseQueue = []
     let mseSourceBuffer
@@ -251,8 +322,10 @@ const RemoteVideo = forwardRef(({ uuid, status, onPlaying, fullScreen, onError }
 
     //     if (peerConnectionError) {
     //         log('connect fail, try again....')
-    //         id = setInterval(getStreaming, 5000);
-    //         setIntervalId(id);
+    //        // id = setInterval(getStreaming, 5000);
+    //         //setIntervalId(id);
+
+    //         getStreaming();
     //         setPeerConnectionError(false);
     //     } else {
     //         log('clear interval id')
@@ -285,7 +358,7 @@ const RemoteVideo = forwardRef(({ uuid, status, onPlaying, fullScreen, onError }
 
         if (status === 'run') {
          
-            getStreaming();
+            getStreaming2();
 
         }else{
             setPeerConnectionError(false);

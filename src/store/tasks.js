@@ -163,6 +163,20 @@ export const exportTask = createAsyncThunk('tasks/exportTask', async (myData) =>
     return response.json();
 });
 
+export const importTask = createAsyncThunk('tasks/importTask', async (myData) => {
+    log(`--- import task start ---`);
+    log(`${TASK_URL}`)
+
+    log(myData)
+
+    const response = await fetch(`${TASK_URL}/import`, {
+        method: 'POST',
+        body: myData,
+    });
+
+    return response.json();
+});
+
 export const deleteTask = createAsyncThunk('tasks/deleteTask', async (uuid) => {
     log(`--- delete task start ---`);
     log(`${TASK_URL}`)
@@ -266,6 +280,8 @@ const tasksSlice = createSlice({
         updateMessage: '',
         exportStatus: 'idle',
         exportMessage: '',
+        importStatus: 'idle',
+        importMessage: '',
     },
     reducers: {
         toggleOn(state, action) {
@@ -315,9 +331,28 @@ const tasksSlice = createSlice({
 
 
         },
+        setMessageKey(state, action) {
+            log('reducer update task status....');
+            log(action.payload.task_uid);
+            log(action.payload.key);
+           
+            const indexToUpdate = state.data.findIndex(item => item.task_uid === action.payload.task_uid);
+           
+            state.data[indexToUpdate].messageKey = action.payload.key;
+
+
+        },
         resetExportStatus(state,action){
             state.exportStatus='idle';
             state.exportMessage='';
+        },
+        resetImportStatus(state,action){
+            state.importStatus='idle';
+            state.importMessage='';
+        },
+        resetDeleteTaskStatus(state,action){
+            state.deleteStatus='idle';
+            state.deleteMessage='';
         },
     },
     extraReducers: (builder) => {
@@ -630,8 +665,8 @@ const tasksSlice = createSlice({
             }
         )
 
-          // ---- export task conditions ---
-          builder.addCase(
+        // ---- export task conditions ---
+        builder.addCase(
             exportTask.fulfilled,
             (state, action) => {
                 log(`--- export task fulfilled ---`);
@@ -640,7 +675,7 @@ const tasksSlice = createSlice({
                     state.exportStatus = 'success';
                     const taskId=action.payload.data.uid;
                     const taskObj=find(state.data, function(o) { return o.task_uid === taskId; });
-                    state.exportMessage = taskObj.task_name+ ' ' +action.payload.data.status;
+                    state.exportMessage = taskObj.task_name+ ' - ' +action.payload.data.status;
                 } else if (action.payload.status_code === 500) {
                     state.exportStatus = 'error';
                     if (action.payload.data.data){
@@ -650,7 +685,7 @@ const tasksSlice = createSlice({
                     }
                 } else {
                     //return updateTaskStatus(state,action.meta.arg,'set_stream_delete_error');
-                    log('--- fetch data unknow error ---')
+                    log('--- export task unknow error ---')
                     state.exportMessage = "Unknow error.";
                     state.exportStatus = 'error';
                 }
@@ -661,7 +696,7 @@ const tasksSlice = createSlice({
         builder.addCase(
             exportTask.pending,
             (state, action) => {
-                log(`--- delete task pending ---`);
+                log(`--- export task pending ---`);
                 state.exportStatus = 'pending';
 
             }
@@ -669,9 +704,54 @@ const tasksSlice = createSlice({
         builder.addCase(
             exportTask.rejected,
             (state, action) => {
-                log(`--- delete task rejected ---`);
+                log(`--- export task rejected ---`);
                 state.exportMessage = 'Export task rejected.';
                 state.exportStatus = 'error';
+            }
+        )
+
+        // ---- import task conditions ---
+        builder.addCase(
+            importTask.fulfilled,
+            (state, action) => {
+                log(`--- import task fulfilled ---`);
+                log(action.payload)
+                if (action.payload.status_code === 200) {
+                    state.importStatus = 'success';
+                    const taskId=action.payload.data.uid;
+                    const taskObj=find(state.data, function(o) { return o.task_uid === taskId; });
+                    state.importMessage = 'Import task' + ' - ' +action.payload.data.status;
+                } else if (action.payload.status_code === 500) {
+                    state.importStatus = 'error';
+                    if (action.payload.data.data){
+                        state.importMessage = JSON.stringify(action.payload.data.data);
+                    }else{
+                        state.importMessage = action.payload.message;
+                    }
+                } else {
+                    //return updateTaskStatus(state,action.meta.arg,'set_stream_delete_error');
+                    log('--- import task unknow error ---')
+                    state.importMessage = "Unknow error.";
+                    state.importStatus = 'error';
+                }
+
+
+            }
+        )
+        builder.addCase(
+            importTask.pending,
+            (state, action) => {
+                log(`--- import task pending ---`);
+                state.importStatus = 'pending';
+
+            }
+        )
+        builder.addCase(
+            importTask.rejected,
+            (state, action) => {
+                log(`--- import task rejected ---`);
+                state.importMessage = 'Import task rejected.';
+                state.importStatus = 'error';
             }
         )
 
@@ -681,5 +761,5 @@ const tasksSlice = createSlice({
 
 });
 export const tasksActions = tasksSlice.actions;
-export const { resetError, setTaskDeleteMessage, setTaskStatus,resetExportStatus } = tasksSlice.actions;
+export const { resetError, setTaskDeleteMessage, setTaskStatus,resetExportStatus,resetImportStatus,resetDeleteTaskStatus,setMessageKey } = tasksSlice.actions;
 export default tasksSlice.reducer;

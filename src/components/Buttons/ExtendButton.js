@@ -2,20 +2,23 @@ import React, { useState, useEffect, useImperativeHandle, forwardRef } from 'rea
 import { useSelector, useDispatch } from "react-redux";
 import log from "../../utils/console";
 
-import { exportTask} from "../../store/tasks";
+import { exportTask } from "../../store/tasks";
+import { ReactComponent as Icon_More } from '../../assets/Icon_More.svg';
 
 // function ToggleButton({ onChange, status }) {
 const ExtendButton = forwardRef((props, ref) => {
 
     const [disabled, setDisabled] = useState(false);
 
-    const [showExtendMenu,setShowExtendMenu] = useState(false);
+    const [showExtendMenu, setShowExtendMenu] = useState(false);
 
-    const [buttonClassName,setButtonClassName] = useState('');
+    const [buttonClassName, setButtonClassName] = useState('');
 
     const TASK_SERVER = process.env.REACT_APP_TASK_SERVER;
 
-    const dispatch=useDispatch();
+    const myData = useSelector((state) => state.tasks.data);
+
+    const dispatch = useDispatch();
 
 
     const handleButtonClick = (event) => {
@@ -24,12 +27,12 @@ const ExtendButton = forwardRef((props, ref) => {
     };
 
 
-    const exportTaskAPI=(myTaskId,myTaskName)=>{
+    const exportTaskAPI = (myTaskId, myTaskName) => {
 
-        const myData={};
-        myData.uids=[myTaskId];
-        myData.to_icap=false;
-        myData.taskName=myTaskName;
+        const myData = {};
+        myData.uids = myTaskId;
+        myData.to_icap = false;
+        myData.taskName = myTaskName;
 
         dispatch(exportTask(myData));
 
@@ -45,16 +48,22 @@ const ExtendButton = forwardRef((props, ref) => {
         //         log('fetch result ---> ',data)
         //     );
     }
-    
+
 
     const handleExportClick = (event) => {
         event.stopPropagation();
         log('handle export click')
         log(props.uuid)
         setShowExtendMenu(false);
+        exportTaskAPI([props.uuid], props.taskName);
+    };
 
-        exportTaskAPI(props.uuid,props.taskName);
-
+    const handleImportClick = (event) => {
+        event.stopPropagation();
+        log('handle import click');
+        setShowExtendMenu(false);
+        props.onImport();
+        
     };
 
     useImperativeHandle(ref, () => ({
@@ -77,8 +86,8 @@ const ExtendButton = forwardRef((props, ref) => {
                 break;
             default:
                 setButtonClassName('my-extend-button-2')
-               
-          }
+
+        }
 
 
     }, [props.type]);
@@ -86,17 +95,31 @@ const ExtendButton = forwardRef((props, ref) => {
     return (
         <div style={{ position: 'relative', width: 32, height: 32 }}>
             <div className={buttonClassName} onClick={handleButtonClick} style={{ position: 'absolute', left: 0 }}>
-                •••
+                <Icon_More ></Icon_More>
             </div>
 
-           
+            <Icon_More ></Icon_More>
             {
                 showExtendMenu ?
-                    <div className='my-extend-menu' style={{ position: 'absolute', left: -108 ,top:32, zIndex:5}} onMouseLeave={(e)=>setShowExtendMenu(false)}>
-                        <div className='my-extend-menu-item' onClick={handleExportClick}>
-                            Export
-                        </div>
-                       
+
+                    <div className='my-extend-menu' style={{ position: 'absolute', left: -108, top: 32, zIndex: 5 }} onMouseLeave={(e) => setShowExtendMenu(false)}>
+
+                        {
+                            (props.type === 1) &&
+                            <div className='my-extend-menu-item' onClick={handleExportClick}>
+                                Export
+                            </div>
+
+                        }
+
+                        {
+                            (props.type === 2) &&
+                            <div className='my-extend-menu-item' onClick={handleImportClick}>
+                                Import
+                            </div>
+
+                        }
+
                     </div>
                     :
                     <></>

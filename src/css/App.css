@@ -1060,6 +1060,14 @@ body{
     padding: 40px!important;
 }
 
+.MuiSnackbarContent-root{
+    padding: 0px!important;
+}
+
+.MuiSnackbarContent-message{
+    padding: 0px 5px 0px 5px!important;
+}
+
 .my-input-title {
     color: var(--on_color_2);
     height: 32px;
@@ -1533,14 +1541,12 @@ input:checked+.my-toggle-slider:before {
 .my-extend-button-1 {
     width: 32px;
     height: 32px;
+    background-color: #F8F8F8;
     border-radius: 4px;
     font-family: roboto;
     font-weight: 300;
-    padding-top: 2px;
-    padding-left: 6px;
-    background-color: #FFFFFF;
-    border: 1px solid #E0E1E6;
-    cursor: pointer;
+    padding:0px;
+  
 }
 
 .my-extend-button-1:hover {
@@ -1548,15 +1554,18 @@ input:checked+.my-toggle-slider:before {
     background-color: #E0E1E6;
 
 }
+
+
 .my-extend-button-2 {
     width: 32px;
     height: 32px;
-    background-color: #F8F8F8;
     border-radius: 4px;
     font-family: roboto;
     font-weight: 300;
-    padding-top: 2px;
-    padding-left: 6px;
+    padding:0px;
+    background-color: #FFFFFF;
+    border: 1px solid #E0E1E6;
+    cursor: pointer;
 }
 
 .my-extend-button-2:hover {
@@ -1586,6 +1595,16 @@ input:checked+.my-toggle-slider:before {
 }
 .my-extend-menu-item:hover {
     background-color: #979CB529;
+}
+
+.my-select-file-button{
+
+    font-size: 28px;
+    color:#000;
+    font-family: Roboto Medium;
+    font-weight:500;
+    height:374px;
+    cursor:pointer;
 }
 
 
