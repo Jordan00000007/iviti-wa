@@ -1,5 +1,6 @@
 
 import React,{forwardRef} from 'react';
+import log from "../../utils/console";
 
 import { SnackbarContent,Button } from '@mui/material';
 
@@ -31,7 +32,7 @@ const StyledSnackbarContent = forwardRef((props, ref) => {
           <div className='d-flex flex-row align-items-center'>
             {iconArr[type]}
             <div style={{paddingTop:3,paddingLeft:5}}>
-              {msg}
+              {msg} 
             </div>   
           </div>
         }
@@ -45,6 +46,11 @@ const StyledSnackbarContent = forwardRef((props, ref) => {
 // 這個 data 可以定義自己需要傳入 StyledSnackbarContent 的資料
 // 後面回傳的 function 則是 notistack 用來接收 key 和 message 的 callback function
 export const content = (data) => (key, message) => {
+
+  log('key-->')
+  log(key)
+  log('message-->')
+  log(message)
   // 把取得的資料傳入 StyledSnackbarContent 中
   return <StyledSnackbarContent id={key} message={message} data={data} />;
 };

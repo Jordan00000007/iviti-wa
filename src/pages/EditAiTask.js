@@ -7,6 +7,7 @@ import UndoAlert from '../components/Alerts/UndoAlert';
 import ProgressAlert from '../components/Alerts/ProgressAlert';
 import DrawingTooltip from '../components/Tooltips/DrawingTooltip';
 import CustomTooltip from '../components/Tooltips/CustomTooltip';
+import CustomToast from '../components/Alerts/CustomToast';
 
 import WarnningPanel from '../components/Panel/WarnningPanel';
 
@@ -25,6 +26,7 @@ import { getAllModels, importModel, deleteModel } from "../store/models";
 import { getAllApplications } from "../store/applications";
 import { addTask, updateTask } from "../store/tasks";
 import areas, { initData, setDependOn, setLinePanel } from "../store/areas";
+import WebSocketTitle from '../components/WebSockets/WebSocketTitle';
 
 
 import Modal from '@mui/joy/Modal';
@@ -97,6 +99,8 @@ function EditAiTask() {
     const [applicationPanelWarnning, setApplicationPanelWarnning] = useState(false);
     const [eventPanelWarnning, setEventPanelWarnning] = useState(false);
 
+    const myData = useSelector((state) => state.tasks.data);
+
 
     const [basicType, setBasicType] = useState(false);
 
@@ -155,6 +159,7 @@ function EditAiTask() {
     const KeyLRef = useRef(null);
     const KeyDRef = useRef(null);
     const fileRef = useRef(null);
+    const toastRef = useRef(null);
 
 
     const params = useParams();
@@ -230,6 +235,12 @@ function EditAiTask() {
     const setMessageClose = () => {
 
         alertRef.current.setShowClose();
+
+    };
+
+    const setToastMessage = (myType,myMessage,myTaskId) => {
+
+        toastRef.current.setMessage(myType,myMessage,myTaskId);
 
     };
 
@@ -1082,6 +1093,20 @@ function EditAiTask() {
         setToggleType(value);
     }
 
+    const handleImportMessage=(myType,myMessage,myTaskId)=>{
+        
+        if (myType===0) setToastMessage(myType,myMessage,'ImportTask');
+    }
+
+    const handleExportMessage=(myType,myTaskId,myMessage)=>{
+
+        const myTaskIndex = myData.findIndex(item => item.task_uid === myTaskId);
+        const myTaskName = (myTaskIndex === -1) ? 'Export Task' : myData[myTaskIndex].task_name;
+
+        if (myType===0) setToastMessage(myType,`${myTaskName} - ${myMessage}`,myTaskId);
+        
+    }
+
     useEffect(() => {
 
         if (taskDeleteStatus === 'success') {
@@ -1679,6 +1704,11 @@ function EditAiTask() {
 
     }, [eventPanelWarnning]);
 
+    useEffect(() => {
+        dispatch(fetchData());
+        dispatch(resetFileName());
+    }, []);
+
     if (serverRejected) {
         return (
             <SimpleLayout>
@@ -1697,6 +1727,7 @@ function EditAiTask() {
                 <UndoAlert message={showText} type={showType} ref={undoAlertRef} />
                 <CustomAlert message={showText} type={showType} ref={alertRef} />
                 <ProgressAlert message={showText} type={showType} ref={progressAlertRef} />
+                <CustomToast ref={toastRef}/>
                 <div className="container p-0">
                     <div className="my-body" onClick={handleBodyClick}>
                         <div className="row p-0 g-0 mb-0 mt-3">
@@ -1704,7 +1735,7 @@ function EditAiTask() {
                                 {
                                     (taskUid === '') &&
                                     <div className="my-body-title roboto-h2">
-                                        Add AI task
+                                        <WebSocketTitle title="Add AI Task" onImportMessage={handleImportMessage} onExportMessage={handleExportMessage}></WebSocketTitle>
                                     </div>
                                 }
                                 {

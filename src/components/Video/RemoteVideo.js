@@ -1,14 +1,15 @@
-import React, { useState, useEffect, useRef,forwardRef,useImperativeHandle } from 'react';
+import React, { useState, useEffect, useRef, forwardRef, useImperativeHandle } from 'react';
 import log from "../../utils/console";
 import { Buffer } from "buffer";
 import { PropaneSharp } from '@mui/icons-material';
 import Hls from 'hls.js';
+import isOnline from 'is-online';
 
 
 //= forwardRef((props, ref) => {
 
 
-const RemoteVideo = forwardRef(({ uuid, status, onPlaying, fullScreen, onError },ref) => {
+const RemoteVideo = forwardRef(({ uuid, status, onPlaying, fullScreen, onError }, ref) => {
     const STREAM_SERVER = process.env.REACT_APP_STREAM_SERVER;
     const [remoteStream, setRemoteStream] = useState(null);
     //const remoteVideoRef = useRef(null);
@@ -19,193 +20,69 @@ const RemoteVideo = forwardRef(({ uuid, status, onPlaying, fullScreen, onError }
     const [intervalId, setIntervalId] = useState(null);
     const [peerConnectionError, setPeerConnectionError] = useState(false);
 
+   
+
 
     useImperativeHandle(ref, () => ({
-  
+
         setBorderOn: () => {
             //remoteVideoRef1.current.style="box-shadow:0px 0px 0px 10px blue inset;";
-            remoteVideoRef1.current.style="outline: 5px solid #E61F23CC !important;outline-offset: -6px !important;"
+            remoteVideoRef1.current.style = "outline: 5px solid #E61F23CC !important;outline-offset: -6px !important;"
         },
         setBorderOff: () => {
-            remoteVideoRef1.current.style="outline: 0px;";
+            remoteVideoRef1.current.style = "outline: 0px;";
         }
-      }));
+    }));
 
-    const getStreaming = () => {
+   
+    const getStreamingWebRTC = () => {
 
-        log('--- remote video start (web rtc) ---')
-
-        log('(1) Create RTCPeerConnection')
-        const peerConnection = new RTCPeerConnection({
-            iceServers: [
-                {
-                    urls: ['stun:stun.l.google.com:19302']
-                },
-                {
-                    urls: ['turn:192.168.8.134:3478'],
-                    username:'turnguest',
-                    credential:'turnguestpass',
-                },
-            ],
-
-           
-            sdpSemantics: 'unified-plan'
-        })
-
-        //const peerConnection = new RTCPeerConnection()
-
-        log("(2) Add Transceiver");
-        peerConnection.addTransceiver('video', { 'direction': 'sendrecv' })
-
-        log("(3) Define Negotiation");
-        peerConnection.onnegotiationneeded = async function handleNegotiationNeeded() {
-
-            log('(3-1) Create Offer');
-            // 建立請求
-            const offer = await peerConnection.createOffer()
-
-            // 提供本地端的資訊
-            await peerConnection.setLocalDescription(offer);
-
-            log('(3-2) Trying to Get Remote Request');
-            // 使用 http 與 remote 進行請求，需要透過 sdp 去請求
-
-            const trg_url = `${STREAM_SERVER}/stream/${uuid}/channel/0/webrtc`;
-
-            fetch(trg_url, {
-                method: "POST",
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8',
-                },
-                // body: 'data=' + btoa(offer.sdp)
-                body: 'data=' + Buffer.from(offer.sdp).toString('base64')
-            })
-                .then((response) => {
-                    return response.text()
-                })
-                .then((body) => {
-
-                    if (body.slice(0, 1) === '{') {
-                        const myBody = JSON.parse(body);
-                        setVideoMessage('Something wrong with this AI task.');
-                        onPlaying(false);
-                        onError(myBody.payload);
-                        //onError('WebRTC connection failed, transfer to MSE streaming');
-                        log(myBody.payload);
-                        setPeerConnectionError(true);
-
-                    } else {
-                        peerConnection.setRemoteDescription(
-                            new RTCSessionDescription({
-                                type: 'answer',
-                                //sdp: atob(decodeURIComponent(body))
-                                sdp: Buffer.from(decodeURIComponent(body), 'base64')
-                                //decodeURIComponent
-                            })
-                        )
-                    }
-
-                })
-                .catch(function (err) {
-                    log('--- err ---')
-                    log(err)
-                    setPeerConnectionError(true);
-                    //setTimeout( setPeerConnectionError(true), 30000);
-                });
-        }
-
-        log("(4) Define Track Event");
-        peerConnection.ontrack = function (event) {
-
-            setRemoteStream(event.streams[0]);
-
-        }
-
-
-        peerConnection.oniceconnectionstatechange = (e) => {
-
-            log('peerConnection')
-            log(e.currentTarget)
-
-            // if (e.currentTarget.iceConnectionState === 'disconnected') {
-            //     setPeerConnectionError(true);
-            //     log('peerConnection')
-            // }
-
-            // if (e.currentTarget.iceConnectionState === 'connected') {
-            //     setPeerConnectionError(false);
-            // }
-
-
-        };
-
-
-    }
-
-    const getStreaming2 = () => {
-
-        const videoEl=remoteVideoRef1.current;
+        const videoEl = remoteVideoRef1.current;
 
         const url = `${STREAM_SERVER}/stream/${uuid}/channel/0/webrtc`;
 
         const webrtc = new RTCPeerConnection({
-          iceServers: [{
-            urls: ['stun:stun.l.google.com:19302']
-          },
-          {
-            urls: ['turn:192.168.8.134:3478?transport=udp'],
-            username: 'turnguest',
-            credential: 'turnguestpass',
-        }
-        ],
-        //iceServers:[],
-          sdpSemantics: 'unified-plan'
+            iceServers: [
+                {
+                    urls: ['stun:stun.l.google.com:19302']
+                },
+                // {
+                //     urls: ['turn:innotest:3478'],
+                //     username: 'turnguest',
+                //     credential: 'turnguestpass',
+                // }
+            ],
+            //iceServers:[],
+            sdpSemantics: 'unified-plan'
         })
         webrtc.ontrack = function (event) {
-          console.log(event.streams.length + ' track is delivered')
-          videoEl.srcObject = event.streams[0]
-          videoEl.play()
+            videoEl.srcObject = event.streams[0]
+            videoEl.play()
         }
         webrtc.addTransceiver('video', { direction: 'sendrecv' })
-        webrtc.onnegotiationneeded = async function handleNegotiationNeeded () {
+        webrtc.onnegotiationneeded = async function handleNegotiationNeeded() {
 
             const offer = await webrtc.createOffer()
-
             await webrtc.setLocalDescription(offer)
-
-            // log('--- sdp ---')
-            // log(btoa(webrtc.localDescription.sdp))
-      
             fetch(url, {
-              method: 'POST',
-              body: new URLSearchParams({ data: btoa(webrtc.localDescription.sdp) })
+                method: 'POST',
+                body: new URLSearchParams({ data: btoa(webrtc.localDescription.sdp) })
             })
-              .then(response => response.text())
-              .then(data => {
-                try {
-                  webrtc.setRemoteDescription(
-                    new RTCSessionDescription({ type: 'answer', sdp: atob(data) })
-                  )
-                } catch (e) {
-                  console.warn(e)
-                  //getStreaming2();
-                  setPeerConnectionError(true);
-                }
-              })
+                .then(response => response.text())
+                .then(data => {
+                    try {
+                        webrtc.setRemoteDescription(
+                            new RTCSessionDescription({ type: 'answer', sdp: atob(data) })
+                        )
+                    } catch (e) {
+                        setPeerConnectionError(true);
+                    }
+                })
 
         }
-    
-        // const webrtcSendChannel = webrtc.createDataChannel('rtsptowebSendChannel')
-        // webrtcSendChannel.onopen = (event) => {
-        //   console.log(`${webrtcSendChannel.label} has opened`)
-        //   webrtcSendChannel.send('ping')
-        // }
-        // webrtcSendChannel.onclose = (_event) => {
-        //   console.log(`${webrtcSendChannel.label} has closed`)
-        //   getStreaming2(videoEl, url)
-        // }
-        // webrtcSendChannel.onmessage = event => console.log(event.data)
-      }
+
+      
+    }
 
     const mseQueue = []
     let mseSourceBuffer
@@ -242,19 +119,45 @@ const RemoteVideo = forwardRef(({ uuid, status, onPlaying, fullScreen, onError }
     const getStreamingMSE = () => {
         log('get Streaming MSE...')
 
-        const myUrl = `${STREAM_SERVER.replace("http://","ws://")}/stream/${uuid}/channel/0/mse?uuid=${uuid}&channel=0`;
+        if (STREAM_SERVER===""){
+            //正式環境
+            const myUrl = `ws://${window.location.hostname}:8083/stream/${uuid}/channel/0/mse?uuid=${uuid}&channel=0`;
+            log(myUrl)
+            startPlay(remoteVideoRef1.current, myUrl);
+
+        }
+        else
+        {      
+            //開發環境
+            let myUrl = `${STREAM_SERVER.replace("http://", "ws://")}/${(STREAM_SERVER==="")?"wsstream":"stream"}/${uuid}/channel/0/mse?uuid=${uuid}&channel=0`;
+            log(myUrl)
+            startPlay(remoteVideoRef1.current, myUrl);
 
 
-        startPlay(remoteVideoRef1.current, myUrl);
+        }
+
+
     }
 
 
     const startPlay = (videoEl, url) => {
+        
+        videoEl.pause();
+        videoEl.currentTime =0;
+        videoEl.srcObject =null;
+       
 
         const mse = new MediaSource()
+
+        log('mse')
+        log(mse)
+
+
         videoEl.src = window.URL.createObjectURL(mse)
         mse.addEventListener('sourceopen', function () {
             const ws = new WebSocket(url)
+            log('try ws connect...')
+
             ws.binaryType = 'arraybuffer'
             ws.onopen = function (event) {
                 console.log('Connect to ws')
@@ -277,6 +180,8 @@ const RemoteVideo = forwardRef(({ uuid, status, onPlaying, fullScreen, onError }
                 }
             }
         }, false)
+
+        videoEl.load();
     }
 
     const pushPacket = () => {
@@ -314,39 +219,29 @@ const RemoteVideo = forwardRef(({ uuid, status, onPlaying, fullScreen, onError }
         }
     }
 
-  
-
-    // useEffect(() => {
-
-    //     let id;
-
-    //     if (peerConnectionError) {
-    //         log('connect fail, try again....')
-    //        // id = setInterval(getStreaming, 5000);
-    //         //setIntervalId(id);
-
-    //         getStreaming();
-    //         setPeerConnectionError(false);
-    //     } else {
-    //         log('clear interval id')
-    //         clearInterval(id);
-    //     }
-
-    //     return () => clearInterval(intervalId);
-
-    // }, [peerConnectionError]);
-
     useEffect(() => {
 
-        log('peerConnectionError',peerConnectionError)
+        log('peerConnectionError', peerConnectionError)
 
         if (peerConnectionError) {
-           
-            getStreamingMSE();
+
+            getStreaming();
             setPeerConnectionError(false);
-        } 
+        }
 
     }, [peerConnectionError]);
+
+    const getStreaming=async ()=>{
+        const myOnline=await isOnline();
+        if (myOnline){
+            log('online...')
+            getStreamingWebRTC();
+            
+        }else{
+            log('offline...')
+            getStreamingMSE();
+        }
+    }
 
 
     useEffect(() => {
@@ -357,10 +252,10 @@ const RemoteVideo = forwardRef(({ uuid, status, onPlaying, fullScreen, onError }
         let timer = null;
 
         if (status === 'run') {
-         
-            getStreaming2();
 
-        }else{
+            getStreaming();
+
+        } else {
             setPeerConnectionError(false);
         }
 

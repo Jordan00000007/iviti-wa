@@ -23,7 +23,7 @@ const StatusButton = ({ name }) => {
             )
         }
 
-        if (name==="set_task_run_loading"){
+        if ((name==="set_task_run_loading")||(name.toLowerCase()==="loading")){
             return (
                 <div className="my-tooltip-container" data-tooltip-id="my-tooltip-id" data-tooltip-content={name.replaceAll("_"," ")}>
                     <button className="my-button-loading">

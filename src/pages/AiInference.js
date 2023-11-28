@@ -46,8 +46,8 @@ import WarnningPanel from '../components/Panel/WarnningPanel';
 
 import localStorage from "localStorage";
 
-
-
+import WebSocketTitle from '../components/WebSockets/WebSocketTitle';
+import CustomToast from '../components/Alerts/CustomToast';
 
 function AiInference() {
 
@@ -61,6 +61,7 @@ function AiInference() {
     const fpsRef = useRef(null);
     const videoPanelRef = useRef(null);
     const remoteVideoRef = useRef();
+    const toastRef = useRef(null);
 
     const [showType, setShowType] = useState(0);
     const [showText, setShowText] = useState('test');
@@ -123,9 +124,27 @@ function AiInference() {
         if (alertRef.current) {
             alertRef.current.setShowTrue(3000);
         }
+    };
 
+    const setToastMessage = (myType,myMessage,myTaskId) => {
+
+        toastRef.current.setMessage(myType,myMessage,myTaskId);
 
     };
+
+    const handleImportMessage=(myType,myMessage,myTaskId)=>{
+        
+        if (myType===0) setToastMessage(myType,myMessage,'ImportTask');
+    }
+
+    const handleExportMessage=(myType,myTaskId,myMessage)=>{
+
+        const myTaskIndex = myData.findIndex(item => item.task_uid === myTaskId);
+        const myTaskName = (myTaskIndex === -1) ? 'Export Task' : myData[myTaskIndex].task_name;
+
+        if (myType===0) setToastMessage(myType,`${myTaskName} - ${myMessage}`,myTaskId);
+        
+    }
 
     const handleBackClick = () => {
         log('Handle Button clicked!');
@@ -351,6 +370,7 @@ function AiInference() {
         return (
             <SimpleLayout>
                 <CustomAlert message={showText} type={showType} ref={alertRef} />
+                <CustomToast ref={toastRef}/>
                 <div className="container p-0">
                     <div className="my-body">
                         <div className="row p-0 g-0 mb-3 mt-3">
@@ -364,10 +384,11 @@ function AiInference() {
 
 
                                     <CustomTooltip customClassName="my-body-title roboto-h2">
-                                        {(myItem.task_name) ? myItem.task_name : ""}
-                                    </CustomTooltip>
+                                    {(myItem.task_name) ? myItem.task_name : ""}
+                                        </CustomTooltip>
 
-
+                                                                   
+                                    
                                     <div className='d-flex justify-content-start align-items-center'>
                                         <ToggleButton onChange={handleToggleChange} status={myItem.status} />
                                     </div>
@@ -603,6 +624,8 @@ function AiInference() {
                         </div>
                     </ModalDialog>
                 </Modal>
+
+                <WebSocketTitle title=""  onImportMessage={handleImportMessage} onExportMessage={handleExportMessage}></WebSocketTitle> 
 
             </SimpleLayout>
         );

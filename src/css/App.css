@@ -1051,8 +1051,6 @@ body{
     background-color:#0000001f!important; 
 }
 
-
-
 .MuiModalDialog-root{
     border: 1px solid #E0E1E6!important;
     border-radius: 12px!important; 
@@ -1180,6 +1178,40 @@ body{
     border-radius: 6px;
     border: 2px solid var(--base_2);
     
+}
+
+.my-toast-body{
+    margin: 0px !important;
+    width:1200px;
+    height:44px;
+    padding: 0px!important;
+    top: -7px;
+    left:1px;
+    font-size: 16px;
+    position:absolute; 
+}
+
+.my-rotating-svg {
+    animation: rotate 5s linear infinite;
+   
+}
+
+.Toastify__toast-icon {
+    width: 32px!important;
+    height: 32px!important;
+    /* top: 6px;
+    left: 5px;
+    position:absolute; */
+
+}
+
+.Toastify__toast-body {
+    margin: 0px !important;
+    width:1200px;
+    height:44px;
+    padding: 0px!important;
+  
+    position:relative; 
 }
 
 input:checked+.my-toggle-slider {

@@ -4,7 +4,7 @@ import log from "../utils/console";
 
 import { Link } from 'react-router-dom';
 import { useSelector, useDispatch } from "react-redux";
-import { SnackbarProvider, enqueueSnackbar,closeSnackbar } from 'notistack';
+
 import Modal from '@mui/joy/Modal';
 import ModalDialog from '@mui/joy/ModalDialog';
 
@@ -20,7 +20,7 @@ import TaskCard from '../components/Cards/TaskCard';
 import CustomAlert from '../components/Alerts/CustomAlert';
 import WarnningPanel from '../components/Panel/WarnningPanel';
 import WebSocketTitle from '../components/WebSockets/WebSocketTitle';
-import CustomSnackbar from '../components/Alerts/CustomSnackbar';
+import CustomToast from '../components/Alerts/CustomToast';
 
 
 function AllAiTasks() {
@@ -29,10 +29,10 @@ function AllAiTasks() {
     const [showType, setShowType] = useState(0);
     const [showText, setShowText] = useState('');
     const [showImportModal, setShowImportModal] = useState(false);
-    const [importTaskMessageKey, setImportTaskMessageKey] = useState(null);
-
+   
     const alertRef = useRef();
     const fileRef = useRef();
+    const toastRef = useRef();
 
     const dispatch = useDispatch();
     const myData = useSelector((state) => state.tasks.data);
@@ -54,66 +54,14 @@ function AllAiTasks() {
 
     const setMessageOpen = (showType, showText) => {
 
-        // setShowType(showType);
-        // setShowText(showText);
-        // alertRef.current.setShowTrue(3000);
-
-        //setSnackMessage(showType, showText)
-
-        const myKey=enqueueSnackbar('null', {
-            // STEP 4：content 的地方帶入客製化樣式，裡面可以帶入客製化資料（data）
-            content: CustomSnackbar({
-                type: showType,
-                msg: showText,
-            }),
-
-        });
+        toastRef.current.setMessage(showType,showText,null);
 
     };
 
-    const setSnackMessage = (showType, showText,myTaskId) => {
+    const setSnackMessage = (showType, showText, myTaskId) => {
 
-        log('myTaskId',myTaskId)
-
-        const myTaskIndex = myData.findIndex(item => item.task_uid === myTaskId);
-        log('myTaskIndex',myTaskIndex)
-
-        if (myTaskIndex>=0){
-            const myPrevKey=(typeof myData[myTaskIndex].messageKey == "undefined")?null:myData[myTaskIndex].messageKey;
-            if (myPrevKey>0) closeSnackbar(myPrevKey)
-        }
-
-        if (myTaskId==='Import task'){
-            if (importTaskMessageKey!==null) closeSnackbar(importTaskMessageKey)
-        }
-
-        //log('typeof myData[myTaskIndex].messageKey',typeof myData[myTaskIndex].messageKey)
-
-       
-       
-
-
-        const myKey=enqueueSnackbar('null', {
-            // STEP 4：content 的地方帶入客製化樣式，裡面可以帶入客製化資料（data）
-            content: CustomSnackbar({
-                type: showType,
-                msg: showText,
-            }),
-
-        });
-
-        if (myTaskIndex>=0){
-            dispatch(setMessageKey({task_uid:myTaskId,key:myKey}))
-        }
-        if (myTaskId==='Import task'){
-            setImportTaskMessageKey(myKey)
-        }
-       
-
-        log('--- my key ---')
-        log(myKey)
-
-
+        toastRef.current.setMessage(showType,showText,myTaskId);
+    
     };
 
     const handleClickAdd = () => {
@@ -148,7 +96,7 @@ function AllAiTasks() {
             formData.append('file', event.target.files[0]);
             formData.append('url', '');
             dispatch(importTask(formData))
-            setSnackMessage(2,'Import task - Start','Import task')
+            setSnackMessage(2, 'Import task - Waiting (0%)', 'ImportTask')
 
         }
 
@@ -156,25 +104,27 @@ function AllAiTasks() {
 
 
 
-    const handleImportMessage = (myMessageType, myTaskName, myTaskStatus) => {
+    const handleImportMessage = (myMessageType, myTaskStatus, myTaskId) => {
 
-        setSnackMessage(myMessageType, `Import task - ${myTaskStatus}`,'Import task');
+        setSnackMessage(myMessageType, myTaskStatus, myTaskId);
 
-        if (myTaskStatus.toLowerCase()==='success'){
+        if (myTaskStatus.toLowerCase().indexOf('success') >= 0) {
 
             setTimeout(() => {
                 dispatch(fetchData());
                 dispatch(resetFileName());
-              }, 3000); 
+            }, 1000);
         }
     }
 
     const handleExportMessage = (myMessageType, myTaskId, myTaskStatus) => {
 
+
+
         const myTaskIndex = myData.findIndex(item => item.task_uid === myTaskId);
-        log('myTaskIndex',myTaskIndex)
-        const myTaskName = (myTaskIndex===-1)?'Export Task':myData[myTaskIndex].task_name;
-        setSnackMessage(myMessageType, `${myTaskName} - ${myTaskStatus}`,myTaskId)
+        log('myTaskIndex', myTaskIndex)
+        const myTaskName = (myTaskIndex === -1) ? 'Export Task' : myData[myTaskIndex].task_name;
+        setSnackMessage(myMessageType, `${myTaskName} - ${myTaskStatus}`, myTaskId)
 
     }
 
@@ -210,13 +160,11 @@ function AllAiTasks() {
 
     useEffect(() => {
 
-        log('taskExportStatus', taskExportStatus)
-        log('taskExportMessage', taskExportMessage)
-
-        if ((taskExportMessage.toLowerCase() !== 'Verifying')&&(taskExportMessage.toLowerCase() !== '') && (taskExportStatus.toLowerCase() !== 'success') && (myStatus === 'success')) {
+    
+        if ((taskExportMessage.toLowerCase().indexOf('verifying')<0) && (taskExportMessage.toLowerCase() !== '') && (taskExportMessage !== '') && (myStatus === 'success')) {
 
             setMessageOpen(1, taskExportMessage);
-           
+
         }
 
         dispatch(resetExportStatus());
@@ -229,9 +177,9 @@ function AllAiTasks() {
         // log('taskImportMessage', taskImportMessage)
 
         if ((taskImportMessage !== '') && (myStatus === 'success')) {
-           
-            setSnackMessage((taskImportStatus.toLowerCase()==='success')?2:1, taskImportMessage,'Import task');
-            
+
+            setSnackMessage((taskImportStatus.toLowerCase() === 'success') ? 2 : 1, taskImportMessage, 'ImportTask');
+
         }
 
         dispatch(resetImportStatus());
@@ -248,7 +196,7 @@ function AllAiTasks() {
     if (myStatus === 'success')
         return (
             <SimpleLayout>
-                <SnackbarProvider anchorOrigin={{ horizontal: 'center', vertical: 'bottom' }} autoHideDuration={3000} >
+                
                     <CustomAlert message={showText} type={showType} ref={alertRef} />
                     <div className="container p-0">
                         <div className="my-body">
@@ -300,8 +248,7 @@ function AllAiTasks() {
                             }
                         </div>
                     </div>
-                </SnackbarProvider>
-
+               
 
 
                 <Modal
@@ -327,6 +274,7 @@ function AllAiTasks() {
                     </ModalDialog>
                 </Modal>
                 <input type="file" name="files" onChange={handleFileChange} ref={fileRef} style={{ visibility: 'hidden', width: '0px', height: '0px' }} />
+                <CustomToast ref={toastRef}/>
 
             </SimpleLayout>
         );

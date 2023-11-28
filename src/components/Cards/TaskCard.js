@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from "react-router-dom";
+import axios  from 'axios';
 import log from "../../utils/console";
 import AppIcon from '../Icons/AppIcon'
 import CustomButton from '../Buttons/CustomButton';
@@ -18,6 +19,9 @@ const TaskCard = (props) => {
     const [status, setStatus] = useState(props.nameStatus);
     const [disabled, setDisabled] = useState(false);
 
+    const STREAM_SERVER = process.env.REACT_APP_STREAM_SERVER;
+    const STREAM_URL = `${STREAM_SERVER}/stream`;
+
     const dispatch = useDispatch();
     const myData = useSelector((state) => state.tasks.data);
     const myIndex = myData.findIndex(item => item.task_uid === props.task_uid);
@@ -32,19 +36,19 @@ const TaskCard = (props) => {
 
     const handleClickEdit = (e) => {
 
-        e.stopPropagation(); 
-        window.location.href=`/editTask/${props.task_uid}/0`;
+        e.stopPropagation();
+        window.location.href = `/editTask/${props.task_uid}/0`;
 
     };
 
     const handleClickView = (e) => {
 
-        e.stopPropagation(); 
-        window.location.href=`/inference/${props.task_uid}`;
+        e.stopPropagation();
+        window.location.href = `/inference/${props.task_uid}`;
 
     };
 
-    const getToggleDisabled=()=>{
+    const getToggleDisabled = () => {
 
         log('get toggle disabled')
         log(toggleRef.current.getDisabled())
@@ -56,7 +60,7 @@ const TaskCard = (props) => {
         log('toogle change')
         log(props.task_uid)
 
-      
+
         setDisabled(true);
 
         if (event.target.checked) {
@@ -71,19 +75,19 @@ const TaskCard = (props) => {
     const handleCardClick = (event) => {
 
         log('handle card click')
-        if (!disabled){
-           window.location.href=`/inference/${props.task_uid}`;
+        if (!disabled) {
+            window.location.href = `/inference/${props.task_uid}`;
         }
-        
+
     }
 
 
     useEffect(() => {
         // Compare the old state with the new state
-        if ((myItem.status==='run')||(myItem.status==='stop')||(myItem.status.indexOf('error')>=0)) {
-            
-           setDisabled(false)
-        } 
+        if ((myItem.status === 'run') || (myItem.status === 'stop') || (myItem.status.indexOf('error') >= 0)) {
+
+            setDisabled(false)
+        }
     }, [myItem.status]);
 
     useEffect(() => {
@@ -93,33 +97,34 @@ const TaskCard = (props) => {
             dispatch(addStream(props.task_uid));
             //dispatch(runStream(props.task_uid));
         }
-       
+
         if (myItem.status === 'set_task_stop_success') {
+
             dispatch(deleteStream(props.task_uid));
-        }
-       
-        if ("apiError" in myItem)
-        {
-            if((myItem.apiError!==undefined)&&(myItem.apiError!=='')){
-                props.showMessage(1,myItem.apiError);
-              
-            }
-               
+
+        
         }
 
-        if ("apiSuccess" in myItem)
-        {
+        if ("apiError" in myItem) {
+            if ((myItem.apiError !== undefined) && (myItem.apiError !== '')) {
+                props.showMessage(1, myItem.apiError);
+
+            }
+
+        }
+
+        if ("apiSuccess" in myItem) {
             // if((myItem.apiSuccess!==undefined)&&(myItem.apiSuccess!==''))
             //     props.showMessage(0,myItem.apiSuccess);
         }
-      
+
 
     }, [myItem.status]);
 
-   
+
     return (
         <div className="card border-0">
-            <div className="card-body my-card-l p-3" style={{cursor:(disabled)?'arrow':'pointer'}} >
+            <div className="card-body my-card-l p-3" style={{ cursor: (disabled) ? 'arrow' : 'pointer' }} >
                 <div className="row p-1 gy-0">
                     <div className="col-12 roboto-h4 mb-2 d-flex flex-row justify-content-between" onClick={handleCardClick}>
                         <CustomTooltip customClassName='roboto-h4'>
@@ -138,11 +143,11 @@ const TaskCard = (props) => {
                                         </div>
                                         <div className="d-flex flex-column gap-1">
 
-                                            <div className='roboto-h6' style={{'whiteSpace':'nowrap'}}>
-                                                {props.nameApplication.toString().replace("_"," ").replace("_"," ")}
+                                            <div className='roboto-h6' style={{ 'whiteSpace': 'nowrap' }}>
+                                                {props.nameApplication.toString().replace("_", " ").replace("_", " ")}
                                             </div>
-                                           
-                                            
+
+
 
                                             <CustomTooltip customClassName='my-card-model-name'>
                                                 {props.nameModel}
@@ -166,7 +171,7 @@ const TaskCard = (props) => {
                                         </div>
                                         <div>
                                             <StatusButton name={myItem.status} className="mb-2" />
-                                            
+
                                         </div>
                                     </div>
                                     <div style={{ paddingTop: '4px', paddingRight: '5px' }}>
@@ -177,14 +182,14 @@ const TaskCard = (props) => {
                         </div>
                     </div>
                     <div className="col-12 mt-1 d-flex justify-content-between">
-                        { ((myItem.status === 'stop')||(myItem.status.indexOf("error")>=0)) &&
-                            
-                            <CustomButton onClick={handleClickEdit} disabled={myItem.status === 'run' ? true : false} name="edit" width="115"/>
-                            
+                        {((myItem.status === 'stop') || (myItem.status.indexOf("error") >= 0)) &&
+
+                            <CustomButton onClick={handleClickEdit} disabled={myItem.status === 'run' ? true : false} name="edit" width="115" />
+
                         }
-                       
-                        <CustomButton onClick={handleClickView} status={myItem.status} name="view" disabled={disabled} width="115"/>
-                       
+
+                        <CustomButton onClick={handleClickView} status={myItem.status} name="view" disabled={disabled} width="115" />
+
                     </div>
                 </div>
             </div>

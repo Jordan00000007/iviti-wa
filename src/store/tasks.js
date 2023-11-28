@@ -2,7 +2,8 @@ import { createSlice, createAsyncThunk, current } from "@reduxjs/toolkit";
 import update from 'react-addons-update';
 import log from "../utils/console";
 import moment from 'moment';
-import { orderBy,cloneDeep,find }  from 'lodash-es';
+import { orderBy, cloneDeep, find } from 'lodash-es';
+import axios from 'axios';
 
 const TASK_SERVER = process.env.REACT_APP_TASK_SERVER;
 const STREAM_SERVER = process.env.REACT_APP_STREAM_SERVER;
@@ -17,7 +18,7 @@ const DEVICE_URL = `${TASK_SERVER}/device`;
 
 export const fetchData = createAsyncThunk('tasks/fetchData', async () => {
     log(`--- fetch data start ---`);
-   
+
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), REQUEST_TIMEOUT);
 
@@ -27,9 +28,9 @@ export const fetchData = createAsyncThunk('tasks/fetchData', async () => {
         }).then((res) => res.json());
         return response;
     } catch (error) {
-        const customResponse={};
-        customResponse.status_code=408;
-        customResponse.message="Request time out.";
+        const customResponse = {};
+        customResponse.status_code = 408;
+        customResponse.message = "Request time out.";
         return customResponse;
     } finally {
         clearTimeout(timeoutId);
@@ -58,7 +59,7 @@ export const runTask = createAsyncThunk('tasks/runTask', async (uuid) => {
     }).then((res) => res.json());
     return response;
 
-   
+
 
 });
 
@@ -267,9 +268,9 @@ const updateTemperatureInfo = (state, uuid, message) => {
 
 const tasksSlice = createSlice({
     name: "tasks",
-    initialState: { 
-        status: 'idle', 
-        data: [], 
+    initialState: {
+        status: 'idle',
+        data: [],
         error: null,
         temperature: 'N/A',
         deleteStatus: 'idle',
@@ -335,24 +336,24 @@ const tasksSlice = createSlice({
             log('reducer update task status....');
             log(action.payload.task_uid);
             log(action.payload.key);
-           
+
             const indexToUpdate = state.data.findIndex(item => item.task_uid === action.payload.task_uid);
-           
+
             state.data[indexToUpdate].messageKey = action.payload.key;
 
 
         },
-        resetExportStatus(state,action){
-            state.exportStatus='idle';
-            state.exportMessage='';
+        resetExportStatus(state, action) {
+            state.exportStatus = 'idle';
+            state.exportMessage = '';
         },
-        resetImportStatus(state,action){
-            state.importStatus='idle';
-            state.importMessage='';
+        resetImportStatus(state, action) {
+            state.importStatus = 'idle';
+            state.importMessage = '';
         },
-        resetDeleteTaskStatus(state,action){
-            state.deleteStatus='idle';
-            state.deleteMessage='';
+        resetDeleteTaskStatus(state, action) {
+            state.deleteStatus = 'idle';
+            state.deleteMessage = '';
         },
     },
     extraReducers: (builder) => {
@@ -371,7 +372,7 @@ const tasksSlice = createSlice({
                         state.data = [];
                     } else {
                         //console.log('have data ---------------->',action.payload.data)
-                        const myOrderArr=orderBy(action.payload.data, ['created_time'],['desc'])
+                        const myOrderArr = orderBy(action.payload.data, ['created_time'], ['desc'])
                         //console.log('have data order ---------------->',myOrderArr)
                         state.data = myOrderArr;
                     }
@@ -380,9 +381,9 @@ const tasksSlice = createSlice({
                 } else if (action.payload.status_code === 500) {
                     log('--- fetch data error ---')
                     state.status = 'error';
-                    if (action.payload.data.data){
+                    if (action.payload.data.data) {
                         state.error = JSON.stringify(action.payload.data.data);
-                    }else{
+                    } else {
                         state.error = action.payload.message;
                     }
                 } else if (action.payload.status_code === 408) {
@@ -452,7 +453,10 @@ const tasksSlice = createSlice({
                 //log(`--- stop task [${action.meta.arg}] fulfilled ---`);
                 //log(action.payload);
                 if (action.payload.status_code === 200) {
+
                     return updateTaskStatus(state, action.meta.arg, 'set_task_stop_success');
+
+    
                 } else {
                     return updateTaskStatus(state, action.meta.arg, 'set_task_stop_error');
                 }
@@ -516,8 +520,22 @@ const tasksSlice = createSlice({
                 //log(action.payload);
                 if (action.payload.status === 1) {
                     return updateTaskStatus(state, action.meta.arg, 'stop', 'Set streaming stop success.');
+
+                  
                 } else {
-                    return updateTaskStatus(state, action.meta.arg, 'set_stream_delete_error', action.payload.payload);
+                
+                    if (action.payload.payload === 'stream not found') {
+                        return updateTaskStatus(state, action.meta.arg, 'stop', 'Stream not found.');
+                    } else {
+                        return updateTaskStatus(state, action.meta.arg, 'set_stream_delete_error', action.payload.payload);
+                    }
+                }
+
+
+                if (action.payload.payload === 'stream already exists') {
+                    return updateTaskStatus(state, action.meta.arg, 'run', 'Streaming already exists.');
+                } else {
+                    return updateTaskStatus(state, action.meta.arg, 'set_stream_add_error', action.payload.payload);
                 }
 
             }
@@ -549,12 +567,12 @@ const tasksSlice = createSlice({
                     state.addMessage = 'Success';
                 } else if (action.payload.status_code === 500) {
                     state.addStatus = 'error'
-                    if (action.payload.data.data){
+                    if (action.payload.data.data) {
                         state.addMessage = JSON.stringify(action.payload.data.data);
-                    }else{
+                    } else {
                         state.addMessage = action.payload.message;
                     }
-                    
+
                 } else {
                     state.addStatus = 'error'
                     state.addMessage = 'Unknow error.';
@@ -593,12 +611,12 @@ const tasksSlice = createSlice({
                     state.updateMessage = 'Success';
                 } else if (action.payload.status_code === 500) {
                     state.updateStatus = 'error';
-                    if (action.payload.data.data){
+                    if (action.payload.data.data) {
                         state.updateMessage = JSON.stringify(action.payload.data.data);
-                    }else{
+                    } else {
                         state.updateMessage = action.payload.message;
                     }
-                    
+
                 } else {
                     state.updateStatus = 'error'
                     state.updateMessage = 'Unknow error.';
@@ -633,9 +651,9 @@ const tasksSlice = createSlice({
                     state.deleteStatus = 'success';
                 } else if (action.payload.status_code === 500) {
                     state.deleteStatus = 'error';
-                    if (action.payload.data.data){
+                    if (action.payload.data.data) {
                         state.deleteMessage = JSON.stringify(action.payload.data.data);
-                    }else{
+                    } else {
                         state.deleteMessage = action.payload.message;
                     }
                 } else {
@@ -673,14 +691,14 @@ const tasksSlice = createSlice({
                 log(action.payload)
                 if (action.payload.status_code === 200) {
                     state.exportStatus = 'success';
-                    const taskId=action.payload.data.uid;
-                    const taskObj=find(state.data, function(o) { return o.task_uid === taskId; });
-                    state.exportMessage = taskObj.task_name+ ' - ' +action.payload.data.status;
+                    const taskId = action.payload.data.uid;
+                    const taskObj = find(state.data, function (o) { return o.task_uid === taskId; });
+                    state.exportMessage = taskObj.task_name + ' - ' + action.payload.data.status;
                 } else if (action.payload.status_code === 500) {
                     state.exportStatus = 'error';
-                    if (action.payload.data.data){
+                    if (action.payload.data.data) {
                         state.exportMessage = JSON.stringify(action.payload.data.data);
-                    }else{
+                    } else {
                         state.exportMessage = action.payload.message;
                     }
                 } else {
@@ -718,14 +736,14 @@ const tasksSlice = createSlice({
                 log(action.payload)
                 if (action.payload.status_code === 200) {
                     state.importStatus = 'success';
-                    const taskId=action.payload.data.uid;
-                    const taskObj=find(state.data, function(o) { return o.task_uid === taskId; });
-                    state.importMessage = 'Import task' + ' - ' +action.payload.data.status;
+                    const taskId = action.payload.data.uid;
+                    const taskObj = find(state.data, function (o) { return o.task_uid === taskId; });
+                    state.importMessage = 'Import task' + ' - ' + action.payload.data.status;
                 } else if (action.payload.status_code === 500) {
                     state.importStatus = 'error';
-                    if (action.payload.data.data){
+                    if (action.payload.data.data) {
                         state.importMessage = JSON.stringify(action.payload.data.data);
-                    }else{
+                    } else {
                         state.importMessage = action.payload.message;
                     }
                 } else {
@@ -761,5 +779,5 @@ const tasksSlice = createSlice({
 
 });
 export const tasksActions = tasksSlice.actions;
-export const { resetError, setTaskDeleteMessage, setTaskStatus,resetExportStatus,resetImportStatus,resetDeleteTaskStatus,setMessageKey } = tasksSlice.actions;
+export const { resetError, setTaskDeleteMessage, setTaskStatus, resetExportStatus, resetImportStatus, resetDeleteTaskStatus, setMessageKey } = tasksSlice.actions;
 export default tasksSlice.reducer;
