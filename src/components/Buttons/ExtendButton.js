@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useImperativeHandle, forwardRef } from 'react';
 import { useSelector, useDispatch } from "react-redux";
+import OutsideClickHandler from 'react-outside-click-handler';
 import log from "../../utils/console";
 
 import { exportTask } from "../../store/tasks";
@@ -23,6 +24,7 @@ const ExtendButton = forwardRef((props, ref) => {
 
     const handleButtonClick = (event) => {
         event.stopPropagation();
+
         setShowExtendMenu(!showExtendMenu)
     };
 
@@ -63,7 +65,7 @@ const ExtendButton = forwardRef((props, ref) => {
         log('handle import click');
         setShowExtendMenu(false);
         props.onImport();
-        
+
     };
 
     useImperativeHandle(ref, () => ({
@@ -94,33 +96,51 @@ const ExtendButton = forwardRef((props, ref) => {
 
     return (
         <div style={{ position: 'relative', width: 32, height: 32 }}>
-            <div className={buttonClassName} onClick={handleButtonClick} style={{ position: 'absolute', left: 0 }}>
-                <Icon_More ></Icon_More>
+            <div className={buttonClassName} onClick={handleButtonClick} style={{ position: 'absolute', left: 0 }} name={`extendButton_${props.uuid}`} >
+                <Icon_More name={`extendButton_${props.uuid}`} ></Icon_More>
             </div>
 
             <Icon_More ></Icon_More>
             {
                 showExtendMenu ?
 
-                    <div className='my-extend-menu' style={{ position: 'absolute', left: -108, top: 32, zIndex: 5 }} onMouseLeave={(e) => setShowExtendMenu(false)}>
+                    // <div className='my-extend-menu' style={{ position: 'absolute', left: -108, top: 32, zIndex: 5 }} onMouseLeave={(e) => setShowExtendMenu(false)}>
+                    <OutsideClickHandler
+                        onOutsideClick={(evt) => {
+                          
+                            const actionName = evt.target.getAttribute('name');
+                          
+                            if (actionName!=null){
+                                const uuid=actionName.replace("extendButton_","");
+                                if (props.uuid!==uuid){
+                                    setShowExtendMenu(false);
+                                }
+                            }else{
+                                setShowExtendMenu(false);
+                            }
+        
+                        }}
+                    >
+                        <div className='my-extend-menu' style={{ position: 'absolute', left: -108, top: 32, zIndex: 5 }} >
 
-                        {
-                            (props.type === 1) &&
-                            <div className='my-extend-menu-item' onClick={handleExportClick}>
-                                Export
-                            </div>
+                            {
+                                (props.type === 1) &&
+                                <div className='my-extend-menu-item' onClick={handleExportClick}>
+                                    Export
+                                </div>
 
-                        }
+                            }
 
-                        {
-                            (props.type === 2) &&
-                            <div className='my-extend-menu-item' onClick={handleImportClick}>
-                                Import
-                            </div>
+                            {
+                                (props.type === 2) &&
+                                <div className='my-extend-menu-item' onClick={handleImportClick}>
+                                    Import
+                                </div>
 
-                        }
+                            }
 
-                    </div>
+                        </div>
+                    </OutsideClickHandler>
                     :
                     <></>
             }

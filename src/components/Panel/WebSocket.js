@@ -34,6 +34,8 @@ export const WebSocket = (props) => {
 
                 const myData = JSON.parse(lastMessage.data);
 
+                log('--- my data ---',myData)
+
                 if (myData.type!==undefined){
                     if (myData.type==="TEMP"){
                         const myTemp=myData.data[props.device].temperature;

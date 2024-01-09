@@ -879,6 +879,8 @@ body{
 
 }
 
+
+
 /* .my-source-input-text:focus + .my-source-input-tag {
    border-left: 0px !important;
    border-top:1px solid red!important;
@@ -1618,7 +1620,7 @@ input:checked+.my-toggle-slider:before {
 .my-extend-menu-item {
     width:138px;
     height:36px;
-    background-color: white;
+    background-color: #FAFAFD;
     padding: 8px 16px 7px 16px;
     color: #16272e;
     font-size:16px;

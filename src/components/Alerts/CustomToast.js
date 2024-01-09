@@ -30,11 +30,13 @@ const CustomToast = forwardRef((props, ref) => {
                         minHeight: 44,
                         color: 'white',
 
-                    }
+                    },
+                    closeOnClick: true,
+                    autoClose: (myType===2)?false:true,
                 });
             } else {
 
-                toast.update(myTaskId, { render: myMessage, icon: iconArr[myType] })
+                toast.update(myTaskId, { render: myMessage, icon: iconArr[myType],closeOnClick: true,autoClose: false,autoClose: (myType===2)?false:true})
             }
 
 
